@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
     <title>RegisterLogin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/style/login.css">
@@ -86,6 +87,30 @@
       <button id="signUpButton">Sign Up</button>
     </div>
 </div>
+  <script>
+// Chặn Zoom qua chuột (Ctrl + cuộn chuột)
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) {
+    e.preventDefault(); // Ngừng zoom khi người dùng nhấn Ctrl + cuộn chuột
+  }
+}, { passive: false });
+
+// Chặn phím tắt Ctrl + "+" và Ctrl + "-" từ cả thanh số và numpad
+document.addEventListener('keydown', function(e) {
+  const isCtrlPlus =
+    e.ctrlKey &&
+    (e.key === '=' || e.key === '+' || e.key === 'Add' || e.keyCode === 107); // Dấu + từ thanh số và numpad
+  const isCtrlMinus =
+    e.ctrlKey &&
+    (e.key === '-' || e.key === 'Subtract' || e.keyCode === 109); // Dấu - từ thanh số và numpad
+
+  if (isCtrlPlus || isCtrlMinus) {
+    e.preventDefault(); // Ngừng zoom khi nhấn Ctrl + "+" hoặc Ctrl + "-"
+  }
+}, { passive: false });
+
+
+  </script>
 
       <script src="/script/login.js"></script>
 </body>

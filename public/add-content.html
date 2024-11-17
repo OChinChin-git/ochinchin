@@ -2,8 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thêm Content</title>
+        <title>Thêm Content</title>
     <style>
       /* CSS để ẩn phần Feature hoặc Movie List tùy theo lựa chọn */
       .section {
@@ -290,7 +289,7 @@ tr.moving {
       <input type="text" name="featuredImgUrl" placeholder="Nhập URL Feature" required /><br />
       <label>Mô tả:</label><br />
       <textarea name="featuredDesc" placeholder = "Nhập mô tả" required></textarea><br />
-      <button type="submit">Lưu Feature</button>
+      <button type="submit" id="save-feature">Lưu Feature</button>
     </form>
   </div>
 
@@ -315,7 +314,7 @@ tr.moving {
         <!-- Các mục video sẽ được thêm vào đây, tạo bảng nếu cần -->
       </div>
     </div>
-    <button type="submit">Lưu Movie List</button>
+    <button type="submit" id="save-movieList">Lưu Movie List</button>
   </form>
 </div>
 
@@ -706,10 +705,13 @@ document
 
 // Xử lý gửi form để lưu Feature mới
 // Xử lý gửi form để lưu Feature mới
-document
-  .getElementById("new-feature-form")
-  .addEventListener("submit", (event) => {
-    event.preventDefault();
+document.getElementById("new-feature-form").addEventListener("submit", function(event) {
+  event.preventDefault(); // Ngừng hành động submit mặc định của form
+  
+  // Lấy nút submit đã được nhấn
+  const clickedButtonId = event.submitter ? event.submitter.id : null;
+  
+  if (clickedButtonId === "save-feature") {
 
     // Thu thập dữ liệu từ form Feature
     const formData = new FormData(event.target);
@@ -769,21 +771,20 @@ if (featureData.backgroundUrl) {
           input.value = "";
         });
       })
-      .catch((error) => console.error("Lỗi lưu Feature:", error));
+      .catch((error) => console.error("Lỗi lưu Feature:", error));}
   });
 
 
-// Xử lý gửi form để lưu Movie List mới
-document
-  .getElementById("new-movie-list-form")
-  .addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    // Thu thập dữ liệu từ form Movie List
+document.getElementById("new-movie-list-form").addEventListener("submit", function(event) {
+  event.preventDefault(); // Ngừng hành động submit mặc định của form
+  
+  // Lấy nút submit đã được nhấn
+  const clickedButtonId = event.submitter ? event.submitter.id : null;
+  
+  if (clickedButtonId === "save-movieList") {
+    // Xử lý khi nhấn nút "Lưu Movie List"
     const formData = new FormData(event.target);
     const movieListData = Object.fromEntries(formData.entries());
-
-    // Kiểm tra điều kiện tên Movie List
     if (
       !movieListData.movieListName || // Kiểm tra trống
       /\s/.test(movieListData.movieListName) || // Kiểm tra khoảng trắng
@@ -865,7 +866,7 @@ if (videoThumbnail) {
           videoItem.remove(); // Xóa hoàn toàn video item khỏi DOM
         });
       })
-      .catch((error) => console.error("Error:", error));
+   .catch((error) => console.error("Error:", error));}
   });
 
 
