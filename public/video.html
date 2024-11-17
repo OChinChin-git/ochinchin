@@ -73,8 +73,13 @@
 </div>
   </div>
   <script>
-// Lấy thông tin video từ localStorage
-const videoUrl = localStorage.getItem('videoUrl');
+// Lấy thông tin video từ localStorage hoặc từ URL
+function getVideoUrlFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('videoUrl');
+}
+
+const videoUrl = localStorage.getItem('videoUrl') || getVideoUrlFromUrl();
 const videoTitle = localStorage.getItem('videoTitle');
 const videoDesc = localStorage.getItem('videoDesc');
 
@@ -101,8 +106,8 @@ function convertPornhubToEmbedUrl(url) {
   return url; // Nếu không phải Pornhub URL, giữ nguyên URL ban đầu
 }
 
-// Kiểm tra và cập nhật thông tin video
-if (videoUrl) {
+// Cập nhật thông tin video
+function updateVideo(videoUrl) {
   const videoIframe = document.getElementById('video-iframe');
   let embedUrl = convertToEmbedUrl(videoUrl); // Xử lý URL YouTube trước
 
@@ -110,6 +115,15 @@ if (videoUrl) {
   embedUrl = convertPornhubToEmbedUrl(embedUrl); // Nếu là Pornhub, chuyển đổi thành URL nhúng
 
   videoIframe.src = embedUrl;  // Cập nhật nguồn video iframe
+
+  // Cập nhật URL trang
+  const newUrl = window.location.origin + window.location.pathname + "?videoUrl=" + encodeURIComponent(videoUrl);
+  window.history.pushState({ path: newUrl }, '', newUrl);
+}
+
+// Xử lý khi trang được tải và có URL video
+if (videoUrl) {
+  updateVideo(videoUrl);
 }
 
 if (videoTitle) {
