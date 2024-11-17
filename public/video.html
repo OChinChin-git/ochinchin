@@ -73,18 +73,41 @@
 </div>
   </div>
   <script>
-// Lấy thông tin video từ localStorage hoặc từ URL
+// Lấy video URL từ query string (nếu có)
 function getVideoUrlFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('videoUrl');
+  const encodedUrl = urlParams.get('videoUrl');
+  return encodedUrl ? decodeUrl(encodedUrl) : null;  // Giải mã URL nếu có
 }
 
-const videoUrl = localStorage.getItem('videoUrl') || getVideoUrlFromUrl();
+// Giải mã chuỗi Base64 trở lại thành URL
+function decodeUrl(encodedUrl) {
+  return atob(encodedUrl);  // Chuyển chuỗi Base64 về URL gốc
+}
+
+// Mã hóa URL thành chuỗi Base64
+function encodeUrl(url) {
+  return btoa(url);  // Chuyển URL thành Base64
+}
+
+// Lấy video URL từ query string (nếu có), nếu không có thì lấy từ `localStorage`
+function getVideoUrl() {
+  const videoUrlFromUrl = getVideoUrlFromUrl();
+  if (videoUrlFromUrl) {
+    // Nếu có video URL trong query string, trả về nó
+    return videoUrlFromUrl;
+  } else {
+    // Nếu không có trong query string, lấy từ `localStorage`
+    return localStorage.getItem('videoUrl');
+  }
+}
+
+// Khi trang tải lại, luôn luôn lấy video URL từ query string nếu có, hoặc lấy từ `localStorage`
+const videoUrl = getVideoUrl();
 const videoTitle = localStorage.getItem('videoTitle');
 const videoDesc = localStorage.getItem('videoDesc');
-
+// Chuyển đổi URL YouTube thành URL nhúng
 function convertToEmbedUrl(url) {
-  // Regex để khớp với các URL YouTube phổ biến, bao gồm youtube.com/live/
   const youtubeRegEx = /(?:https?:\/\/(?:www\.)?(?:youtube\.com\/(?:live\/|watch\?v=|embed\/|v\/|shorts\/|.*[?&]v=)|youtu\.be\/))([a-zA-Z0-9_-]{11})/;
   const match = url.match(youtubeRegEx);
   if (match && match[1]) {
@@ -99,7 +122,6 @@ function convertPornhubToEmbedUrl(url) {
   const pornhubMatch = url.match(pornhubRegEx);
   
   if (pornhubMatch && pornhubMatch[1]) {
-    // Lấy viewkey từ URL Pornhub và tạo URL nhúng
     const videoKey = pornhubMatch[1];
     return `https://www.pornhub.com/embed/${videoKey}`;  // Cập nhật URL nhúng cho Pornhub
   }
@@ -111,14 +133,18 @@ function updateVideo(videoUrl) {
   const videoIframe = document.getElementById('video-iframe');
   let embedUrl = convertToEmbedUrl(videoUrl); // Xử lý URL YouTube trước
 
-  // Xử lý URL Pornhub nếu có
   embedUrl = convertPornhubToEmbedUrl(embedUrl); // Nếu là Pornhub, chuyển đổi thành URL nhúng
-
   videoIframe.src = embedUrl;  // Cập nhật nguồn video iframe
 
-  // Cập nhật URL trang
-  const newUrl = window.location.origin + window.location.pathname + "?videoUrl=" + encodeURIComponent(videoUrl);
+  // Cập nhật URL trang bằng chuỗi Base64
+  const encodedUrl = encodeUrl(videoUrl);
+  const newUrl = window.location.origin + window.location.pathname + "?videoUrl=" + encodedUrl;
   window.history.pushState({ path: newUrl }, '', newUrl);
+
+  // Lưu lại videoUrl vào localStorage
+  localStorage.setItem('videoUrl', videoUrl);
+  localStorage.setItem('videoTitle', videoTitle || 'Default Title');
+  localStorage.setItem('videoDesc', videoDesc || 'Default Description');
 }
 
 // Xử lý khi trang được tải và có URL video
@@ -133,15 +159,12 @@ if (videoTitle) {
 if (videoDesc) {
   document.getElementById('video-description').textContent = videoDesc;  // Cập nhật mô tả
 }
-
+loadVideo();
 // Nếu có thông tin video cho featureData
 if (featureData && featureData.videoUrl) {
   let featureEmbedUrl = convertToEmbedUrl(featureData.videoUrl); // Chuyển đổi YouTube URL
-
-  // Chuyển đổi URL Pornhub nếu có
   featureEmbedUrl = convertPornhubToEmbedUrl(featureEmbedUrl); // Chuyển thành URL nhúng Pornhub nếu là Pornhub
 
-  // Cập nhật iframe của feature video
   const featureVideoIframe = document.getElementById('feature-video-iframe');
   featureVideoIframe.src = featureEmbedUrl;
 }
