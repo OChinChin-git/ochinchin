@@ -533,3 +533,24 @@ body {
   color: #45a100; /* Màu khi hover */
   transform: scale(1.2); /* Phóng to khi hover */
 }
+@media screen and (max-width: 1000px) {
+  /* Navbar */
+  .navbar-container {
+    padding: 0 20px; /* Giảm padding cho navbar */
+  }
+
+  .menu-container {
+    flex: 1; /* Giảm độ rộng menu-container (nếu cần) */
+  }
+
+  .menu-list-item {
+    padding: 4px 6px; /* Giảm padding cho các item trong menu */
+    font-size: 16px; /* Giảm kích thước chữ cho các item trong menu */
+  }
+
+
+  .sidebar i {
+    font-size: 22px; /* Giảm kích thước icon trên màn hình nhỏ */
+    margin: 12px 0;   /* Giảm khoảng cách giữa các icon */
+  }
+}
