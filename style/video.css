@@ -1,0 +1,106 @@
+/* Điều chỉnh lại container và các phần con */
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 50px); /* Trừ đi chiều rộng của sidebar */
+  margin-left: 60px;  /* Đảm bảo phần này không bị tràn qua sidebar */
+  height: calc(100vh - 50px); /* Trừ đi chiều cao thanh điều hướng (ví dụ 60px) */
+  box-sizing: border-box;
+}
+
+/* Phần chat chiếm ít không gian hơn */
+.chat {
+  flex: auto;  /* Giảm tỷ lệ flex để chat chiếm ít không gian hơn */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;  /* Giảm padding trong chat */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 50px);  /* Đảm bảo chiều cao phần chat không vượt quá màn hình */
+  overflow-y: auto; /* Nếu chat dài hơn, sẽ có thanh cuộn */
+  box-sizing: border-box; /* Đảm bảo không bị tràn */
+  max-width: 30%; /* Giới hạn chiều rộng tối đa của phần chat */
+}
+
+.chat h2 {
+  font-size: 20px; /* Giảm font size tiêu đề chat */
+  font-weight: bold;
+  margin-bottom: 8px; /* Giảm khoảng cách giữa tiêu đề chat và tin nhắn */
+}
+
+.chat .message {
+  margin-bottom: 12px; /* Giảm khoảng cách giữa các tin nhắn */
+}
+
+.chat .message .username {
+  font-weight: bold;
+  color: #333;
+}
+
+.chat .message .message-text {
+  font-size: 14px;
+  color: #555;
+}
+
+.video-container {
+  flex: 3;  /* Điều chỉnh tỷ lệ chiều rộng */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  box-sizing: border-box; /* Đảm bảo không bị tràn */
+  height: calc(100vh - 50px); /* Trừ đi chiều cao thanh điều hướng (ví dụ 60px) */
+  overflow: hidden;  /* Đảm bảo phần thừa không hiển thị */
+  margin-left:20px;
+}
+
+
+#video-iframe {
+  width: 100%;
+  height: 380px; /* Giảm chiều cao của video */
+  border-radius: 8px;
+  margin-bottom: 1px; /* Giảm khoảng cách giữa video và tiêu đề */
+}
+
+.video-title {
+  font-size: 20px; /* Giảm font size tiêu đề */
+  font-weight: bold;
+  color: #333;
+  margin: 1px 0;  /* Giảm khoảng cách giữa tiêu đề và mô tả */
+  color: #4dbf00
+}
+
+.video-description {
+  font-size: 14px;  /* Giảm font size mô tả */
+  color: #666;
+  line-height: 1.5;
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 8px;  /* Giảm padding trong mô tả */
+  display: inline-block;
+  max-width: 100%;
+  word-wrap: break-word;
+  margin-top: 1px;  /* Giảm khoảng cách giữa mô tả và phần còn lại */
+  
+  /* Giới hạn chiều cao và thêm thanh cuộn dọc nếu cần */
+  max-height: 50px;  /* Chiều cao tối đa của phần mô tả */
+  overflow-y: auto;   /* Thêm thanh cuộn dọc nếu nội dung dài hơn chiều cao */
+}
+
+/* Thiết lập layout cho màn hình nhỏ */
+@media (max-width: 768px) {
+  .content-container {
+    flex-direction: column;
+    gap: 5px; /* Giảm khoảng cách giữa các phần */
+  }
+
+  .video-container {
+    flex: 1;
+    height: 250px; /* Điều chỉnh lại chiều cao cho video */
+  }
+
+  .chat {
+    flex: 1;
+    height: 250px; /* Điều chỉnh lại chiều cao cho chat */
+    max-width: 100%; /* Đảm bảo chiều rộng chat không vượt quá màn hình nhỏ */
+  }
+}

@@ -1,0 +1,6 @@
+feature feature1
+feature newanime
+movie-list Dandadan
+movie-list Hentai
+movie-list Movie2
+movie-list Re-Zero
