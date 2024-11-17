@@ -3,20 +3,117 @@ const leftArrows = document.querySelectorAll(".arrow-left"); // Mũi tên trái
 const rightArrows = document.querySelectorAll(".arrow"); // Mũi tên phải
 const movieLists = document.querySelectorAll(".movie-list");
 
-document.addEventListener('contextmenu', function (e) {
-  e.preventDefault(); // Vô hiệu hóa chuột phải
+// document.addEventListener('contextmenu', function (e) {
+//   e.preventDefault(); // Ngăn menu chuột phải
+// });
+window.addEventListener('load', function () {
+  // Kiểm tra nếu DevTools đã được phát hiện trong phiên trước
+  const devToolsDetected = localStorage.getItem('devToolsDetected');
+  const devToolsDetectedTime = localStorage.getItem('devToolsDetectedTime'); // Lấy thời gian phát hiện
+
+  // Nếu đã phát hiện trong phiên trước và chưa hết thời gian 5 phút
+  if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) < 60*60*1000) {
+    let remainingTime = Math.max(0, 60*60 - Math.floor((Date.now() - devToolsDetectedTime) / 1000)); // Tính thời gian còn lại, 300s = 5 phút
+
+    // Hiển thị thông báo chặn
+    const message = `Bị chặn! Xem hentai và truy cập lại sau ${remainingTime} giây.`;
+
+    // Hiển thị thông báo
+    alert(message); 
+
+    // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
+    setTimeout(() => {
+      const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
+      window.location.href = 'https://ihentai.ac'; // Chuyển hướng khi hết thời gian
+
+      // Kiểm tra nếu trang không chuyển hướng thành công
+      setTimeout(() => {
+        if (window.location.href === originalUrl) {
+          // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
+          window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
+        }
+      }, 1000); // Kiểm tra sau 1 giây
+    }, 100); // Chờ 100ms sau alert() để tránh việc chuyển hướng bị chặn
+
+    return; // Dừng các bước tiếp theo để tránh tiếp tục tải trang
+  }
+
+  // Nếu đã phát hiện DevTools trước đó và thời gian đã quá 5 phút, reset trạng thái
+  if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) >= 60*60*1000) {
+    localStorage.removeItem('devToolsDetected');
+    localStorage.removeItem('devToolsDetectedTime');
+  }
+
+  // Theo dõi thay đổi kích thước cửa sổ
+  let devToolsOpened = false; // Trạng thái phát hiện DevTools trong phiên hiện tại
+  window.addEventListener('resize', function () {
+    if (!devToolsOpened && window.outerWidth - window.innerWidth > 200) {
+      devToolsOpened = true; // Đánh dấu DevTools đã mở
+      localStorage.setItem('devToolsDetected', 'true'); // Lưu trạng thái
+      localStorage.setItem('devToolsDetectedTime', Date.now()); // Lưu thời gian phát hiện
+
+      alert('Đừng zoom hoặc mở DevTools!');
+      const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
+      window.location.href = 'https://ihentai.ac'; // Chuyển hướng ngay lập tức nếu DevTools mở
+
+      // Kiểm tra nếu trang không chuyển hướng thành công
+      setTimeout(() => {
+        if (window.location.href === originalUrl) {
+          // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
+          window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
+        }
+      }, 1000); // Kiểm tra sau 1 giây
+    }
+  });
 });
 
+
+//
+//
+//
+//
+
 document.addEventListener('keydown', function (e) {
-  // Ngăn tổ hợp phím "Ctrl+U", "Ctrl+Shift+I", "F12"
-  if (
-    (e.ctrlKey && e.key === 'u') || // Ctrl+U
-    (e.ctrlKey && e.shiftKey && e.key === 'i') || // Ctrl+Shift+I
-    e.key === 'F12' // F12
-  ) {
-    e.preventDefault();
-  }
+  // Các tổ hợp phím cần ngăn
+  const forbiddenKeys = [
+    { ctrl: true, shift: true, key: 'I' }, // Ctrl+Shift+I
+    { ctrl: true, key: 'U' }, // Ctrl+U
+    { ctrl: true, shift: true, key: 'J' }, // Ctrl+Shift+J
+    { key: 'F12' } // F12
+  ];
+
+  forbiddenKeys.forEach((combo) => {
+    if (
+      (combo.ctrl && !e.ctrlKey) === false &&
+      (combo.shift && !e.shiftKey) === false &&
+      e.key.toLowerCase() === combo.key.toLowerCase()
+    ) {
+      e.preventDefault();
+    }
+  });
 });
+
+// Chặn Zoom qua chuột (Ctrl + cuộn chuột)
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) {
+    e.preventDefault(); // Ngừng zoom khi người dùng nhấn Ctrl + cuộn chuột
+  }
+}, { passive: false });
+
+// Chặn phím tắt Ctrl + "+" và Ctrl + "-" từ cả thanh số và numpad
+document.addEventListener('keydown', function(e) {
+  const isCtrlPlus =
+    e.ctrlKey &&
+    (e.key === '=' || e.key === '+' || e.key === 'Add' || e.keyCode === 107); // Dấu + từ thanh số và numpad
+  const isCtrlMinus =
+    e.ctrlKey &&
+    (e.key === '-' || e.key === 'Subtract' || e.keyCode === 109); // Dấu - từ thanh số và numpad
+
+  if (isCtrlPlus || isCtrlMinus) {
+    e.preventDefault(); // Ngừng zoom khi nhấn Ctrl + "+" hoặc Ctrl + "-"
+  }
+}, { passive: false });
+
 
 // Tải và chèn sidebar HTML vào .sidebar
 fetch("/views/sidebar.html")

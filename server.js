@@ -22,6 +22,10 @@ app.set('view engine', 'ejs');
 // cache
 // cache
 // cache
+app.use('/views', (req, res, next) => {
+  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
+  next();
+});
 app.use('/style/style.css', (req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
   next();
@@ -34,11 +38,8 @@ app.use('/script/animated.js', (req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
   next();
 });
+
 app.use('/script/app.js', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-app.use('/views', (req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
   next();
 });
@@ -134,8 +135,7 @@ const watchDataDir = () => {
 
 // Chạy hàm để theo dõi thư mục và cập nhật order.txt khi có thay đổi
 watchDataDir();
-// Route để lưu feature mới
-app.post('/save-feature', (req, res) => {
+app.post('/save-feature', async (req, res) => {
     const { featureName, title, videoUrl, backgroundUrl, featuredImgUrl, featuredDesc } = req.body;
 
     // Kiểm tra nếu thiếu bất kỳ trường quan trọng nào
@@ -155,66 +155,71 @@ app.post('/save-feature', (req, res) => {
         featuredDesc,
     };
 
-    // Kiểm tra nếu file đã tồn tại, nếu có thì thay thế
-    fs.exists(filePath, (exists) => {
-        if (exists) {
-            // File đã tồn tại, ghi đè nội dung
-            fs.writeFile(filePath, JSON.stringify(featureData, null, 2), (err) => {
-                if (err) return res.status(500).send('Lỗi ghi đè feature');
+    try {
+        // Kiểm tra xem file có tồn tại không
+        await fs.promises.access(filePath, fs.constants.F_OK);
+
+        // File đã tồn tại, ghi đè nội dung
+        await fs.promises.writeFile(filePath, JSON.stringify(featureData, null, 2));
+        
+  
+        res.send('Feature đã cập nhật thành công');
+    } catch (err) {
+        // Nếu file không tồn tại, tạo mới
+        if (err.code === 'ENOENT') {
+            try {
+                await fs.promises.writeFile(filePath, JSON.stringify(featureData, null, 2));
                 
-                // Cập nhật file order.txt
-                updateOrderFile('feature', featureName);
-                
-                res.send('Feature đã cập nhật thành công');
-            });
-        } else {
-            // Nếu không tồn tại, lưu mới
-            fs.writeFile(filePath, JSON.stringify(featureData, null, 2), (err) => {
-                if (err) return res.status(500).send('Lỗi lưu feature');
-                
-                // Cập nhật file order.txt
-                updateOrderFile('feature', featureName);
+    
                 
                 res.send('Feature đã lưu thành công');
-            });
+            } catch (writeError) {
+                res.status(500).send('Lỗi lưu feature');
+            }
+        } else {
+            res.status(500).send('Lỗi kiểm tra file');
         }
-    });
+    }
 });
 
-
-// Route để lưu movie list mới
-app.post('/save-movie-list', (req, res) => {
+app.post('/save-movie-list', async (req, res) => {
     const { movieListName, listName, movies } = req.body;
 
-    if (!movieListName) return res.status(400).send('Tên file là bắt buộc.');
+    // Kiểm tra nếu thiếu tên movie list
+    if (!movieListName) {
+        return res.status(400).send('Tên file là bắt buộc.');
+    }
 
     const validFileName = `m_${movieListName}.json`;
     const filePath = path.join(dataDir, validFileName);
 
-    // Kiểm tra nếu file đã tồn tại, nếu có thì thay thế
-    fs.exists(filePath, (exists) => {
-        if (exists) {
-            // File đã tồn tại, ghi đè nội dung
-            fs.writeFile(filePath, JSON.stringify({ listName, movies }), (err) => {
-                if (err) return res.status(500).send('Lỗi ghi đè movie list');
-                
-                // Cập nhật file order.txt
-                updateOrderFile('movie-list', movieListName);
+    // Tạo đối tượng movieListData để lưu vào file JSON
+    const movieListData = { listName, movies };
 
-                res.send('Movie List đã cập nhật thành công');
-            });
-        } else {
-            // Nếu không tồn tại, lưu mới
-            fs.writeFile(filePath, JSON.stringify({ listName, movies }), (err) => {
-                if (err) return res.status(500).send('Lỗi lưu movie list');
-                
-                // Cập nhật file order.txt
-                updateOrderFile('movie-list', movieListName);
+    try {
+        // Kiểm tra xem file có tồn tại không
+        await fs.promises.access(filePath, fs.constants.F_OK);
 
+        // File đã tồn tại, ghi đè nội dung
+        await fs.promises.writeFile(filePath, JSON.stringify(movieListData, null, 2));
+
+     
+        res.send('Movie List đã cập nhật thành công');
+    } catch (err) {
+        // Nếu file không tồn tại, tạo mới
+        if (err.code === 'ENOENT') {
+            try {
+                await fs.promises.writeFile(filePath, JSON.stringify(movieListData, null, 2));
+
+               
                 res.send('Movie List đã lưu thành công');
-            });
+            } catch (writeError) {
+                res.status(500).send('Lỗi lưu movie list');
+            }
+        } else {
+            res.status(500).send('Lỗi kiểm tra file');
         }
-    });
+    }
 });
 
 // Lấy danh sách tất cả các file JSON trong thư mục data
