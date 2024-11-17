@@ -1,0 +1,20 @@
+{
+  "name": "ochinchin",
+  "version": "1.0.0",
+  "description": "Mô tả về dự án của bạn",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1",
+    "dropbox": "^10.9.0",
+    "sortablejs": "^1.15.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

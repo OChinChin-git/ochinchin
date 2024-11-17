@@ -1,0 +1,42 @@
+.animated-title1 {
+    font-size: 1.6em; /* Kích thước chữ lớn */
+    animation: color-change 2s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+.animated-title2 {
+    font-size: 2.2em; /* Kích thước chữ lớn */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+    text-align: left; /* Căn giữa tiêu đề */
+    animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-title3 {
+    font-size: 1.8em; /* Kích thước chữ lớn */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+    text-align: center; /* Căn giữa tiêu đề */
+    animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-title4 {
+    font-size: 1em; /* Kích thước chữ lớn */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+    text-align: center; /* Căn giữa tiêu đề */
+    animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Hiệu ứng hoạt hình đổi màu */
+@keyframes color-change {
+0% {
+color: var(--color-1);
+}
+25% {
+color: var(--color-2);
+}
+50% {
+color: var(--color-3);
+}
+75% {
+color: var(--color-4);
+}
+100% {
+color: var(--color-1);
+}
+}

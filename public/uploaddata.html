@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Đã Tải Lên</title>
+    <style>
+       /* Toàn bộ trang */
+      body {
+
+          background-color: #121212; /* Màu nền tối */
+          color: #f5f5f5; /* Màu chữ sáng */
+      }
+
+
+      .container {
+          max-width: 800px; /* Tăng chiều rộng tối đa của container */
+          width: 90%; /* Đặt chiều rộng của container là 90% chiều rộng màn hình */
+          margin: 20px auto; /* Căn giữa container */
+          background: #1e1e1e; /* Màu nền tối cho container */
+          padding: 30px; /* Tăng padding để thêm không gian bên trong */
+          border-radius: 8px; /* Bo tròn góc */
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Tăng độ mờ cho hiệu ứng bóng */
+      }
+
+
+      * {
+          box-sizing: border-box; /* Đảm bảo chiều rộng và chiều cao tính cả padding và border */
+      }
+      h1 {
+        text-align: center;
+        color: #f5f5f5; /* Màu chữ sáng cho tiêu đề */
+      }
+      .category {
+          margin-top: 20px;
+          display: none; /* Ẩn tất cả mục */
+      }
+
+      table {
+          width: 100%; /* Giữ kích thước bảng cố định */
+          max-width: 600px; /* Giới hạn kích thước tối đa của bảng */
+          border-collapse: separate; /* Giữ viền ngoài */
+          border-spacing: 0; /* Xóa khoảng cách giữa các ô */
+          margin: 20px auto; /* Căn giữa bảng */
+          border: 4px solid #2196f3; /* Viền bảng dày hơn (4px) */
+          border-radius: 10px; /* Bo tròn góc bảng */
+          background-color: #1e1e1e; /* Thêm màu nền tối cho bảng */
+      }
+
+      th,
+      td {
+          padding: 2px; /* Giảm khoảng cách bên trong ô */
+          text-align: center; /* Căn giữa */
+          border: 2px solid #2196f3; /* Viền cho ô (dày hơn) */
+          font-size: 14px; /* Giảm kích thước chữ */
+          color: #f5f5f5; /* Màu chữ sáng cho các ô */
+      }
+
+      th {
+          background-color: #4caf50; /* Màu nền cho ô tiêu đề */
+          font-size: 16px; /* Giảm kích thước chữ */
+          padding: 2px; /* Giảm khoảng cách bên trong ô */
+      }
+
+      tr:nth-child(even) {
+          background-color: #2a2a2a; /* Màu nền cho hàng chẵn */
+      }
+
+      tr:nth-child(odd) {
+          background-color: #1e1e1e; /* Màu nền cho hàng lẻ */
+      }
+
+      tr:hover {
+          background-color: #333; /* Màu nền khi hover */
+      }
+
+      td.file-name,
+      td.file-link {
+        max-width: 100px; /* Giới hạn chiều rộng tối đa cho ô tên file và link */
+        overflow: hidden; /* Ẩn phần nội dung vượt quá */
+        white-space: nowrap; /* Ngăn không cho dòng xuống dòng */
+        text-overflow: ellipsis; /* Hiển thị "..." cho phần nội dung bị ẩn */
+        cursor: pointer; /* Hiển thị con trỏ chuột khi hover */
+      }
+      .table-title {
+          color: #4caf50; /* Màu tiêu đề sáng hơn để nổi bật trên nền tối */
+          margin-top: 20px; /* Khoảng cách phía trên tiêu đề */
+          margin-bottom: 15px; /* Khoảng cách phía dưới tiêu đề */
+          font-size: 1.3em; /* Kích thước chữ cho h2 nhỏ hơn so với h1 */
+          text-align: center; /* Căn giữa tiêu đề */
+          font-weight: bold; /* Làm đậm tiêu đề để nó nổi bật hơn */
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Thêm bóng chữ để tăng độ nổi bật */
+          animation: color-change 5s infinite; /* Thêm hiệu ứng hoạt hình cho h2 */
+      }
+      /* CSS cho modal */
+      #commonModal {
+          display: none; /* Ẩn modal ban đầu */
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0, 0, 0, 0.4); /* Màu nền tối với độ mờ */
+      }
+
+      .modal-content {
+          background-color: #1e1e1e; /* Màu nền tối cho modal */
+          margin: 15% auto;
+          padding: 10px;
+          border: 1px solid #888; /* Có thể giữ màu viền hoặc thay đổi thành màu sáng hơn */
+          width: 80%; /* Giới hạn chiều rộng modal */
+          max-width: 400px; /* Kích thước tối đa của modal */
+          max-height: 80vh; /* Kích thước tối đa chiều cao */
+          overflow-y: auto; /* Cuộn nếu cần */
+          border-radius: 8px; /* Bo góc cho modal */
+      }
+
+      #modalContent {
+          word-wrap: break-word; /* Cho phép xuống dòng */
+          overflow-wrap: break-word; /* Hỗ trợ cho các trình duyệt khác */
+          color: #f5f5f5; /* Màu chữ sáng để nổi bật trên nền tối */
+      }
+
+      #commonModal div {
+          width: auto; /* Chiều rộng tự động dựa trên nội dung */
+          max-width: 300; /* Giới hạn chiều rộng tối đa để không quá lớn */
+          min-width: 200px; /* Đặt chiều rộng tối thiểu để tránh quá hẹp */
+          height: auto; /* Chiều cao tự động dựa trên nội dung */
+          max-height: 8vh; /* Giới hạn chiều cao tối đa */
+          min-height: 160px;
+          overflow-y: auto; /* Hiển thị thanh cuộn nếu nội dung quá dài */
+          background-color: #1e1e1e; /* Màu nền tối cho phần nội dung */
+          border: 1px solid #555; /* Viền xám tối hơn để phù hợp với nền tối */
+          padding: 20px; /* Khoảng cách bên trong */
+          position: relative; /* Để đặt nút đóng */
+          color: #f5f5f5; /* Màu chữ sáng cho phần nội dung */
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 4px 6px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .navigation {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .toast {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px; /* Trừ chiều rộng của toast để căn giữa */
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+      }
+
+      .toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s; /* Thêm hiệu ứng fade */
+      }
+
+      @keyframes fadein {
+        from {
+          bottom: 0;
+          opacity: 0;
+        }
+        to {
+          bottom: 30px;
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeout {
+        from {
+          bottom: 30px;
+          opacity: 1;
+        }
+        to {
+          bottom: 0;
+          opacity: 0;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+      <div class="navbar">
+      <div class="navbar-container">
+        <div class="logo-container">
+          <h1 class="logo animated-title2">OChinChin</h1>
+        </div>
+        <div class="menu-container"></div>
+<div class="profile-container">
+  <img class="profile-picture" id="profilePicture"  alt="Profile Picture">
+  
+  <div class="profile-text-container" id="profileTextContainer">
+    <span class="profile-text">Profile</span>
+    <i class="fas fa-caret-down"></i>
+  </div>
+  
+  <div id="dropdownMenu" style="display: none;">
+    <div id="name">Name: <span id="loggedUserName"></span></div>
+    <div id="email">Email: <span id="loggedUserEmail"></span></div>
+    
+    <div class="button-container">
+      <button id="changeProfileButton">Change Profile</button> <!-- Thêm nút thay đổi -->
+      <button id="authButton">Login</button> <!-- Nút sẽ thay đổi thành "Logout" khi người dùng đã đăng nhập -->
+    </div>
+  </div>
+</div>
+      <div class="toggle"></div>
+      </div>
+    </div>
+
+    <div class="sidebar"></div>
+
+  <div class="container">
+    <div class="content-container" id="content-container">
+      <h1 class="animated-title">File Đã Tải</h1>
+
+      <div class="navigation">
+        <button onclick="showCategory('image')">Ảnh</button>
+        <button onclick="showCategory('audio')">Âm Thanh</button>
+        <button onclick="showCategory('video')">Video</button>
+        <button onclick="showCategory('other')">Các File Khác</button>
+      </div>
+
+      <div class="category" id="imageCategory">
+        <h2 class="table-title">Ảnh</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên File</th>
+              <th>Link</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody class="fileList" id="imageList"></tbody>
+        </table>
+      </div>
+
+      <div class="category" id="audioCategory">
+        <h2 class="table-title">Âm thanh</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên File</th>
+              <th>Link</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody class="fileList" id="audioList"></tbody>
+        </table>
+      </div>
+
+      <div class="category" id="videoCategory">
+        <h2 class="table-title">Video</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên File</th>
+              <th>Link</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody class="fileList" id="videoList"></tbody>
+        </table>
+      </div>
+
+      <div class="category" id="otherCategory">
+        <h2 class="table-title">File khác</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên File</th>
+              <th>Link</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody class="fileList" id="otherList"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="commonModal">
+      <div class="modal-content">
+        <span id="closeModal">&times;</span>
+        <div id="modalContent"></div>
+      </div>
+    </div>
+    </div>
+    
+    <script>
+// Hàm để tải danh sách file từ server
+function loadFileData() {
+  fetch("/uploads")
+    .then((response) => response.json())
+    .then((files) => {
+      const imageList = document.getElementById("imageList");
+      const audioList = document.getElementById("audioList");
+      const videoList = document.getElementById("videoList");
+      const otherList = document.getElementById("otherList");
+
+      // Xóa nội dung cũ
+      imageList.innerHTML = "";
+      audioList.innerHTML = "";
+      videoList.innerHTML = "";
+      otherList.innerHTML = "";
+
+      files.forEach((file) => {
+        const row = document.createElement("tr");
+
+        // Đảm bảo link có dạng https
+        const fileUrl = file.fileUrl.startsWith('https://') ? file.fileUrl : file.fileUrl.replace(/^http:\/\//i, 'https://');
+
+        row.innerHTML = `  
+              <td class="file-name">${file.fileName}</td>
+              <td class="file-link"><a href="${fileUrl}" target="_blank">${fileUrl}</a></td>
+              <td>
+                  <button onclick="copyToClipboard('${fileUrl}')">Copy</button>
+                  <button onclick="deleteFile('${file.fileName}')">Xóa</button>
+              </td>
+          `;
+
+        // Thêm sự kiện click cho tên file
+        row
+          .querySelector("td.file-name")
+          .addEventListener("click", () => {
+            const fileName = file.fileName;
+            document.getElementById(
+              "modalContent"
+            ).innerHTML = `${fileName}`;
+            document.getElementById("commonModal").style.display =
+              "block";
+          });
+
+        // Thêm sự kiện click cho link
+        row
+          .querySelector("td.file-link")
+          .addEventListener("click", () => {
+            const fileUrl = fileUrl; // Sử dụng URL đã điều chỉnh
+            document.getElementById(
+              "modalContent"
+            ).innerHTML = `${fileUrl}`;
+            document.getElementById("commonModal").style.display =
+              "block";
+          });
+
+        // Phân loại file theo loại MIME
+        const fileType = file.fileName.split(".").pop().toLowerCase();
+        if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
+          imageList.appendChild(row);
+        } else if (["mp3", "wav", "ogg"].includes(fileType)) {
+          audioList.appendChild(row);
+        } else if (["mp4", "avi", "mov"].includes(fileType)) {
+          videoList.appendChild(row);
+        } else {
+          otherList.appendChild(row);
+        }
+      });
+    })
+    .catch((error) => console.error("Có lỗi xảy ra:", error));
+}
+
+
+      // Đóng modal khi nhấp vào nút đóng
+      document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("commonModal").style.display = "none";
+      });
+
+      // Đóng modal khi nhấp ra ngoài modal
+      window.addEventListener("click", (event) => {
+        const modal = document.getElementById("commonModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+
+      // Hàm sao chép link vào clipboard
+      function copyToClipboard(link) {
+        navigator.clipboard
+          .writeText(link)
+          .then(() => {
+            alert("Đã sao chép link!");
+          })
+          .catch((err) => {
+            console.error("Có lỗi khi sao chép link:", err);
+          });
+      }
+
+      // Hàm hiển thị mục đã chọn và ẩn các mục còn lại
+      function showCategory(category) {
+        const categories = ["image", "audio", "video", "other"];
+        categories.forEach((cat) => {
+          const element = document.getElementById(`${cat}Category`);
+          element.style.display = cat === category ? "block" : "none";
+        });
+      }
+
+      // Tải danh sách file khi trang được tải
+      window.onload = () => {
+        loadFileData();
+        showCategory("");
+      };
+
+      function showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("show");
+        }, 100);
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+          document.body.removeChild(toast);
+        }, 3000);
+      }
+
+      function deleteFile(fileName) {
+        const confirmed = confirm(
+          `Bạn có chắc chắn muốn xóa file: ${fileName}?`
+        );
+        if (confirmed) {
+          fetch(`/delete/${fileName}`, { method: "DELETE" })
+            .then((response) => {
+              if (response.ok) {
+                showToast("File đã được xóa thành công!");
+                loadFileData();
+              } else {
+                showToast("Có lỗi xảy ra khi xóa file!");
+              }
+            })
+            .catch((error) => console.error("Có lỗi xảy ra:", error));
+        }
+      }
+
+    </script>
+          <script src="/script/app.js" defer></script>
+      <script src="/script/animated.js" defer></script>
+    <script type="module" src="/script/profile.js" defer></script>
+
+  </body>
+</html>
