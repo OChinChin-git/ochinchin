@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTools Checker</title>
+</head>
+<body>
+
+    <!-- Phần tử để hiển thị trạng thái -->
+    <div id="status">Chưa mở DevTools</div>
+
+    <script>
+        // Hàm onDevtoolsOpen để thay đổi trạng thái hiển thị trên trang và console
+        function onDevtoolsOpen() {
+            // Cập nhật nội dung của phần tử có id 'status' với thông báo 'opened'
+            document.getElementById('status').textContent = 'opened';
+
+            // Xóa các thông báo trong console sau một khoảng thời gian ngắn
+            setTimeout(console.clear.bind(console), 0);
+
+            // In thông báo vào console sau 10ms
+            setTimeout(() => {
+                console.log("%cDevtools is open!", 'color: red; font-weight: bold;');
+            }, 10);
+        }
+
+        // Giữ nguyên mã JavaScript của bạn
+        class devtoolsChecker extends Error {
+            toString() {
+                // Giữ nguyên hàm toString()
+            }
+
+            get message() {
+                // Gọi hàm onDevtoolsOpen() khi message được truy cập
+                onDevtoolsOpen();
+                return "Devtools đã được mở!";
+            }
+        }
+
+        // Gọi và tạo đối tượng devtoolsChecker, sẽ gọi phương thức get message
+        console.log(new devtoolsChecker());
+    </script>
+
+</body>
+</html>
