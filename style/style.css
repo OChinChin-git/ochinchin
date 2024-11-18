@@ -533,19 +533,45 @@ body {
   color: #45a100; /* Màu khi hover */
   transform: scale(1.2); /* Phóng to khi hover */
 }
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 845px) {
   /* Navbar */
   .navbar-container {
-    padding: 0 20px; /* Giảm padding cho navbar */
+    padding: 0 4px; /* Giảm padding cho navbar */
   }
 
   .menu-container {
-    flex: 1; /* Giảm độ rộng menu-container (nếu cần) */
+    flex: 0.1; /* Giảm độ rộng menu-container (nếu cần) */
   }
 
   .menu-list-item {
-    padding: 4px 6px; /* Giảm padding cho các item trong menu */
-    font-size: 16px; /* Giảm kích thước chữ cho các item trong menu */
+    padding: 2px 4px; /* Giảm padding cho các item trong menu */
+    font-size: 14px; /* Giảm kích thước chữ cho các item trong menu */
+  }
+  .profile-text{
+    font-size: 14px;
+  }
+
+  .sidebar i {
+    font-size: 22px; /* Giảm kích thước icon trên màn hình nhỏ */
+    margin: 12px 0;   /* Giảm khoảng cách giữa các icon */
+  }
+}
+@media screen and (max-width: 686px) {
+  /* Navbar */
+  .navbar-container {
+    padding: 0 4px; /* Giảm padding cho navbar */
+  }
+
+  .menu-container {
+    flex: 0.1; /* Giảm độ rộng menu-container (nếu cần) */
+  }
+.profile-text{
+    font-size: 10px;
+  }
+
+  .menu-list-item {
+    padding: 1px 2px; /* Giảm padding cho các item trong menu */
+    font-size: 10px; /* Giảm kích thước chữ cho các item trong menu */
   }
 
 
@@ -554,3 +580,12 @@ body {
     margin: 12px 0;   /* Giảm khoảng cách giữa các icon */
   }
 }
+@media screen and (max-width: 590px) {
+  .menu-container{
+    display: none;
+  }
+  .profile-text{
+    font-size: 18px;
+  }
+
+  }

@@ -1,5 +1,5 @@
-feature feature1
 feature newanime
+feature feature1
 movie-list Dandadan
 movie-list Hentai
 movie-list Movie2
