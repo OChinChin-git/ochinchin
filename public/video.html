@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
     <title>Watch Video</title>
   <link rel="stylesheet" href="/style/video.css">
+  <link rel="stylesheet" href="/style/animated.css">
   
       <link
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Sen:wght@400;700;800&display=swap"
@@ -48,12 +49,12 @@
   <div class="video-container">
     <!-- Iframe để nhúng video -->
     <iframe id="video-iframe" frameborder="0" allowfullscreen></iframe>
-    <div class="video-title" id="video-title">Video Title</div>
+    <div class="video-title animated1" id="video-title">Video Title</div>
     
   </div>
 
   <!-- Chat Container -->
-  <div class="chat">
+  <div class="chat" >
     <h2>Chat</h2>
     <!-- Example of chat message -->
     <div class="message">
@@ -66,20 +67,45 @@
     </div>
     <!-- Add more chat messages as needed -->
   </div>
-  <div class="overlay" id="overlay"></div>  <!-- Lớp nền mờ -->
-  <div class="notification" id="notification">
-    <p>Xoay ngang để xem!</p>
-  </div>
+
 </div>
   </div>
   <script>
-// Lấy thông tin video từ localStorage
-const videoUrl = localStorage.getItem('videoUrl');
+// Lấy video URL từ query string (nếu có)
+function getVideoUrlFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedUrl = urlParams.get('videoUrl');
+  return encodedUrl ? decodeUrl(encodedUrl) : null;  // Giải mã URL nếu có
+}
+
+// Giải mã chuỗi Base64 trở lại thành URL
+function decodeUrl(encodedUrl) {
+  return atob(encodedUrl);  // Chuyển chuỗi Base64 về URL gốc
+}
+
+// Mã hóa URL thành chuỗi Base64
+function encodeUrl(url) {
+  return btoa(url);  // Chuyển URL thành Base64
+}
+
+// Lấy video URL từ query string (nếu có), nếu không có thì lấy từ `localStorage`
+function getVideoUrl() {
+  const videoUrlFromUrl = getVideoUrlFromUrl();
+  if (videoUrlFromUrl) {
+    // Nếu có video URL trong query string, trả về nó
+    return videoUrlFromUrl;
+  } else {
+    // Nếu không có trong query string, lấy từ `localStorage`
+    return localStorage.getItem('videoUrl');
+  }
+}
+
+// Khi trang tải lại, luôn luôn lấy video URL từ query string nếu có, hoặc lấy từ `localStorage`
+const videoUrl = getVideoUrl();
 const videoTitle = localStorage.getItem('videoTitle');
 const videoDesc = localStorage.getItem('videoDesc');
-
+// Chuyển đổi URL YouTube thành URL nhúng
 function convertToEmbedUrl(url) {
-  // Regex để khớp với các URL YouTube phổ biến, bao gồm youtube.com/live/
   const youtubeRegEx = /(?:https?:\/\/(?:www\.)?(?:youtube\.com\/(?:live\/|watch\?v=|embed\/|v\/|shorts\/|.*[?&]v=)|youtu\.be\/))([a-zA-Z0-9_-]{11})/;
   const match = url.match(youtubeRegEx);
   if (match && match[1]) {
@@ -94,22 +120,34 @@ function convertPornhubToEmbedUrl(url) {
   const pornhubMatch = url.match(pornhubRegEx);
   
   if (pornhubMatch && pornhubMatch[1]) {
-    // Lấy viewkey từ URL Pornhub và tạo URL nhúng
     const videoKey = pornhubMatch[1];
     return `https://www.pornhub.com/embed/${videoKey}`;  // Cập nhật URL nhúng cho Pornhub
   }
   return url; // Nếu không phải Pornhub URL, giữ nguyên URL ban đầu
 }
 
-// Kiểm tra và cập nhật thông tin video
-if (videoUrl) {
+// Cập nhật thông tin video
+function updateVideo(videoUrl) {
   const videoIframe = document.getElementById('video-iframe');
   let embedUrl = convertToEmbedUrl(videoUrl); // Xử lý URL YouTube trước
 
-  // Xử lý URL Pornhub nếu có
   embedUrl = convertPornhubToEmbedUrl(embedUrl); // Nếu là Pornhub, chuyển đổi thành URL nhúng
-
   videoIframe.src = embedUrl;  // Cập nhật nguồn video iframe
+
+  // Cập nhật URL trang bằng chuỗi Base64
+  const encodedUrl = encodeUrl(videoUrl);
+  const newUrl = window.location.origin + window.location.pathname + "?videoUrl=" + encodedUrl;
+  window.history.pushState({ path: newUrl }, '', newUrl);
+
+  // Lưu lại videoUrl vào localStorage
+  localStorage.setItem('videoUrl', videoUrl);
+  localStorage.setItem('videoTitle', videoTitle || 'Default Title');
+  localStorage.setItem('videoDesc', videoDesc || 'Default Description');
+}
+
+// Xử lý khi trang được tải và có URL video
+if (videoUrl) {
+  updateVideo(videoUrl);
 }
 
 if (videoTitle) {
@@ -119,19 +157,25 @@ if (videoTitle) {
 if (videoDesc) {
   document.getElementById('video-description').textContent = videoDesc;  // Cập nhật mô tả
 }
-
+loadVideo();
 // Nếu có thông tin video cho featureData
 if (featureData && featureData.videoUrl) {
   let featureEmbedUrl = convertToEmbedUrl(featureData.videoUrl); // Chuyển đổi YouTube URL
-
-  // Chuyển đổi URL Pornhub nếu có
   featureEmbedUrl = convertPornhubToEmbedUrl(featureEmbedUrl); // Chuyển thành URL nhúng Pornhub nếu là Pornhub
 
-  // Cập nhật iframe của feature video
   const featureVideoIframe = document.getElementById('feature-video-iframe');
   featureVideoIframe.src = featureEmbedUrl;
 }
 
+window.onpopstate = function (event) {
+  // Kiểm tra nếu người dùng nhấn nút quay lại
+  if (event) {
+    window.location.href = '/'; // Chuyển hướng về trang "/"
+  }
+};
+
+// Đảm bảo trang hiện tại được thêm vào lịch sử
+history.pushState(null, '', window.location.href);
 
   </script>
       <script src="/script/app.js" defer></script>

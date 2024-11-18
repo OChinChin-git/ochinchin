@@ -22,6 +22,12 @@
     text-align: center; /* Căn giữa tiêu đề */
     animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
 }
+.animated1 {
+    font-size: 1.2em; /* Kích thước chữ lớn */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+    text-align: center; /* Căn giữa tiêu đề */
+    animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
 /* Hiệu ứng hoạt hình đổi màu */
 @keyframes color-change {
 0% {

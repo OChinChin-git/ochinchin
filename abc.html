@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Audio Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            width: 80%;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            background: #f9f9f9;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        li:hover {
+            background: #ececec;
+        }
+
+        .active {
+            background-color: #e0e0e0;
+        }
+
+        .time-display {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Thêm kiểu cho thanh âm lượng, thanh chỉnh thời gian phát, và tốc độ phát */
+        .volume-container, .seekbar-container, .speed-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .volume-label, .seekbar-label, .speed-label {
+            margin-right: 10px;
+        }
+
+        .volume-slider, .seekbar, .speed-input {
+            width: 200px;
+        }
+
+        .submit-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="content-container" id="content-container">
+        <h1>YouTube Audio Player</h1>
+        <div class="controls">
+            <button id="prevBtn">Bài trước</button>
+            <button id="playPauseBtn">Phát</button>
+            <button id="nextBtn">Bài tiếp theo</button>
+        </div>
+
+        <h3>Danh sách bài hát</h3>
+        <ul id="songList">
+            <!-- Danh sách bài hát sẽ được tự động thêm vào đây -->
+        </ul>
+
+        <div class="time-display">
+            <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+        </div>
+
+        <!-- Thanh điều chỉnh âm lượng -->
+        <div class="volume-container">
+            <span class="volume-label">Âm lượng:</span>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="100">
+        </div>
+
+        <!-- Thanh chỉnh thời gian phát -->
+        <div class="seekbar-container">
+            <span class="seekbar-label">Thời gian:</span>
+            <input type="range" id="seekbar" class="seekbar" min="0" max="100" value="0">
+        </div>
+
+        <!-- Ô nhập tốc độ phát và nút Submit -->
+        <div class="speed-container">
+            <span class="speed-label">Tốc độ:</span>
+            <input type="number" id="speedInput" class="speed-input" min="0.5" max="2" step="0.1" value="1">
+            <button id="submitSpeed" class="submit-btn">Đặt Tốc Độ</button>
+        </div>
+    </div>
+
+    <!-- Phần nhúng YouTube -->
+    <div id="audio-placeholder"></div>
+
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let currentYouTubePlayer = null;
+        let currentIndex = 0;
+        let songList = [];
+
+        // Lấy danh sách bài hát từ Google Sheets và chèn vào ul
+        async function fetchAndPopulateSongs() {
+            const response = await fetch("https://docs.google.com/spreadsheets/d/12QKYOMYG8K1zGiEjkDgXRxPPjDddPlPD4UoGbl4oF30/gviz/tq?tqx=out:json");
+            const data = await response.text();
+            const json = JSON.parse(data.substr(47).slice(0, -2)); // Xử lý chuỗi JSON
+            const rows = json.table.rows;
+            const songListElement = document.getElementById("songList");
+            songListElement.innerHTML = "";
+
+            rows.slice(1).forEach(row => {
+                const songTitle = row.c[0]?.v;
+                const songUrl = row.c[1]?.v;
+                if (songTitle && songUrl) {
+                    const embedUrl = convertToEmbedUrl(songUrl);
+                    const songItem = document.createElement("li");
+                    songItem.textContent = songTitle;
+                    songItem.setAttribute("data-src", embedUrl);
+                    songListElement.appendChild(songItem);
+                    songList.push(songItem);
+                }
+            });
+
+            if (songList.length === 0) {
+                console.error("Không có bài hát nào trong danh sách.");
+            }
+        }
+
+        // Chuyển đổi URL thành nhúng YouTube
+        function convertToEmbedUrl(url) {
+            const youtubeRegEx = /(?:https?:\/\/(?:www\.)?(?:youtube\.com\/(?:live\/|watch\?v=|embed\/|v\/|shorts\/|.*[?&]v=)|youtu\.be\/))([a-zA-Z0-9_-]{11})/;
+            const match = url.match(youtubeRegEx);
+            if (match && match[1]) {
+                return `https://www.youtube.com/embed/${match[1]}`;
+            }
+            return url;
+        }
+
+        // Khởi tạo YouTube Player
+        function playYouTubeAudio(embedUrl) {
+            if (currentYouTubePlayer) {
+                currentYouTubePlayer.destroy();
+            }
+            const videoId = embedUrl.split("/embed/")[1];
+            currentYouTubePlayer = new YT.Player('audio-placeholder', {
+                height: '0', 
+                width: '0',
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    modestbranding: 1,
+                    rel: 0
+                },
+                events: {
+                    onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        // Xử lý trạng thái video
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                updateTime();
+            }
+            if (event.data === YT.PlayerState.ENDED) {
+                playNextSong();
+            }
+        }
+
+        // Phát bài hát
+        function playSong(index) {
+            if (index < 0 || index >= songList.length) return;
+
+            currentIndex = index;
+            const song = songList[currentIndex];
+            const embedUrl = song.getAttribute("data-src");
+
+            if (embedUrl.includes("youtube.com/embed")) {
+                playYouTubeAudio(embedUrl);
+                highlightCurrentSong();
+            } else {
+                console.error("Invalid YouTube URL");
+            }
+        }
+
+        // Phát bài tiếp theo
+        function playNextSong() {
+            playSong((currentIndex + 1) % songList.length);
+        }
+
+        // Phát bài trước
+        function playPreviousSong() {
+            playSong((currentIndex - 1 + songList.length) % songList.length);
+        }
+
+        // Tạm dừng hoặc phát lại video
+        function togglePlayPause() {
+            if (!currentYouTubePlayer) {
+                const song = songList[currentIndex];
+                const embedUrl = song.getAttribute("data-src");
+                playYouTubeAudio(embedUrl); // Khởi tạo video khi nút play được nhấn lần đầu
+            } else {
+                const state = currentYouTubePlayer.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    currentYouTubePlayer.pauseVideo();
+                } else {
+                    currentYouTubePlayer.playVideo();
+                }
+            }
+        }
+
+        // Nổi bật bài hát đang phát
+        function highlightCurrentSong() {
+            const activeSong = songList[currentIndex];
+            songList.forEach(song => song.classList.remove("active"));
+            activeSong.classList.add("active");
+        }
+
+        // Cập nhật thời gian phát
+        function updateTime() {
+            if (currentYouTubePlayer) {
+                const currentTime = currentYouTubePlayer.getCurrentTime();
+                const totalTime = currentYouTubePlayer.getDuration();
+                document.getElementById("currentTime").textContent = formatTime(currentTime);
+                document.getElementById("totalTime").textContent = formatTime(totalTime);
+
+                const seekbar = document.getElementById("seekbar");
+                seekbar.value = (currentTime / totalTime) * 100;
+
+                setTimeout(updateTime, 1000);
+            }
+        }
+
+        // Định dạng thời gian
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${hours > 0 ? hours + ':' : ''}${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Điều chỉnh âm lượng
+        document.getElementById("volumeSlider").addEventListener("input", function() {
+            const volume = this.value / 100;
+            if (currentYouTubePlayer) {
+                currentYouTubePlayer.setVolume(volume * 100);
+            }
+        });
+
+        // Điều chỉnh thời gian phát
+        document.getElementById("seekbar").addEventListener("input", function() {
+            const seekTime = (this.value / 100) * currentYouTubePlayer.getDuration();
+            if (currentYouTubePlayer) {
+                currentYouTubePlayer.seekTo(seekTime);
+            }
+        });
+
+        // Điều chỉnh tốc độ phát qua nút Submit
+        document.getElementById("submitSpeed").addEventListener("click", function() {
+            const speed = parseFloat(document.getElementById("speedInput").value);
+            if (currentYouTubePlayer) {
+                currentYouTubePlayer.setPlaybackRate(speed);
+            }
+        });
+
+        // Sự kiện khi người dùng click vào bài hát trong danh sách
+        document.getElementById("songList").addEventListener("click", function(event) {
+            const clickedSong = event.target;
+            if (clickedSong.tagName === "LI") {
+                const index = Array.from(songList).indexOf(clickedSong);
+                playSong(index);
+            }
+        });
+
+        // Tự động hiển thị danh sách bài hát khi trang tải xong
+        window.addEventListener("load", fetchAndPopulateSongs);
+
+        // Các sự kiện cho nút điều khiển
+        document.getElementById("nextBtn").addEventListener("click", playNextSong);
+        document.getElementById("prevBtn").addEventListener("click", playPreviousSong);
+        document.getElementById("playPauseBtn").addEventListener("click", togglePlayPause);
+    </script>
+</body>
+</html>

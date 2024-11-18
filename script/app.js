@@ -23,6 +23,8 @@ window.addEventListener('load', function () {
 
     // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
     setTimeout(() => {
+      document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+
       const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
       window.location.href = 'https://ihentai.ac'; // Chuyển hướng khi hết thời gian
 
@@ -54,6 +56,8 @@ window.addEventListener('load', function () {
 
       alert('Đừng zoom hoặc mở DevTools!');
       const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
+      document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+
       window.location.href = 'https://ihentai.ac'; // Chuyển hướng ngay lập tức nếu DevTools mở
 
       // Kiểm tra nếu trang không chuyển hướng thành công
