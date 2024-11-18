@@ -48,6 +48,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  padding:4px 4px 0px;
   box-sizing: border-box; /* Đảm bảo không bị tràn */
   height: calc(100vh - 50px); /* Trừ đi chiều cao thanh điều hướng (ví dụ 60px) */
   overflow: hidden;  /* Đảm bảo phần thừa không hiển thị */

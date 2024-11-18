@@ -74,67 +74,35 @@ app.get("/video", (req, res) => res.sendFile(path.join(__dirname, "public/video.
 app.get("/data", (req, res) => res.sendFile(path.join(__dirname, "public/data.html")));
 
 
-const orderFilePath = path.join(dataDir, 'data/order.txt');
+const orderFilePath = path.join(dataDir, 'order.txt');
 // Hàm để ghi nội dung vào file order.txt
-const updateOrderFile = (entries) => {
+const readOrderFile = () => {
+    try {
+        const content = fs.readFileSync(orderFilePath, 'utf8').trim();
+        return content ? content.split('\n') : [];
+    } catch (err) {
+        console.error(`Lỗi đọc file order.txt: ${err}`);
+        return [];
+    }
+};
+
+// Hàm để ghi nội dung mới vào order.txt
+const writeOrderFile = (entries) => {
     const newContent = entries.join('\n') + '\n';
+    fs.writeFileSync(orderFilePath, newContent, 'utf8');
+    console.log('Đã cập nhật file order.txt.');
+};
 
-    // Ghi nội dung vào order.txt
-    fs.writeFile(orderFilePath, newContent, (err) => {
+const appendToOrderFile = (entry) => {
+    const line = `${entry}\n`; // Đảm bảo mỗi dòng kết thúc bằng '\n'
+    fs.appendFile(orderFilePath, line, (err) => {
         if (err) {
-            console.error(`Lỗi cập nhật file order.txt: ${err}`);
+            console.error(`Lỗi ghi vào order.txt: ${err}`);
         } else {
-            console.log('Đã cập nhật file order.txt');
+            console.log(`Đã thêm: "${entry}" vào order.txt`);
         }
     });
 };
-
-// Hàm để đọc tất cả các file JSON trong thư mục data/ và cập nhật vào order.txt
-const updateOrderFromJsonFiles = () => {
-    // Đọc danh sách các file trong thư mục data/
-    fs.readdir(dataDir, (err, files) => {
-        if (err) {
-            console.error(`Lỗi đọc thư mục data: ${err}`);
-            return;
-        }
-
-        // Lọc ra những file có đuôi .json
-        const jsonFiles = files.filter(file => path.extname(file) === '.json');
-
-        const orderEntries = [];
-
-        // Đọc và xử lý từng file JSON
-        jsonFiles.forEach((file) => {
-            const filePath = path.join(dataDir, file);
-
-            // Kiểm tra loại file và phân loại
-            if (file.startsWith('f_')) {
-                const name = file.slice(2, -5); // Lấy tên phần còn lại, bỏ "f_" và ".json"
-                orderEntries.push(`feature ${name}`);
-            } else if (file.startsWith('m_')) {
-                const name = file.slice(2, -5); // Lấy tên phần còn lại, bỏ "m_" và ".json"
-                orderEntries.push(`movie-list ${name}`);
-            }
-        });
-
-        // Cập nhật order.txt với các entry mới
-        updateOrderFile(orderEntries);
-    });
-};
-
-// Hàm để theo dõi sự thay đổi trong thư mục data/ và cập nhật order.txt khi có thay đổi
-const watchDataDir = () => {
-    fs.watch(dataDir, { encoding: 'utf-8' }, (eventType, filename) => {
-        if (eventType === 'rename') {
-            console.log(`Thay đổi trong thư mục data: ${filename}`);
-            // Cập nhật lại order.txt khi có thay đổi (thêm hoặc xóa file)
-            updateOrderFromJsonFiles();
-        }
-    });
-};
-
-// Chạy hàm để theo dõi thư mục và cập nhật order.txt khi có thay đổi
-watchDataDir();
 app.post('/save-feature', async (req, res) => {
     const { featureName, title, videoUrl, backgroundUrl, featuredImgUrl, featuredDesc } = req.body;
 
@@ -171,7 +139,9 @@ app.post('/save-feature', async (req, res) => {
                 await fs.promises.writeFile(filePath, JSON.stringify(featureData, null, 2));
                 
     
-                
+                // Chỉ cập nhật order.txt khi file được tạo mới
+                const orderEntry = `feature ${featureName}`;
+                appendToOrderFile(orderEntry);
                 res.send('Feature đã lưu thành công');
             } catch (writeError) {
                 res.status(500).send('Lỗi lưu feature');
@@ -211,7 +181,9 @@ app.post('/save-movie-list', async (req, res) => {
             try {
                 await fs.promises.writeFile(filePath, JSON.stringify(movieListData, null, 2));
 
-               
+               // Cập nhật order.txt sau khi tạo mới file
+                const orderEntry = `movie-list ${movieListName}`;
+                appendToOrderFile(orderEntry);
                 res.send('Movie List đã lưu thành công');
             } catch (writeError) {
                 res.status(500).send('Lỗi lưu movie list');
@@ -359,33 +331,49 @@ app.get('/data/:filename', (req, res) => {
 const PASSWORD = "ochinchin"; // Mật khẩu cần thiết để xóa
 // Route xóa file
 app.post('/delete-file', (req, res) => {
-  const { password, content, name } = req.body;
+    const { password, content, name } = req.body;
 
-  // Kiểm tra mật khẩu
-  if (password !== PASSWORD) {
-    return res.json({ success: false, message: "Mật khẩu sai" });
-  }
-
-  // Tạo tên file cần xóa dựa trên loại nội dung
-  let fileName = '';
-  if (content === 'feature') {
-    fileName = `f_${name}.json`;
-  } else if (content === 'movie-list') {
-    fileName = `m_${name}.json`;
-  } else {
-    return res.json({ success: false, message: "Loại nội dung không hợp lệ" });
-  }
-
-  console.log(`Đang xóa file: ${fileName}`);  // Kiểm tra tên file
-
-  // Kiểm tra nếu file tồn tại và xóa
-  fs.unlink(`./data/${fileName}`, (err) => {
-    if (err) {
-      console.error(err);
-      return res.json({ success: false, message: "Không thể xóa file" });
+    // Kiểm tra mật khẩu
+    if (password !== PASSWORD) {
+        return res.json({ success: false, message: "Mật khẩu sai" });
     }
-    res.json({ success: true });
-  });
+
+    // Tạo tên file cần xóa dựa trên loại nội dung
+    let fileName = '';
+    let orderEntry = '';
+    if (content === 'feature') {
+        fileName = `f_${name}.json`;
+        orderEntry = `feature ${name}`;
+    } else if (content === 'movie-list') {
+        fileName = `m_${name}.json`;
+        orderEntry = `movie-list ${name}`;
+    } else {
+        return res.json({ success: false, message: "Loại nội dung không hợp lệ" });
+    }
+
+    console.log(`Đang xóa file: ${fileName}`); // Kiểm tra tên file
+
+    // Kiểm tra nếu file tồn tại và xóa
+    const filePath = path.join(dataDir, fileName);
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            return res.json({ success: false, message: "Không thể xóa file" });
+        }
+
+        // Xóa dòng tương ứng khỏi order.txt
+        try {
+            const currentOrder = readOrderFile();
+            const updatedOrder = currentOrder.filter(entry => entry !== orderEntry);
+            writeOrderFile(updatedOrder);
+
+            console.log(`Đã xóa ${orderEntry} khỏi order.txt.`);
+            res.json({ success: true });
+        } catch (error) {
+            console.error(`Lỗi cập nhật order.txt: ${error}`);
+            res.json({ success: false, message: "File đã bị xóa nhưng không thể cập nhật order.txt" });
+        }
+    });
 });
 // Khai báo biến để lưu trữ API Key
 let DROPBOX_ACCESS_TOKEN = fs.readFileSync("data/apikey.txt", "utf-8");
