@@ -6,70 +6,105 @@ const movieLists = document.querySelectorAll(".movie-list");
 // document.addEventListener('contextmenu', function (e) {
 //   e.preventDefault(); // Ngăn menu chuột phải
 // });
-window.addEventListener('load', function () {
-  // Kiểm tra nếu DevTools đã được phát hiện trong phiên trước
-  const devToolsDetected = localStorage.getItem('devToolsDetected');
-  const devToolsDetectedTime = localStorage.getItem('devToolsDetectedTime'); // Lấy thời gian phát hiện
-
-  // Nếu đã phát hiện trong phiên trước và chưa hết thời gian 5 phút
-  if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) < 60*60*1000) {
-    let remainingTime = Math.max(0, 60*60 - Math.floor((Date.now() - devToolsDetectedTime) / 1000)); // Tính thời gian còn lại, 300s = 5 phút
-
-    // Hiển thị thông báo chặn
-    const message = `Bị chặn! Xem hentai và truy cập lại sau ${remainingTime} giây.`;
-
-    // Hiển thị thông báo
-    alert(message); 
-
-    // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
-    setTimeout(() => {
-      document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
-
-      const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
-      window.location.href = 'https://ihentai.ac'; // Chuyển hướng khi hết thời gian
-
-      // Kiểm tra nếu trang không chuyển hướng thành công
-      setTimeout(() => {
-        if (window.location.href === originalUrl) {
-          // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
-          window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
-        }
-      }, 1000); // Kiểm tra sau 1 giây
-    }, 100); // Chờ 100ms sau alert() để tránh việc chuyển hướng bị chặn
-
-    return; // Dừng các bước tiếp theo để tránh tiếp tục tải trang
-  }
-
-  // Nếu đã phát hiện DevTools trước đó và thời gian đã quá 5 phút, reset trạng thái
-  if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) >= 60*60*1000) {
-    localStorage.removeItem('devToolsDetected');
-    localStorage.removeItem('devToolsDetectedTime');
-  }
-
-  // Theo dõi thay đổi kích thước cửa sổ
-  let devToolsOpened = false; // Trạng thái phát hiện DevTools trong phiên hiện tại
-  window.addEventListener('resize', function () {
-    if (!devToolsOpened && window.outerWidth - window.innerWidth > 200) {
-      devToolsOpened = true; // Đánh dấu DevTools đã mở
-      localStorage.setItem('devToolsDetected', 'true'); // Lưu trạng thái
-      localStorage.setItem('devToolsDetectedTime', Date.now()); // Lưu thời gian phát hiện
-
-      alert('Đừng zoom hoặc mở DevTools!');
-      const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
-      document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
-
-      window.location.href = 'https://ihentai.ac'; // Chuyển hướng ngay lập tức nếu DevTools mở
-
-      // Kiểm tra nếu trang không chuyển hướng thành công
-      setTimeout(() => {
-        if (window.location.href === originalUrl) {
-          // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
-          window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
-        }
-      }, 1000); // Kiểm tra sau 1 giây
+// Tạo lớp devtoolsChecker để phát hiện DevTools và thay đổi trạng thái
+class devtoolsChecker extends Error {
+    toString() {
+        // Trả về thông báo lỗi mặc định khi gọi toString()
+        return "DevTools đã được phát hiện!";
     }
-  });
+
+    get message() {
+        // Phát hiện DevTools và gọi hàm onDevtoolsOpen()
+        onDevtoolsOpen();
+        return "DevTools đã được mở!";
+    }
+}
+
+// Biến toàn cục để theo dõi trạng thái DevTools
+let devToolsOpened = false;
+
+window.addEventListener('load', function () {
+    // Kiểm tra nếu DevTools đã được phát hiện trong phiên trước
+    const devToolsDetected = localStorage.getItem('devToolsDetected');
+    const devToolsDetectedTime = localStorage.getItem('devToolsDetectedTime'); // Lấy thời gian phát hiện
+
+    // Nếu đã phát hiện trong phiên trước và chưa hết thời gian 1 giờ (3600 giây)
+    if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) < 10*365*24*60*60*1000) {
+        let remainingSeconds = Math.max(0, 10*365*24*60*60 - Math.floor((Date.now() - devToolsDetectedTime) / 1000));
+
+// Tính toán các đơn vị thời gian
+let years = Math.floor(remainingSeconds / (365*24*60*60)); // Tính năm
+remainingSeconds -= years * (365*24*60*60);
+
+let days = Math.floor(remainingSeconds / (24*60*60)); // Tính ngày
+remainingSeconds -= days * (24*60*60);
+
+let hours = Math.floor(remainingSeconds / (60*60)); // Tính giờ
+remainingSeconds -= hours * (60*60);
+
+let minutes = Math.floor(remainingSeconds / 60); // Tính phút
+remainingSeconds -= minutes * 60;
+
+let seconds = remainingSeconds; // Giây còn lại
+
+// Hiển thị thông báo chặn với thời gian còn lại
+const message = `Bị ban 10 năm r nhé cu 😞! Xem hentai và truy cập lại sau :`;
+const message1 = `${years} year ${days} day / ${hours}h${minutes}m${seconds} s.`;
+
+
+        // Hiển thị thông báo
+       // Hiển thị thông báo với các giá trị
+alert(message + `\n` + message1);
+
+        // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
+        setTimeout(() => {
+            document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+
+            const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
+            window.location.href = 'https://ihentai.ac'; // Chuyển hướng đến trang khác
+
+            // Kiểm tra nếu trang không chuyển hướng thành công
+            setTimeout(() => {
+                if (window.location.href === originalUrl) {
+                    // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
+                    window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
+                }
+            }, 1000); // Kiểm tra sau 1 giây
+        }, 100); // Chờ 100ms sau alert() để tránh việc chuyển hướng bị chặn
+
+        return; // Dừng các bước tiếp theo để tránh tiếp tục tải trang
+    }
+
+    // Nếu đã phát hiện DevTools trước đó và thời gian đã quá 1 giờ, reset trạng thái
+    if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) >= 60*60*1000) {
+        localStorage.removeItem('devToolsDetected');
+        localStorage.removeItem('devToolsDetectedTime');
+    }
+
+
+    // Kiểm tra DevTools ngay khi đối tượng devtoolsChecker được tạo ra
+    console.log(new devtoolsChecker());
 });
+
+// Hàm onDevtoolsOpen() được gọi khi DevTools mở
+function onDevtoolsOpen() {
+    document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+    devToolsOpened = true; // Đánh dấu DevTools đã mở
+            localStorage.setItem('devToolsDetected', 'true'); // Lưu trạng thái
+            localStorage.setItem('devToolsDetectedTime', Date.now()); // Lưu thời gian phát hiện
+
+            alert('Đừng mở DevTools!');    // Xóa toàn bộ console sau một khoảng thời gian ngắn
+    setTimeout(console.clear.bind(console), 0);
+
+    // In ra thông báo "Devtools is open!" vào console
+    setTimeout(() => {
+        console.log("%cDevtools is open!", 'color: red; font-weight: bold;');
+    }, 10);
+
+    // Chuyển hướng người dùng đến trang khác khi DevTools mở
+    window.location.href = 'https://ihentai.ac'; // Thực hiện chuyển hướng
+}
+
 
 
 //
