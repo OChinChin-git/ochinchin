@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "ochinchin"
+  },
+  "targets": {
+    "thanhchimbe-d29a4": {
+      "hosting": {
+        "ochinchin": [
+          "ochinchin"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

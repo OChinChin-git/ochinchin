@@ -1,4 +1,4 @@
-
+ 
 const leftArrows = document.querySelectorAll(".arrow-left"); // Mũi tên trái
 const rightArrows = document.querySelectorAll(".arrow"); // Mũi tên phải
 const movieLists = document.querySelectorAll(".movie-list");
@@ -178,22 +178,22 @@ fetch("/views/sidebar.html")
         homeItem.classList.add('active'); 
       }
     } 
-    if (currentPage === "/upload/") {
+    if (currentPage === "/upload") {
       if (uploadItem) {
         uploadItem.classList.add('active'); 
       }
     } 
-    if (currentPage === "/edm/") {
+    if (currentPage === "/edm") {
       if (edmItem) {
         edmItem.classList.add('active');
       }
     } 
-      if (currentPage === "/video/") {
+      if (currentPage === "/video") {
       if (videoItem) {
         videoItem.classList.add('active'); 
       }
     } 
-        if (currentPage === "/data/" || currentPage === "/data/uploadData") {
+        if (currentPage === "/data" || currentPage === "/data/uploadData") {
   if (dataItem) {
     dataItem.classList.add('active'); 
   }
@@ -204,13 +204,13 @@ fetch("/views/sidebar.html")
     //click
     if (edmItem) {
       edmItem.addEventListener('click', function() {
-        window.location.href = '/edm/';
+        window.location.href = '/edm';
       });
     }
     // Đăng ký sự kiện click cho các phần tử
     if (uploadItem) {
      uploadItem.addEventListener('click', function() {
-        window.location.href = '/upload/';
+        window.location.href = '/upload';
       });
     }
     if (homeItem) {
@@ -220,7 +220,7 @@ fetch("/views/sidebar.html")
     }
   if (dataItem) {
       dataItem.addEventListener('click', function() {
-        window.location.href = '/data/';
+        window.location.href = '/data';
       });
     }
       // Sự kiện khi nhấn vào phần tử có id là "search"
@@ -274,19 +274,19 @@ fetch("/views/toggle.html")
         homeItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-    if (currentPage === "/edm/") {
+    if (currentPage === "/edm") {
       const edmItem = document.getElementById('edm');
       if (edmItem) {
         edmItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-    if (currentPage === "/content/") {
+    if (currentPage === "/content") {
       const contentItem = document.getElementById('content');
       if (contentItem) {
         contentItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-        if (currentPage === "/data/") {
+        if (currentPage === "/data") {
       const dataItem = document.getElementById('data');
       if (dataItem) {
         dataItem.classList.add('active'); // Thêm class 'active' cho Home
@@ -296,13 +296,13 @@ fetch("/views/toggle.html")
       const filedata = document.getElementById('data');
       if (filedata) {
         filedata.addEventListener('click', function() {
-          window.location.href = '/data/';
+          window.location.href = '/data';
         });
       }
           const edm = document.getElementById('edm');
       if (edm) {
         edm.addEventListener('click', function() {
-          window.location.href = '/edm/';
+          window.location.href = '/edm';
         });
       }
     const kimochi = document.getElementById('kimochi');
@@ -321,7 +321,7 @@ if (kimochi) {
      const content = document.getElementById('content');
     if (content) {
         content.addEventListener('click', function() {
-          window.location.href = '/content/';
+          window.location.href = '/content';
         });
       }
   })
