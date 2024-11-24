@@ -10,7 +10,8 @@
       }
 
       #feature-section.active,
-      #movie-list-section.active {
+      #movie-list-section.active,
+      #video-manager-section.active{
         display: block;
       }
 /* Cấu trúc cơ bản */
@@ -48,12 +49,13 @@ label {
     color: #85C1E9;
 }
       
-      
+
 
 input[type="text"],
 input[type="url"],
 textarea {
-    width: calc(100% - 120px); /* Làm cho input gần với label */
+    width: calc(100% - 30px); /* Làm cho input gần với label */
+    max-width:500px;
     padding: 8px;
     margin-bottom: 8px;
     border: 1px solid #ccc;
@@ -152,39 +154,7 @@ select {
     background-color: #e67e22;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
 
-    h1 {
-        font-size: 1.8rem;
-        text-align: center;
-    }
-
-    .section {
-        padding: 12px;
-    }
-
-    input[type="text"],
-    input[type="url"],
-    textarea,
-    select {
-        width: 100%;
-        font-size: 0.9rem;
-    }
-
-    button {
-        width: 100%;
-    }
-
-    #movie-list-table,
-    #order-table {
-        width: 100%;
-        font-size: 0.9rem;
-    }
-}
 
 /* Tạo hiệu ứng cho form khi tải */
 input:focus,
@@ -212,6 +182,11 @@ tr {
 
 tr.moving {
   transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động cho hàng khi đổi vị trí */
+}
+.horizontal-container {
+  display: flex;
+  align-items: left; /* Căn giữa các phần tử theo chiều dọc */
+  gap: 10px; /* Khoảng cách giữa các phần tử */
 }
 
     </style>
@@ -257,48 +232,58 @@ tr.moving {
   <h1>Thêm Content</h1>
 
   <!-- Chọn loại nội dung -->
-  <div>
+  <div class="horizontal-container">
     <label for="content-type">Chọn loại nội dung:</label>
     <select id="content-type">
       <option value="feature">Feature</option>
       <option value="movie-list">Movie List</option>
       <option value="order">Sắp xếp</option>
       <option value="delete">Delete-content</option>
+      <option value="add-video">Video</option>
     </select>
   </div>
 
-  <!-- Bảng Feature -->
   <div id="feature-section" class="section">
-    <h2>Feature</h2>
-    <label for="select-feature">Chọn Feature:</label>
-    <select id="select-feature">
-      <!-- Tùy chọn sẽ được nạp từ file JSON có sẵn -->
-    </select>
-    <button id="load-feature">Tải Feature</button>
+  <h2>Feature</h2>
+  <label for="select-feature">Chọn Feature:</label>
+  <select id="select-feature">
+    <!-- Tùy chọn sẽ được nạp từ Firestore -->
+  </select>
+  <button id="load-feature">Tải Feature</button>
 
-    <form id="new-feature-form">
-      <label>Tên file Feature:</label><br />
-      <input type="text" name="featureName" placeholder="feature-name" required /><br />
-      <label>Title:</label><br />
-      <input type="text" name="title" placeholder="Nhập Feature title" required /><br />
-      <label>URL Video:</label><br />
-      <input type="text" name="videoUrl" placeholder="Nhập URL video" required /><br />
-      <label>URL hình nền:</label><br />
-      <input type="text" name="backgroundUrl" placeholder="Nhập URL hình nền " required /><br />
-      <label>URL hình Feature:</label><br />
-      <input type="text" name="featuredImgUrl" placeholder="Nhập URL Feature" required /><br />
-      <label>Mô tả:</label><br />
-      <textarea name="featuredDesc" placeholder = "Nhập mô tả" required></textarea><br />
-      <button type="submit" id="save-feature">Lưu Feature</button>
-    </form>
-  </div>
+  <form id="new-feature-form">
+    <label>Tên file Feature:</label><br />
+    <input type="text" name="featureName" id="featureName" placeholder="feature-name" required /><br />
+    <label>Title:</label><br />
+    <input type="text" name="title" id="title" placeholder="Nhập Feature title" required /><br />
+    
+    <label>Chọn video :</label><br />
+    <select id="video-dropdown">
+      <option value="">-- Chọn video --</option>
+      <!-- Tùy chọn video sẽ được thêm bằng JavaScript -->
+    </select>
+    <br />
+
+    <label>URL Video:</label><br />
+    <input type="text" name="featureVideoUrl" id="video-url" placeholder="Nhập URL video" required /><br />
+    
+    <label>URL hình nền:</label><br />
+    <input type="text" name="backgroundUrl" id="backgroundUrl" placeholder="Nhập URL hình nền" required /><br />
+    <label>URL hình Feature:</label><br />
+    <input type="text" name="featuredImgUrl" id="featuredImgUrl" placeholder="Nhập URL Feature" required /><br />
+    <label>Mô tả:</label><br />
+    <input type="text" name="featuredDesc" id="featuredDesc" placeholder="Nhập mô tả" required/><br />
+    <button type="submit" id="save-feature">Lưu Feature</button>
+  </form>
+</div>
+
 
 <!-- Bảng Movie List -->
 <div id="movie-list-section" class="section">
   <h2>Movie List</h2>
   <label for="select-movie-list">Chọn Movie List:</label>
   <select id="select-movie-list">
-    <!-- Tùy chọn sẽ được nạp từ file JSON có sẵn -->
+    <!-- Tùy chọn sẽ được nạp từ Firestore -->
   </select>
   <button id="load-movie-list">Tải Movie List</button>
 
@@ -306,38 +291,63 @@ tr.moving {
     <label>Tên file Movie List:</label><br />
     <input type="text" name="movieListName" placeholder="movie-list-name" required /><br />
     <label>Tên danh sách Movie:</label><br />
-    <input type="text" name="listName" placeholder = "Nhập tên danh sách Movie" required /><br />
+    <input type="text" name="listName" placeholder="Nhập tên danh sách Movie" required /><br />
+    
     <div id="movies-container">
-      <h4>Movie List:</h4>
-      <button type="button" id="add-video">Thêm Movie</button>
-      <div id="movie-list-table">
-        <!-- Các mục video sẽ được thêm vào đây, tạo bảng nếu cần -->
-      </div>
+      <h3>Movie List:</h3>
+      <label for="select-existing-video">Chọn video từ danh sách:</label><br />
+      <select id="select-existing-video">
+        <!-- Tùy chọn video sẽ được thêm bằng JavaScript -->
+      </select>
+      <button type="button" id="add-to-list">Thêm Movie</button>
+      <table id="movie-list-table">
+    <thead>
+      <tr>
+        <th>Video ID</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody id="movie-list-table-body">
+      <!-- Các video đã chọn sẽ được thêm vào đây -->
+    </tbody>
+  </table>
     </div>
+
     <button type="submit" id="save-movieList">Lưu Movie List</button>
   </form>
 </div>
 
-<div class="video-item" style= "display:none">
-  <label>Tiêu đề video:</label><br />
-  <input type="text" name="videoTitle" placeholder="Nhập tiêu đề video" required /><br />
-  
-  <button type="button" class="remove-video">Xóa Video</button>
-  
-  <button type="button" class="toggle-details">Hiện/Ẩn Chi Tiết</button>
-  
-  <!-- Phần nhập mô tả, URL thumbnail, URL video, sẽ ẩn mặc định -->
-  <div class="video-details" style="display: none;">
+<!-- Bảng Video Manager -->
+<div id="video-manager-section" class="section">
+  <h2>Video</h2>
+
+  <!-- Dropdown để chọn video đã có -->
+  <label for="add-video-to-list">Chọn video :</label>
+  <select id="add-video-to-list">
+    
+  </select>
+  <button id="load-video">Tải Video</button><br /><br />
+
+<form id="new-video-form">
+  <div id="video-form">
+    <label>Tên Video:</label><br />
+    <input type="text" name="videoName" id="videoName" placeholder="Nhập tên video" required /><br />
+
+    <label>Tiêu đề video:</label><br />
+    <input type="text" name="videoTitle"  id="videoTitle" placeholder="Nhập tiêu đề video" /><br />
+
     <label>Mô tả:</label><br />
-    <textarea name="videoDescription" placeholder="Nhập mô tả video"></textarea><br />
-    
+    <input type="text" name="videoDescription" id="videoDescription" placeholder="Nhập mô tả video"/><br />
+
     <label>URL Thumbnail:</label><br />
-    <input type="url" name="videoThumbnail" placeholder="Nhập URL thumbnail" /><br />
-    
+    <input type="url" name="videoThumbnail"  id="videoThumbnail" placeholder="Nhập URL thumbnail" /><br />
+
     <label>URL Video:</label><br />
-    <input type="url" name="videoUrl" placeholder="Nhập URL video" /><br />
+    <input type="url" name="videoUrl" id="videoUrl" placeholder="Nhập URL video" /><br />
+
+    <button type="submit">Lưu Video</button>
   </div>
-  <hr />
+  </form>
 </div>
 
 
@@ -366,13 +376,16 @@ tr.moving {
     <select id="delete-content-type">
       <option value="feature">Feature</option>
       <option value="movie-list">Movie List</option>
+      <option value="video">Video</option>
     </select>
   </div>
 
   <!-- Nhập tên file cần xóa -->
   <div>
-    <label for="content-name">Nhập tên nội dung cần xóa:</label>
-    <input type="text" id="content-name" placeholder="Nhập tên nội dung cần xóa" />
+    <label for="content-name">Chọn nội dung cần xóa:</label>
+    <select id="content-list">
+    </select>
+
   </div>
 
   <button id="delete-content-btn">Xóa nội dung</button>
@@ -384,593 +397,15 @@ tr.moving {
     <button id="confirm-delete-btn">Xác nhận xóa</button>
   </div>
 </div>
+  <!-- Toast container, nơi sẽ chứa tất cả các thông báo -->
+<div id="toast-container"></div>
+
     </div>
     </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 
     <script>
-   document.addEventListener("DOMContentLoaded", () => {
-      const contentTypeSelect = document.getElementById("content-type");
-      const featureSection = document.getElementById("feature-section");
-      const movieListSection = document.getElementById("movie-list-section");
-
-      const selectMovieList = document.getElementById("select-movie-list");
-      const selectFeature = document.getElementById("select-feature");
-
-        // Đảm bảo 'content-type' có giá trị mặc định là 'feature'
-        if (contentTypeSelect.value === "") {
-          contentTypeSelect.value = "feature";
-        }
-
-        // Đảm bảo select-movie-list và select-feature có giá trị mặc định là 'new'
-        selectMovieList.innerHTML = '<option value="new">New</option>';
-        selectFeature.innerHTML = '<option value="new">New</option>';
-
-     
-
-      document.getElementById("content-type").addEventListener("change", (event) => {
-        const selectedType = event.target.value;
-        const orderSection = document.getElementById("order-content-section");
-
-        if (selectedType === "order") {
-          orderSection.style.display = "block";
-          loadOrderContent(); // Gọi hàm loadOrderContent để tải dữ liệu vào bảng
-        } else {
-          orderSection.style.display = "none";
-        }
-      });
-
-// Hàm tải dữ liệu vào bảng Order Content từ order.txt
-function loadOrderContent() {
-  fetch("/get-files-order")
-    .then(response => response.json())
-    .then(files => {
-      const tbody = document.getElementById("order-table-body");
-      tbody.innerHTML = ""; // Xóa các hàng cũ
-
-      // Thêm hàng cho từng file từ order.txt vào bảng
-      files.forEach(file => {
-        const row = document.createElement("tr");
-        row.draggable = true; // Cho phép kéo thả
-        row.innerHTML = `
-          <td>${file.content}</td>
-          <td>${file.name}</td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      addDragAndDropHandlers(); // Thêm chức năng kéo thả vào các hàng
-    })
-    .catch(error => console.error("Error:", error));
-}
-
-// Thêm sự kiện để đổi vị trí hàng khi nhấn
-function addDragAndDropHandlers() {
-  const rows = document.querySelectorAll("#order-table-body tr");
-  rows.forEach(row => {
-    row.addEventListener("click", rowClick);  // Thêm sự kiện click
-  });
-}
-
-let draggedRow = null;  // Lưu hàng đang được chọn
-
-// Khi nhấn vào một hàng
-function rowClick(event) {
-  const clickedRow = event.target.closest('tr');
-  
-  if (!draggedRow) {
-    // Lưu hàng đầu tiên khi nhấn
-    draggedRow = clickedRow;
-    draggedRow.style.opacity = 0.5;  // Giảm độ mờ của hàng đang chọn
-    draggedRow.classList.add('highlight');  // Thêm hiệu ứng nổi bật cho hàng đầu tiên
-  } else if (draggedRow !== clickedRow) {
-    // Khi nhấn vào hàng thứ 2, đổi vị trí nếu không phải hàng đầu tiên
-    const tbody = draggedRow.parentNode;
-    const rows = Array.from(tbody.children);
-    
-    // Xác định vị trí đúng cho hàng
-    if (rows.indexOf(clickedRow) < rows.indexOf(draggedRow)) {
-      tbody.insertBefore(draggedRow, clickedRow); // Di chuyển hàng lên trên
-    } else {
-      tbody.insertBefore(draggedRow, clickedRow.nextSibling); // Di chuyển hàng xuống dưới
-    }
-
-    // Sau khi di chuyển, thêm viền xanh cho hàng thứ 2 và ẩn viền xanh của hàng đầu tiên
-    clickedRow.classList.add('highlight');  // Thêm viền xanh cho hàng thứ 2
-    draggedRow.classList.remove('highlight');  // Ẩn viền xanh của hàng đầu tiên
-
-    draggedRow.style.opacity = 1;  // Khôi phục độ mờ của hàng sau khi thay đổi
-    
-    // Ẩn viền xanh ngay lập tức sau khi đổi vị trí
-    setTimeout(() => {
-      clickedRow.classList.remove('highlight');  // Ẩn viền xanh sau khi đổi xong
-    }, 200);  // Thời gian chờ 200ms trước khi ẩn viền xanh
-     
-    draggedRow = null;  // Đặt lại biến draggedRow sau khi hoàn thành
-  }
-}
-
-
-document.getElementById("save-order-btn").addEventListener("click", () => {
-  const filesOrder = Array.from(document.querySelectorAll("#order-table-body tr")).map(row => {
-    return {
-      content: row.cells[0].innerText,
-      name: row.cells[1].innerText
-    };
-  });
-
-  fetch("/save-file-order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ order: filesOrder }),
-  })
-    .then(response => response.text())
-    .then(data => {
-      alert("Thứ tự đã được lưu thành công!");
-      setTimeout(() => {
-        location.reload();  // Tải lại trang
-      }, 800); 
-    })
-    .catch(error => console.error("Error:", error));
-});
-
-
-     
-
-// Tải danh sách các movie list từ server và thêm vào select
-fetch("/movie-list")
-  .then((response) => response.json())
-  .then((data) => {
-    data.forEach((movieListName) => {
-      // Loại bỏ tiền tố 'm_' và phần mở rộng file
-      const cleanedMovieName = movieListName.replace(/^m_/, '').replace(/\.[^/.]+$/, '');
-
-      const option = document.createElement("option");
-      option.value = cleanedMovieName;
-      option.textContent = cleanedMovieName;
-      selectMovieList.appendChild(option);
-    });
-  })
-  .catch((error) =>
-    console.error("Lỗi tải danh sách movie list:", error)
-  );
-
-// Tải danh sách các feature từ server và thêm vào select
-fetch("/feature-list")
-  .then((response) => response.json())
-  .then((data) => {
-    data.forEach((featureName) => {
-      // Loại bỏ tiền tố 'f_' và phần mở rộng file
-      const cleanedFeatureName = featureName.replace(/^f_/, '').replace(/\.[^/.]+$/, '');
-
-      const option = document.createElement("option");
-      option.value = cleanedFeatureName;
-      option.textContent = cleanedFeatureName;
-      selectFeature.appendChild(option);
-    });
-  })
-  .catch((error) => console.error("Lỗi tải danh sách feature:", error));
-
-        // Hiển thị phần được chọn ngay khi trang tải
-        if (contentTypeSelect.value === "feature") {
-          featureSection.classList.add("active");
-          movieListSection.classList.remove("active");
-        } else if (contentTypeSelect.value === "movie-list") {
-          movieListSection.classList.add("active");
-          featureSection.classList.remove("active");
-        }
-
-        // Xử lý sự kiện khi chọn loại nội dung
-        contentTypeSelect.addEventListener("change", (event) => {
-          const selectedType = event.target.value;
-
-          // Ẩn cả hai phần trước
-          featureSection.classList.remove("active");
-          movieListSection.classList.remove("active");
-
-          // Hiển thị phần được chọn
-          if (selectedType === "feature") {
-            featureSection.classList.add("active");
-          } else if (selectedType === "movie-list") {
-            movieListSection.classList.add("active");
-          }
-        });
-
-document.getElementById("load-movie-list").addEventListener("click", () => {
-  const selectMovieList = document.getElementById("select-movie-list");
-  const selectedMovieList = selectMovieList.value;
-  const moviesContainer = document.getElementById("movies-container");
-
-  if (selectedMovieList === "new") {
-    // Làm trống các ô nhập liệu trong Movie List mà không làm mất phần label
-    document.querySelector("input[name='movieListName']").value = "";
-    document.querySelector("input[name='listName']").value = "";
-
-    // Xóa các video cũ trong container mà không xóa label
-    const movieInputs = moviesContainer.querySelectorAll('.video-item');
-    movieInputs.forEach(input => {
-      input.querySelector('input').value = '';  // Chỉ xóa giá trị ô nhập video
-      input.querySelector('textarea').value = ''; // Chỉ xóa mô tả video
-      input.querySelector('.video-details').style.display = 'none'; // Ẩn chi tiết video
-    });
-
-    alert("Các ô Movie List đã được làm trống.");
-  } else if (selectedMovieList) {
-    // Thêm tiền tố 'm_' và phần mở rộng '.json' vào tên movie list
-    const movieListNameWithPrefix = `m_${selectedMovieList}.json`;
-
-    fetch(`/load-movie-list/${movieListNameWithPrefix}`)
-      .then((response) => response.json())
-      .then((movieList) => {
-        // Cập nhật tên Movie List vào trường 'movieListName'
-        document.querySelector("input[name='movieListName']").value = selectedMovieList;
-
-        // Cập nhật tên danh sách vào trường 'listName'
-        document.querySelector("input[name='listName']").value = movieList.listName;
-
-        // Xóa các video cũ trong container mà không xóa label
-        const movieInputs = moviesContainer.querySelectorAll('.video-item');
-        movieInputs.forEach(input => {
-          input.querySelector('input').value = '';  // Chỉ xóa giá trị URL video
-          input.querySelector('textarea').value = ''; // Chỉ xóa mô tả video
-          input.querySelector('.video-details').style.display = 'none'; // Ẩn chi tiết video
-        });
-
-        // Cập nhật danh sách video vào form từ movieList
-        movieList.movies.forEach((movie) => {
-          const videoContainer = document.createElement("div");
-          videoContainer.classList.add('video-item');
-          videoContainer.style.display = 'block'; // Hiển thị video mới
-          videoContainer.innerHTML = `
-            <label for="videoTitle">Tiêu đề video:</label><br />
-            <input type="text" name="videoTitle" value="${movie.title}" placeholder="Nhập tiêu đề video" required /><br />
-            
-            <button type="button" class="remove-video">Xóa Video</button>
-            
-            <button type="button" class="toggle-details">Hiện/Ẩn Chi Tiết</button>
-            
-            <!-- Phần nhập mô tả, URL thumbnail, URL video, sẽ ẩn mặc định -->
-            <div class="video-details" style="display: none;">
-              <label for="videoDescription">Mô tả:</label><br />
-              <textarea name="videoDescription" placeholder="Nhập mô tả video">${movie.description}</textarea><br />
-              
-              <label for="videoThumbnail">URL Thumbnail:</label><br />
-              <input type="url" name="videoThumbnail" value="${movie.thumbnail}" placeholder="Nhập URL thumbnail" /><br />
-              
-              <label for="videoUrl">URL Video:</label><br />
-              <input type="url" name="videoUrl" value="${movie.url}" placeholder="Nhập URL video" /><br />
-            </div>
-            <hr />
-          `;
-          // Thêm video vào bảng
-          moviesContainer.appendChild(videoContainer);
-
-          // Xử lý sự kiện xóa video
-          videoContainer.querySelector(".remove-video").addEventListener("click", () => {
-            videoContainer.remove();
-          });
-
-          // Lắng nghe sự kiện toggle chi tiết video
-          videoContainer.querySelector(".toggle-details").addEventListener("click", function() {
-            const details = videoContainer.querySelector(".video-details");
-            details.style.display = (details.style.display === "none") ? "block" : "none";
-          });
-        });
-      })
-      .catch((error) => console.error("Lỗi tải Movie List:", error));
-  } else {
-    alert("Vui lòng chọn Movie List.");
-  }
-});
-
-// Khi người dùng chọn một Feature, tải dữ liệu của Feature đó
-document
-  .getElementById("load-feature")
-  .addEventListener("click", () => {
-    const selectFeature = document.getElementById("select-feature");
-    const selectedFeature = selectFeature.value;
-
-    if (selectedFeature === "new") {
-      // Làm trống các ô nhập liệu trong Feature
-      document.querySelector("input[name='featureName']").value = "";
-      document.querySelector("input[name='title']").value = "";
-      document.querySelector("input[name='videoUrl']").value = "";
-      document.querySelector("input[name='backgroundUrl']").value = "";
-      document.querySelector("input[name='featuredImgUrl']").value = "";
-      document.querySelector("textarea[name='featuredDesc']").value = "";
-      alert("Các ô Feature đã được làm trống.");
-    } else if (selectedFeature) {
-      const featureWithPrefix = `f_${selectedFeature}.json`;
-
-      // Tải dữ liệu từ server cho Feature đã chọn
-      fetch(`/load-feature/${featureWithPrefix}`)
-        .then((response) => response.json())
-        .then((feature) => {
-          // Cập nhật các trường trong form với dữ liệu từ feature
-          document.querySelector("input[name='featureName']").value = selectedFeature;
-          document.querySelector("input[name='title']").value = feature.title || "";
-          document.querySelector("input[name='videoUrl']").value = feature.videoUrl || "";
-          document.querySelector("input[name='backgroundUrl']").value = feature.backgroundUrl || "";
-          document.querySelector("input[name='featuredImgUrl']").value = feature.featuredImgUrl || "";
-          document.querySelector("textarea[name='featuredDesc']").value = feature.featuredDesc || "";
-        })
-        .catch((error) => console.error("Lỗi tải Feature:", error));
-    } else {
-      alert("Vui lòng chọn Feature.");
-    }
-  });
-
-// Xử lý gửi form để lưu Feature mới
-// Xử lý gửi form để lưu Feature mới
-document.getElementById("new-feature-form").addEventListener("submit", function(event) {
-  event.preventDefault(); // Ngừng hành động submit mặc định của form
-  
-  // Lấy nút submit đã được nhấn
-  const clickedButtonId = event.submitter ? event.submitter.id : null;
-  
-  if (clickedButtonId === "save-feature") {
-
-    // Thu thập dữ liệu từ form Feature
-    const formData = new FormData(event.target);
-    const featureData = Object.fromEntries(formData.entries());
-
-    // Kiểm tra điều kiện tên Feature
-    if (
-      !featureData.featureName || // Kiểm tra trống
-      /\s/.test(featureData.featureName) || // Kiểm tra khoảng trắng
-      /[<>.:"/\\|?*\x00-\x1F]/.test(featureData.featureName) // Kiểm tra ký tự không hợp lệ
-    ) {
-      alert("Tên file feature không hợp lệ");
-      return; // Dừng lại nếu tên không hợp lệ
-    }
-// Hàm kiểm tra và chuyển đổi URL thành thumbnail YouTube
-function getYouTubeThumbnail(url) {
-  const youtubePattern = /(?:youtube\.com\/(?:watch\?v=|embed\/|live\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-  const match = url.match(youtubePattern);
-  return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : url; // Nếu có video ID, trả về URL thumbnail, nếu không thì trả về URL gốc
-}
-
-// Kiểm tra và xử lý featuredImgUrl và backgroundUrl
-if (featureData.featuredImgUrl) {
-  featureData.featuredImgUrl = getYouTubeThumbnail(featureData.featuredImgUrl);
-}
-
-if (featureData.backgroundUrl) {
-  featureData.backgroundUrl = getYouTubeThumbnail(featureData.backgroundUrl);
-}
-
-// if (featureData.videoUrl) {
-//   // Kiểm tra nếu URL là của Pornhub (chấp nhận bất kỳ subdomain nào)
-//   const pornhubRegEx = /^https:\/\/(?:[a-zA-Z0-9-]+\.)?pornhub\.com\/view_video\.php\?viewkey=([a-zA-Z0-9_-]+)/;
-//   const pornhubMatch = featureData.videoUrl.match(pornhubRegEx);
-  
-//   if (pornhubMatch && pornhubMatch[1]) {
-//     // Lấy viewkey từ URL Pornhub và tạo URL nhúng
-//     const videoKey = pornhubMatch[1];
-//     featureData.videoUrl = `https://www.pornhub.com/embed/${videoKey}`;
-//   }
-// }
-
-    // Gửi dữ liệu Feature đến server
-    fetch("/save-feature", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(featureData),
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        alert(data); // Thông báo sau khi lưu thành công
-
-        // Xóa nội dung của các trường input và textarea sau khi lưu thành công
-        event.target.querySelectorAll("input[type='text'], textarea").forEach((input) => {
-          input.value = "";
-        });
-      })
-      .catch((error) => console.error("Lỗi lưu Feature:", error));}
-  });
-
-
-document.getElementById("new-movie-list-form").addEventListener("submit", function(event) {
-  event.preventDefault(); // Ngừng hành động submit mặc định của form
-  
-  // Lấy nút submit đã được nhấn
-  const clickedButtonId = event.submitter ? event.submitter.id : null;
-  
-  if (clickedButtonId === "save-movieList") {
-    // Xử lý khi nhấn nút "Lưu Movie List"
-    const formData = new FormData(event.target);
-    const movieListData = Object.fromEntries(formData.entries());
-    if (
-      !movieListData.movieListName || // Kiểm tra trống
-      /\s/.test(movieListData.movieListName) || // Kiểm tra khoảng trắng
-      /[<>.:"/\\|?*\x00-\x1F]/.test(movieListData.movieListName) // Kiểm tra ký tự không hợp lệ
-    ) {
-      alert("Tên file movie list không hợp lệ");
-      return; // Dừng lại nếu tên không hợp lệ
-    }
-
-    // Thu thập tất cả URL video trong movies-container
-    const movies = [];
-    document.querySelectorAll("#movies-container .video-item").forEach((videoItem) => {
-      const videoTitle = videoItem.querySelector("input[name='videoTitle']").value;
-      let videoUrl = videoItem.querySelector("input[name='videoUrl']").value;
-      let videoThumbnail = videoItem.querySelector("input[name='videoThumbnail']").value;
-      const videoDescription = videoItem.querySelector("textarea[name='videoDescription']").value;
-
-// Hàm kiểm tra và chuyển đổi URL thành thumbnail YouTube
-function getYouTubeThumbnail(url) {
-  const youtubePattern = /(?:youtube\.com\/(?:watch\?v=|embed\/|live\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-  const match = url.match(youtubePattern);
-  return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : url; // Nếu có video ID, trả về URL thumbnail, nếu không thì trả về URL gốc
-}
-
-// Kiểm tra và xử lý videoThumbnail nếu là URL YouTube
-if (videoThumbnail) {
-  videoThumbnail = getYouTubeThumbnail(videoThumbnail);
-}
-
-//             // Kiểm tra và xử lý videoUrl nếu là Pornhub
-//       if (videoUrl) {
-//         const pornhubRegEx = /^https:\/\/(?:[a-zA-Z0-9-]+\.)?pornhub\.com\/view_video\.php\?viewkey=([a-zA-Z0-9_-]+)/;
-//         const pornhubMatch = videoUrl.match(pornhubRegEx);
-        
-//         if (pornhubMatch && pornhubMatch[1]) {
-//           // Lấy viewkey từ URL Pornhub và tạo URL nhúng
-//           const videoKey = pornhubMatch[1];
-//           videoUrl = `https://www.pornhub.com/embed/${videoKey}`;  // Cập nhật URL nhúng
-//         }
-//       }
-
-      // Đẩy các video vào mảng
-      if (videoUrl) {
-        movies.push({
-          title: videoTitle,
-          url: videoUrl,
-          thumbnail: videoThumbnail,
-          description: videoDescription
-        });
-      }
-    });
-
-    // Thêm mảng movies vào dữ liệu gửi lên
-    movieListData.movies = movies;
-
-    // Gửi dữ liệu Movie List đến server
-    fetch("/save-movie-list", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(movieListData),
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        alert(data); // Thông báo sau khi lưu thành công
-
-        // Xóa nội dung của các trường input và textarea trong form Movie List
-        event.target.querySelectorAll("input[type='text']").forEach((input) => {
-          input.value = ""; 
-        });
-        event.target.querySelectorAll("textarea").forEach((textarea) => {
-          textarea.value = "";
-        });
-
-        // Xóa tất cả các video items trong container
-        const movieInputs = document.querySelectorAll("#movies-container .video-item");
-        movieInputs.forEach((videoItem) => {
-          videoItem.remove(); // Xóa hoàn toàn video item khỏi DOM
-        });
-      })
-   .catch((error) => console.error("Error:", error));}
-  });
-
-
-document.getElementById('add-video').addEventListener('click', function() {
-  // Lấy mẫu video ẩn từ div video-item
-  const videoTemplate = document.querySelector('.video-item');
-
-  // Clone mẫu video ẩn để tạo video mới
-  const videoContainer = videoTemplate.cloneNode(true);
-  videoContainer.style.display = 'block'; // Hiển thị video mới
-  
-  // Làm trống dữ liệu của các trường trong video mới
-  videoContainer.querySelector("input[name='videoTitle']").value = '';
-  videoContainer.querySelector("input[name='videoUrl']").value = '';
-  videoContainer.querySelector("input[name='videoThumbnail']").value = '';
-  videoContainer.querySelector("textarea[name='videoDescription']").value = '';
-
-  // Đảm bảo rằng chi tiết video được ẩn khi thêm video mới
-  const details = videoContainer.querySelector('.video-details');
-  details.style.display = 'none'; // Ẩn phần chi tiết của video mới
-
-  // Thêm video vào cuối cùng của movies-container
-  const moviesContainer = document.getElementById("movies-container");
-  moviesContainer.appendChild(videoContainer);
-
-  // Lắng nghe sự kiện xóa video
-  videoContainer.querySelector('.remove-video').addEventListener('click', function() {
-    videoContainer.remove();
-  });
-
-  // Lắng nghe sự kiện toggle chi tiết video
-  videoContainer.querySelector('.toggle-details').addEventListener('click', function() {
-    const details = videoContainer.querySelector('.video-details');
-    details.style.display = (details.style.display === 'none') ? 'block' : 'none';
-  });
-});
-// Lắng nghe khi người dùng thay đổi lựa chọn trong phần content-type
-document.getElementById("content-type").addEventListener("change", function() {
-  const contentType = this.value;
-  
-  // Kiểm tra nếu chọn "delete", hiển thị phần xóa nội dung
-  if (contentType === "delete") {
-    document.getElementById("delete-container").style.display = "block";  // Hiển thị phần xóa
-  } else {
-    document.getElementById("delete-container").style.display = "none";   // Ẩn phần xóa
-  }
-});
-
-// Lắng nghe sự kiện nhấn nút "Xóa nội dung"
-document.getElementById("delete-content-btn").addEventListener("click", function() {
-  const contentType = document.getElementById("delete-content-type").value;
-  const contentName = document.getElementById("content-name").value;
-
-  // Kiểm tra xem tên nội dung đã nhập chưa
-  if (!contentName) {
-    alert("Vui lòng nhập tên nội dung cần xóa.");
-    return;
-  }
-
-  // Hiển thị yêu cầu nhập mật khẩu
-  document.getElementById("password-container").style.display = "block";
-});
-
-document.getElementById("confirm-delete-btn").addEventListener("click", function() {
-  const password = document.getElementById("password").value;
-  const contentType = document.getElementById("delete-content-type").value;
-  const contentName = document.getElementById("content-name").value;
-
-  // Gửi yêu cầu xóa file lên server
-  const fileName = contentType === "feature" ? `f_${contentName}.json` : `m_${contentName}.json`;
-
-  fetch("/delete-file", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      password: password,         // Mật khẩu
-      content: contentType,       // Loại nội dung (feature/movie-list)
-      name: contentName           // Tên file
-    })
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert("Nội dung đã được xóa thành công.");
-
-        // Reset lại các trường sau khi xóa thành công
-        document.getElementById("content-name").value = "";  // Xóa tên nội dung
-        document.getElementById("password").value = "";     // Xóa mật khẩu
-        document.getElementById("delete-content-type").value = "feature";  // Reset loại nội dung về mặc định
-
-        // Ẩn phần nhập mật khẩu sau khi xóa thành công
-        document.getElementById("password-container").style.display = "none"; 
-      } else {
-        alert(data.message);  // Hiển thị thông báo lỗi từ server
-      }
-    })
-    .catch(error => {
-      console.error("Có lỗi xảy ra:", error);
-      alert("Lỗi khi xóa nội dung.");
-    });
-});
-
 
 const style = document.createElement('style');
 style.textContent = `
@@ -986,7 +421,7 @@ style.textContent = `
     position: absolute; /* Đặt vị trí tuyệt đối */
     top: 100%; /* Đặt nút xuống phía dưới ô nhập liệu */
     left: 0;
-    margin-top: 5px; /* Khoảng cách giữa ô nhập liệu và nút */
+    margin: 5px; /* Khoảng cách giữa ô nhập liệu và nút */
   }
 
   /* Cài đặt nút Copy/Paste */
@@ -994,7 +429,7 @@ style.textContent = `
     background-color: #007BFF;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 7px 10px;
     cursor: pointer;
     font-size: 14px;
     border-radius: 4px;
@@ -1011,6 +446,7 @@ cp-button {
   color: white;
   border: none;
   padding: 5px 10px;
+  margin:0px 4px;
   cursor: pointer;
   font-size: 14px;
   border-radius: 4px;
@@ -1164,11 +600,11 @@ observer.observe(document.body, {
   subtree: true,    // Quan sát toàn bộ cây DOM
 });
 
-      });
+    
     </script>
       <script src="/script/app.js" defer></script>
       <script src="/script/animated.js" defer></script>
     <script type="module" src="/script/profile.js" defer></script>
-
+<script type="module" src="/script/addContent.js" defer></script>
   </body>
 </html>
