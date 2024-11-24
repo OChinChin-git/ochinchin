@@ -1,109 +1,129 @@
- 
+function showToast(message, type = 'info') {
+  // Tạo phần tử div cho toast
+  const toast = document.createElement('div');
+  
+  // Thêm class cho toast, bao gồm cả kiểu thông báo (success, error, info)
+  toast.classList.add('toast', 'toast-' + type);
+  
+  // Thêm nội dung thông báo vào toast
+  toast.innerText = message;
+
+  // Thêm toast vào body
+  document.body.appendChild(toast);
+
+  // Hiển thị toast với hiệu ứng
+  setTimeout(() => {
+    toast.classList.add('show');  // Thêm lớp show để hiển thị toast
+  }, 100); // Để toast có thể kịp vào DOM trước khi áp dụng hiệu ứng
+
+  // Xóa toast sau 1 giây
+  setTimeout(() => {
+    toast.classList.remove('show');  // Ẩn toast
+    setTimeout(() => toast.remove(), 500); // Xóa toast sau khi hiệu ứng ẩn hoàn tất
+  }, 2000); }
+
 const leftArrows = document.querySelectorAll(".arrow-left"); // Mũi tên trái
 const rightArrows = document.querySelectorAll(".arrow"); // Mũi tên phải
 const movieLists = document.querySelectorAll(".movie-list");
 
-// document.addEventListener('contextmenu', function (e) {
-//   e.preventDefault(); // Ngăn menu chuột phải
+// // Tạo lớp devtoolsChecker để phát hiện DevTools và thay đổi trạng thái
+// class devtoolsChecker extends Error {
+//     toString() {
+//         // Trả về thông báo lỗi mặc định khi gọi toString()
+//         return "DevTools đã được phát hiện!";
+//     }
+
+//     get message() {
+//         // Phát hiện DevTools và gọi hàm onDevtoolsOpen()
+//         onDevtoolsOpen();
+//         return "DevTools đã được mở!";
+//     }
+// }
+
+// // Biến toàn cục để theo dõi trạng thái DevTools
+// let devToolsOpened = false;
+
+// window.addEventListener('load', function () {
+//     // Kiểm tra nếu DevTools đã được phát hiện trong phiên trước
+//     const devToolsDetected = localStorage.getItem('devToolsDetected');
+//     const devToolsDetectedTime = localStorage.getItem('devToolsDetectedTime'); // Lấy thời gian phát hiện
+
+//     // Nếu đã phát hiện trong phiên trước và chưa hết thời gian 1 giờ (3600 giây)
+//     if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) < 10*365*24*60*60*1000) {
+//         let remainingSeconds = Math.max(0, 10*365*24*60*60 - Math.floor((Date.now() - devToolsDetectedTime) / 1000));
+
+// // Tính toán các đơn vị thời gian
+// let years = Math.floor(remainingSeconds / (365*24*60*60)); // Tính năm
+// remainingSeconds -= years * (365*24*60*60);
+
+// let days = Math.floor(remainingSeconds / (24*60*60)); // Tính ngày
+// remainingSeconds -= days * (24*60*60);
+
+// let hours = Math.floor(remainingSeconds / (60*60)); // Tính giờ
+// remainingSeconds -= hours * (60*60);
+
+// let minutes = Math.floor(remainingSeconds / 60); // Tính phút
+// remainingSeconds -= minutes * 60;
+
+// let seconds = remainingSeconds; // Giây còn lại
+
+// // Hiển thị thông báo chặn với thời gian còn lại
+// const message = `Bị ban 10 năm r nhé cu 😞! Xem hentai và truy cập lại sau :`;
+// const message1 = `${years} year ${days} day / ${hours}h${minutes}m${seconds} s.`;
+
+
+//         // Hiển thị thông báo
+//        // Hiển thị thông báo với các giá trị
+// alert(message + `\n` + message1);
+
+//         // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
+//         setTimeout(() => {
+//             document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+
+//             const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
+//             window.location.href = 'https://ihentai.ac'; // Chuyển hướng đến trang khác
+
+//             // Kiểm tra nếu trang không chuyển hướng thành công
+//             setTimeout(() => {
+//                 if (window.location.href === originalUrl) {
+//                     // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
+//                     window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
+//                 }
+//             }, 1000); // Kiểm tra sau 1 giây
+//         }, 100); // Chờ 100ms sau alert() để tránh việc chuyển hướng bị chặn
+
+//         return; // Dừng các bước tiếp theo để tránh tiếp tục tải trang
+//     }
+
+//     // Nếu đã phát hiện DevTools trước đó và thời gian đã quá 1 giờ, reset trạng thái
+//     if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) >= 60*60*1000) {
+//         localStorage.removeItem('devToolsDetected');
+//         localStorage.removeItem('devToolsDetectedTime');
+//     }
+
+
+//     // Kiểm tra DevTools ngay khi đối tượng devtoolsChecker được tạo ra
+//     console.log(new devtoolsChecker());
 // });
-// Tạo lớp devtoolsChecker để phát hiện DevTools và thay đổi trạng thái
-class devtoolsChecker extends Error {
-    toString() {
-        // Trả về thông báo lỗi mặc định khi gọi toString()
-        return "DevTools đã được phát hiện!";
-    }
 
-    get message() {
-        // Phát hiện DevTools và gọi hàm onDevtoolsOpen()
-        onDevtoolsOpen();
-        return "DevTools đã được mở!";
-    }
-}
+// // Hàm onDevtoolsOpen() được gọi khi DevTools mở
+// function onDevtoolsOpen() {
+//     document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
+//     devToolsOpened = true; // Đánh dấu DevTools đã mở
+//             localStorage.setItem('devToolsDetected', 'true'); // Lưu trạng thái
+//             localStorage.setItem('devToolsDetectedTime', Date.now()); // Lưu thời gian phát hiện
 
-// Biến toàn cục để theo dõi trạng thái DevTools
-let devToolsOpened = false;
+//             alert('Đừng mở DevTools!');    // Xóa toàn bộ console sau một khoảng thời gian ngắn
+//     setTimeout(console.clear.bind(console), 0);
 
-window.addEventListener('load', function () {
-    // Kiểm tra nếu DevTools đã được phát hiện trong phiên trước
-    const devToolsDetected = localStorage.getItem('devToolsDetected');
-    const devToolsDetectedTime = localStorage.getItem('devToolsDetectedTime'); // Lấy thời gian phát hiện
+//     // In ra thông báo "Devtools is open!" vào console
+//     setTimeout(() => {
+//         console.log("%cDevtools is open!", 'color: red; font-weight: bold;');
+//     }, 10);
 
-    // Nếu đã phát hiện trong phiên trước và chưa hết thời gian 1 giờ (3600 giây)
-    if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) < 10*365*24*60*60*1000) {
-        let remainingSeconds = Math.max(0, 10*365*24*60*60 - Math.floor((Date.now() - devToolsDetectedTime) / 1000));
-
-// Tính toán các đơn vị thời gian
-let years = Math.floor(remainingSeconds / (365*24*60*60)); // Tính năm
-remainingSeconds -= years * (365*24*60*60);
-
-let days = Math.floor(remainingSeconds / (24*60*60)); // Tính ngày
-remainingSeconds -= days * (24*60*60);
-
-let hours = Math.floor(remainingSeconds / (60*60)); // Tính giờ
-remainingSeconds -= hours * (60*60);
-
-let minutes = Math.floor(remainingSeconds / 60); // Tính phút
-remainingSeconds -= minutes * 60;
-
-let seconds = remainingSeconds; // Giây còn lại
-
-// Hiển thị thông báo chặn với thời gian còn lại
-const message = `Bị ban 10 năm r nhé cu 😞! Xem hentai và truy cập lại sau :`;
-const message1 = `${years} year ${days} day / ${hours}h${minutes}m${seconds} s.`;
-
-
-        // Hiển thị thông báo
-       // Hiển thị thông báo với các giá trị
-alert(message + `\n` + message1);
-
-        // Chuyển hướng ngay lập tức sau khi thông báo alert() đã hiển thị
-        setTimeout(() => {
-            document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
-
-            const originalUrl = window.location.href; // Lưu URL gốc trước khi chuyển hướng
-            window.location.href = 'https://ihentai.ac'; // Chuyển hướng đến trang khác
-
-            // Kiểm tra nếu trang không chuyển hướng thành công
-            setTimeout(() => {
-                if (window.location.href === originalUrl) {
-                    // Nếu URL không thay đổi (có thể do chuyển hướng bị chặn), thử lại
-                    window.location.href = 'https://ihentai.ac'; // Thử chuyển hướng lại
-                }
-            }, 1000); // Kiểm tra sau 1 giây
-        }, 100); // Chờ 100ms sau alert() để tránh việc chuyển hướng bị chặn
-
-        return; // Dừng các bước tiếp theo để tránh tiếp tục tải trang
-    }
-
-    // Nếu đã phát hiện DevTools trước đó và thời gian đã quá 1 giờ, reset trạng thái
-    if (devToolsDetected === 'true' && devToolsDetectedTime && (Date.now() - devToolsDetectedTime) >= 60*60*1000) {
-        localStorage.removeItem('devToolsDetected');
-        localStorage.removeItem('devToolsDetectedTime');
-    }
-
-
-    // Kiểm tra DevTools ngay khi đối tượng devtoolsChecker được tạo ra
-    console.log(new devtoolsChecker());
-});
-
-// Hàm onDevtoolsOpen() được gọi khi DevTools mở
-function onDevtoolsOpen() {
-    document.body.innerHTML = ''; // Ẩn toàn bộ nội dung trang
-    devToolsOpened = true; // Đánh dấu DevTools đã mở
-            localStorage.setItem('devToolsDetected', 'true'); // Lưu trạng thái
-            localStorage.setItem('devToolsDetectedTime', Date.now()); // Lưu thời gian phát hiện
-
-            alert('Đừng mở DevTools!');    // Xóa toàn bộ console sau một khoảng thời gian ngắn
-    setTimeout(console.clear.bind(console), 0);
-
-    // In ra thông báo "Devtools is open!" vào console
-    setTimeout(() => {
-        console.log("%cDevtools is open!", 'color: red; font-weight: bold;');
-    }, 10);
-
-    // Chuyển hướng người dùng đến trang khác khi DevTools mở
-    window.location.href = 'https://ihentai.ac'; // Thực hiện chuyển hướng
-}
+//     // Chuyển hướng người dùng đến trang khác khi DevTools mở
+//     window.location.href = 'https://ihentai.ac'; // Thực hiện chuyển hướng
+// }
 
 
 
@@ -178,22 +198,22 @@ fetch("/views/sidebar.html")
         homeItem.classList.add('active'); 
       }
     } 
-    if (currentPage === "/upload") {
+    if (currentPage === "/upload/") {
       if (uploadItem) {
         uploadItem.classList.add('active'); 
       }
     } 
-    if (currentPage === "/edm") {
+    if (currentPage === "/edm/") {
       if (edmItem) {
         edmItem.classList.add('active');
       }
     } 
-      if (currentPage === "/video") {
+      if (currentPage === "/video/") {
       if (videoItem) {
         videoItem.classList.add('active'); 
       }
     } 
-        if (currentPage === "/data" || currentPage === "/data/uploadData") {
+        if (currentPage === "/data/" || currentPage === "/data/uploadData") {
   if (dataItem) {
     dataItem.classList.add('active'); 
   }
@@ -204,13 +224,13 @@ fetch("/views/sidebar.html")
     //click
     if (edmItem) {
       edmItem.addEventListener('click', function() {
-        window.location.href = '/edm';
+        window.location.href = '/edm/';
       });
     }
     // Đăng ký sự kiện click cho các phần tử
     if (uploadItem) {
      uploadItem.addEventListener('click', function() {
-        window.location.href = '/upload';
+        window.location.href = '/upload/';
       });
     }
     if (homeItem) {
@@ -220,7 +240,7 @@ fetch("/views/sidebar.html")
     }
   if (dataItem) {
       dataItem.addEventListener('click', function() {
-        window.location.href = '/data';
+        window.location.href = '/data/';
       });
     }
       // Sự kiện khi nhấn vào phần tử có id là "search"
@@ -274,19 +294,19 @@ fetch("/views/toggle.html")
         homeItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-    if (currentPage === "/edm") {
+    if (currentPage === "/edm/") {
       const edmItem = document.getElementById('edm');
       if (edmItem) {
         edmItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-    if (currentPage === "/content") {
+    if (currentPage === "/content/") {
       const contentItem = document.getElementById('content');
       if (contentItem) {
         contentItem.classList.add('active'); // Thêm class 'active' cho Home
       }
     } 
-        if (currentPage === "/data") {
+        if (currentPage === "/data/") {
       const dataItem = document.getElementById('data');
       if (dataItem) {
         dataItem.classList.add('active'); // Thêm class 'active' cho Home
@@ -296,13 +316,13 @@ fetch("/views/toggle.html")
       const filedata = document.getElementById('data');
       if (filedata) {
         filedata.addEventListener('click', function() {
-          window.location.href = '/data';
+          window.location.href = '/data/';
         });
       }
           const edm = document.getElementById('edm');
       if (edm) {
         edm.addEventListener('click', function() {
-          window.location.href = '/edm';
+          window.location.href = '/edm/';
         });
       }
     const kimochi = document.getElementById('kimochi');
@@ -321,7 +341,7 @@ if (kimochi) {
      const content = document.getElementById('content');
     if (content) {
         content.addEventListener('click', function() {
-          window.location.href = '/content';
+          window.location.href = '/content/';
         });
       }
   })
