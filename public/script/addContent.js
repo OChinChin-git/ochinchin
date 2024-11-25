@@ -9,6 +9,9 @@ import {
   updateDoc,
   deleteField,
   writeBatch,
+  onSnapshot,
+  query,
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -635,6 +638,7 @@ async function loadVideoOptions(selectElement) {
     console.error("Lỗi tải danh sách video từ Firestore:", error);
   }
 }
+
 // Tham chiếu đến các select
 const selectMovieList = document.getElementById("select-movie-list");
 const selectFeature = document.getElementById("select-feature");
@@ -645,8 +649,9 @@ const addVideoList = document.getElementById("add-video-to-list");
 loadMovieListOptions(selectMovieList);
 loadVideoOptions(videoDropdown);
 loadFeatureOptions(selectFeature);
-loadVideoOptions(selectExistingVideo);
 loadVideoOptions(addVideoList);
+loadVideoOptions(selectExistingVideo);
+
 //
 //
 //
@@ -746,7 +751,7 @@ async function loadVideoData(selectedVideo) {
 
 // Lắng nghe sự kiện khi người dùng nhấn nút "Tải Video"
 document.getElementById("load-video").addEventListener("click", async () => {
-  const selectVideo = document.getElementById("select-existing-video");
+  const selectVideo = document.getElementById("add-video-to-list");
   const selectedVideo = selectVideo.value;
   // Gọi hàm loadVideoData để xử lý tải dữ liệu
   await loadVideoData(selectedVideo);
@@ -863,7 +868,7 @@ async function addVideoToList(selectedVideo) {
 document
   .getElementById("add-to-list")
   .addEventListener("click", async (event) => {
-    const selectElement = document.getElementById("add-video-to-list");
+    const selectElement = document.getElementById("select-existing-video");
     const selectedVideo = selectElement.value;
     await addVideoToList(selectedVideo);
   });
@@ -908,7 +913,7 @@ async function loadMovieList(selectedMovieList) {
             <td><button type="button" class="remove-video">Xóa</button></td>
           `;
           movieListTableBody.appendChild(row);
-
+          addDragAndDropHandlers();
           // Gắn sự kiện xóa cho nút "remove-video"
           row.querySelector(".remove-video").addEventListener("click", () => {
             row.remove();
@@ -928,6 +933,10 @@ async function loadMovieList(selectedMovieList) {
     showToast("Vui lòng chọn Movie List.");
   }
 }
+document.getElementById("load-movie-list").addEventListener("click",async(event)=>{
+  const selectedMovieList = document.getElementById("select-movie-list").value
+  loadMovieList(selectedMovieList);
+})
 // Hàm tải dữ liệu vào content-list dựa trên loại nội dung đã chọn
 async function loadContentList(selectedType) {
   const contentListSelect = document.getElementById("content-list");
