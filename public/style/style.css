@@ -589,3 +589,39 @@ body {
   }
 
   }
+/* Container của toast */
+.toast {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 13px;
+  max-width: 300px;
+  width: auto;
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Hiển thị toast khi thêm lớp show */
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Các kiểu toast khác nhau */
+.toast-success {
+  background-color: #4CAF50; /* Màu xanh cho thành công */
+}
+
+.toast-error {
+  background-color: #F44336; /* Màu đỏ cho lỗi */
+}
+
+.toast-info {
+  background-color: #2196F3; /* Màu xanh dương cho thông báo */
+}

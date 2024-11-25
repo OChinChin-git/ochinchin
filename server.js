@@ -19,34 +19,6 @@ app.use(cors());  // Cho phép tất cả các domain gửi yêu cầu đến se
 // Cấu hình view engine là EJS
 app.set('view engine', 'ejs');
 
-// cache
-// cache
-// cache
-app.use('/views', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-app.use('/style/style.css', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-app.use('/style/animated.css', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-app.use('/script/animated.js', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-
-app.use('/script/app.js', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
-app.use('index.html', (req, res, next) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600'); // Lưu cache 1 giờ
-  next();
-});
 
 // Cấu hình thư mục chứa view (tệp EJS)
 app.set('views', './views');

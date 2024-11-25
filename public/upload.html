@@ -367,7 +367,9 @@
       </div>
     </div>
     </div>
-    
+    <!-- Thêm SDK của Dropbox vào trang HTML -->
+<script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
+
     <script>
       const fileInput = document.getElementById("file-input");
       const customNameInput = document.getElementById("custom-name");
@@ -375,6 +377,8 @@
       const downloadLink = document.getElementById("download-link");
       const progressList = document.getElementById("progress-list");
       const copyLinkButton = document.getElementById("copy-link");
+      const DROPBOX_ACCESS_TOKEN = "YOUR_DROPBOX_ACCESS_TOKEN"; // Chèn Access Token của bạn
+      const dbx = new Dropbox.Dropbox({ accessToken: DROPBOX_ACCESS_TOKEN });
 
       const uploadedFiles = []; // Danh sách các file đã tải lên
 
@@ -449,17 +453,25 @@
         document.getElementById("loading-spinner").style.display = "flex";
 
         // Kiểm tra token trước khi tải lên
-        const tokenCheckResponse = await fetch("/check-token");
-        const tokenCheckResult = await tokenCheckResponse.json();
+        try {
+          const dropbox = new Dropbox.Dropbox({ accessToken: DROPBOX_ACCESS_TOKEN });
+
+          // Kiểm tra token hợp lệ bằng cách thử lấy thông tin tài khoản
+          await dropbox.usersGetCurrentAccount();
+        } catch (error) {
+          const errorHTML = `
+            <div class="error-message" style="color: red; font-weight: bold;">
+              <p>API Key đã hết hạn hoặc không hợp lệ!</p>
+              <iframe src="/expired.html" style="width:100%; height:200px; border:none;"></iframe>
+            </div>
+          `;
+          const listItem = document.createElement("li");
+          listItem.innerHTML = errorHTML;
+          progressList.appendChild(listItem);
+          return;
+        }
         // Ẩn spinner khi kiểm tra xong
         document.getElementById("loading-spinner").style.display = "none";
-        if (!tokenCheckResult.valid) {
-          const errorHTML = `
-      <div class="error-message" style="color: red; font-weight: bold;">
-        <p>API Key đã hết hạn hoặc không hợp lệ!</p>
-        <iframe src="/expired.html" style="width:100%; height:200px; border:none;"></iframe>
-      </div>
-    `;
           const listItem = document.createElement("li");
           listItem.innerHTML = errorHTML;
           progressList.appendChild(listItem);
@@ -482,25 +494,25 @@
             );
             return;
           }
-          // Hiển thị spinner khi bắt đầu kiểm tra
-          document.getElementById("loading-spinner").style.display = "flex";
+//           // Hiển thị spinner khi bắt đầu kiểm tra
+//           document.getElementById("loading-spinner").style.display = "flex";
 
-          // Kiểm tra tên file với server
-          const fileNameCheckResponse = await fetch("/check-file-name", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fileName: finalName }), // Gửi tên file
-          });
-          // Ẩn spinner khi kiểm tra xong
-          document.getElementById("loading-spinner").style.display = "none";
+//           // Kiểm tra tên file với server
+//           const fileNameCheckResponse = await fetch("/check-file-name", {
+//             method: "POST",
+//             headers: {
+//               "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({ fileName: finalName }), // Gửi tên file
+//           });
+//           // Ẩn spinner khi kiểm tra xong
+//           document.getElementById("loading-spinner").style.display = "none";
 
-          const fileNameCheckResult = await fileNameCheckResponse.json();
-          if (fileNameCheckResult.error) {
-            alert(fileNameCheckResult.error); // Nếu file đã tồn tại, hiển thị lỗi
-            return;
-          }
+//           const fileNameCheckResult = await fileNameCheckResponse.json();
+//           if (fileNameCheckResult.error) {
+//             alert(fileNameCheckResult.error); // Nếu file đã tồn tại, hiển thị lỗi
+//             return;
+//           }
 
           // Nếu tên file chưa tồn tại, tiếp tục tải lên
           const formData = new FormData();

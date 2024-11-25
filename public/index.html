@@ -52,78 +52,7 @@
     </div>
 
   <script>
-    // Hàm để lấy dữ liệu JSON từ server
-    const fetchJsonData = (fileName) => {
-      return fetch(fileName)
-        .then(response => response.json())
-        .catch(err => console.error("Lỗi khi lấy dữ liệu JSON:", err));
-    };
-const renderFeature = (featureData) => {
-  const featureHtml = `
-    <div class="featured-content" style="background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)), url('${featureData.backgroundUrl}'); background-size: 100%; background-position: center center; background-repeat: no-repeat;">
-      <img class="featured-title" src="${featureData.featuredImgUrl}" alt="${featureData.title}" />
-      <div class="featured-info">
-        <span class="featured-title-text animated-title3">${featureData.title}</span>
-        <p class="featured-desc">${featureData.featuredDesc}</p>
-      </div>
-      <button class="featured-button" data-video-url="${featureData.videoUrl}">WATCH</button>
-    </div>
-  `;
-  return featureHtml;
-};
 
-// Hàm hiển thị Movie List
-const renderMovieList = (movieListData) => {
-  const movieListHtml = `
-    <div class="movie-list-container">
-      <h1 class="movie-list-title animated-title1">${movieListData.listName}</h1>
-      <div class="movie-list-wrapper">
-        <div class="movie-list">
-          ${movieListData.movies.map(movie => {
-            return `
-              <div class="movie-list-item">
-                <img class="movie-list-item-img" src="${movie.thumbnail}" alt="${movie.title}" />
-                <span class="movie-list-item-title">${movie.title}</span>
-                <p class="movie-list-item-desc">${movie.description}</p>
-                <button class="movie-list-item-button" data-video-url="${movie.url}">Watch</button>
-              </div>
-            `;
-          }).join("")}
-        </div>
-        <i class="fas fa-chevron-right arrow"></i>
-        <i class="fas fa-chevron-left arrow-left"></i>
-      </div>
-    </div>
-  `;
-  return movieListHtml;
-};
-
-
-// Hàm khởi tạo và hiển thị tất cả nội dung
-const renderContent = async () => {
-  // Lấy dữ liệu từ endpoint của server để có danh sách order
-  const orderResponse = await fetch('/order');
-  const orderData = await orderResponse.json();
-  
-  const contentContainer = document.getElementById("content-container");
-
-  for (let entry of orderData) {
-    const [type, name] = entry.split(' ');
-
-    if (type === "feature") {
-      const featureData = await fetchJsonData(`/data/f_${name}.json`);
-      const featureHtml = renderFeature(featureData);
-      contentContainer.innerHTML += featureHtml;
-    } else if (type === "movie-list") {
-      const movieListData = await fetchJsonData(`/data/m_${name}.json`);
-      const movieListHtml = renderMovieList(movieListData);
-      contentContainer.innerHTML += movieListHtml;
-    }
-  }
-};
-
-    // Gọi hàm renderContent khi trang tải
-    renderContent();
     document.addEventListener("click", (event) => {
   // Xử lý khi nhấn nút "Watch" trong phần Movie List
   if (event.target.classList.contains("movie-list-item-button")) {
@@ -260,5 +189,6 @@ console.log(Math.floor(window.innerWidth / 270));
       <script src="script/app.js" defer></script>
       <script src="script/animated.js" defer></script>
     <script type="module" src="script/profile.js" defer></script>
+      <script type="module" src="script/loadContent.js" defer></script>
 </body>
 </html>
