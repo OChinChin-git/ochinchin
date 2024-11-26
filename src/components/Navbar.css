@@ -1,0 +1,137 @@
+.navbar {
+  width: 100%;
+  height: 50px;
+  background-color: black;
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Đảm bảo navbar luôn nằm trên tất cả phần tử khác */
+}
+
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  padding: 0 50px;
+  height: 100%;
+  color: white;
+  font-family: "Sen", sans-serif;
+}
+
+.logo-container {
+  flex: 1;
+}
+
+.logo {
+  font-size: 30px;
+  color: #4dbf00;
+}
+
+.menu-container {
+  flex: 6;
+}
+
+.menu-list {
+  display: flex;
+  list-style: none;
+}
+
+/* Các phần tử trong menu có khoảng cách đều */
+.menu-list-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  position: relative; /* Để có thể chứa thanh dưới */
+}
+
+/* Hiệu ứng cho phần tử có class active */
+.menu-list-item.active {
+  color: #45a100; /* Màu chữ khi active */
+  font-weight: bold;
+  position: relative;
+  padding-bottom: 5px; /* Thêm khoảng trống dưới cùng để có thể nhìn thấy thanh dưới */
+}
+/* Hiệu ứng cho phần tử có class active */
+.menu-list-item:hover {
+  color: #45a100; /* Màu chữ khi active */
+}
+/* Thanh dưới màu xanh chạy từ trái sang phải khi active */
+.menu-list-item.active::after {
+  content: ''; /* Không cần nội dung */
+  position: absolute;
+  bottom: 0; /* Đặt thanh dưới ở cuối phần tử */
+  left: 0; /* Đặt thanh dưới ở bên trái */
+  width: 0; /* Thanh dưới sẽ chạy hết chiều rộng */
+  height: 3px; /* Chiều cao của thanh dưới */
+  background-color: #45a100; /* Màu thanh dưới */
+  transition: width 0.3s ease-in-out; /* Hiệu ứng mượt mà khi thanh dưới chạy */
+}
+.menu-list-item:not(.active)::after {
+  content: ''; /* Không cần nội dung */
+  position: absolute;
+  bottom: 0; /* Đặt thanh dưới ở cuối phần tử */
+  left: 0; /* Đặt thanh dưới ở bên trái */
+  width: 0; /* Thanh dưới sẽ chạy hết chiều rộng */
+  height: 3px; /* Chiều cao của thanh dưới */
+  background-color: #45a100; /* Màu thanh dưới */
+  transition: width 0.3s ease-in-out; /* Hiệu ứng mượt mà khi thanh dưới chạy */
+}
+/* Thanh dưới chạy từ trái sang phải khi hover vào */
+.menu-list-item:hover::after {
+  content: ''; /* Đảm bảo thanh dưới xuất hiện */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Khi hover, thanh dưới sẽ chạy hết chiều rộng */
+  height: 3px; /* Chiều cao thanh dưới */
+  background-color: #45a100; /* Màu thanh dưới */
+  
+
+  transition: width 0.3s ease-in-out; /* Hiệu ứng mượt mà khi thanh dưới chạy */
+}
+
+
+.profile-container {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  
+}
+
+.profile-text-container {
+  margin: 0 20px;
+}
+
+.profile-picture {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.toggle {
+  width: 40px;
+  height: 20px;
+  background-color: white;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+}
+
+.toggle-icon {
+  color: goldenrod;
+}
+
+.toggle-ball {
+  width: 18px;
+  height: 18px;
+  background-color: black;
+  position: absolute;
+  right: 1px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 1s ease all;
+}
