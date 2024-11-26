@@ -4,12 +4,16 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+<<<<<<< HEAD
     "site": "toicubu",
+=======
+>>>>>>> 7195266 (ok)
     "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+<<<<<<< HEAD
     ],
     "rewrites": [
       {
@@ -20,3 +24,8 @@
   }
 }
 
+=======
+    ]
+  }
+}
+>>>>>>> 7195266 (ok)
