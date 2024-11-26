@@ -8,10 +8,55 @@
   flex-direction: column;
   align-items: center;
   padding-top: 60px;
+  z-index: 1000;
 }
 
 .left-menu-icon {
   color: white;
   font-size: 20px;
   margin-bottom: 40px;
+}
+/* Hiệu ứng hover cho tất cả các icon */
+.left-menu-icon {
+  font-size: 24px;
+  transition: color 0.3s, transform 0.3s;
+  color: #333; /* Màu mặc định */
+}
+
+.left-menu-icon:hover {
+  color: #45a100; /* Màu khi hover */
+  transform: scale(1.2); /* Phóng to khi hover */
+}
+
+[data-tooltip] {
+  position: relative; /* Đảm bảo phần tử có vị trí để tooltip có thể được căn chỉnh */
+}
+
+/* Hiển thị tooltip ngang hàng với phần tử */
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip); /* Nội dung mô tả lấy từ thuộc tính data-tooltip */
+  position: absolute;
+  left: 35px; /* Căn giữa tooltip theo chiều ngang của phần tử */
+  top: -4px; /* Đảm bảo tooltip nằm ngang với phần tử */
+   background-color: #333;
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  margin-top: 5px; /* Thêm khoảng cách nếu cần */
+  z-index: 10;
+  opacity: 0.9;
+}
+
+/* CSS cho phần tử active trong sidebar */
+.sidebar .left-menu-icon.active {
+  color: #45a100; /* Màu khi hover */
+  transform: scale(1.2); /* Phóng to khi hover */
+}
+.sidebar.active {
+  background-color: white;
+}
+.left-menu-icon.active {
+  color: black;
 }
