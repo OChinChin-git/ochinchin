@@ -1,0 +1,224 @@
+/* Toàn bộ trang */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #000000; /* Màu nền tối */
+  color: white;
+}
+.edmphiphai {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+}
+.kimochi .edmphiphai {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 1)),
+    url("https://images7.alphacoders.com/133/thumb-1920-1338840.png");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+}
+/* Vùng chứa controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+#toggleListBtn {
+  padding: 5px 10px;
+  margin: 5px;
+}
+/* Khoảng cách giữa các phần tử điều khiển */
+.controls > * {
+  margin: 0 5px;
+}
+
+/* Danh sách bài hát */
+.list-edm {
+  margin-bottom: 20px;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #3e3e3e; /* Viền xám */
+  margin: 40px 10px;
+  padding: 10px 20px;
+  background-color: #1e1e1e; /* Nền danh sách tối */
+
+  border-radius: 5px;
+}
+
+.list-edm li {
+  cursor: pointer;
+  padding: 4px;
+  background-color: #2b2b2b; /* Nền mục */
+  margin: 5px 0;
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+}
+
+/* Giao diện danh sách */
+.list-edm ul {
+  list-style-type: none;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #000000;
+  color: white;
+}
+
+.list-edm li.active {
+  background-color: #39ff14; /* Màu nền khi chọn */
+  color: #000000;
+  font-weight: bold;
+  transform: scale(1.05); /* Tăng kích thước một chút */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Thêm hiệu ứng chuyển tiếp */
+}
+.kimochi .list-edm li.active {
+  background-color: #00ffff; /* Màu nền khi chọn */
+}
+/* Hiệu ứng hover */
+.list-edm li:hover {
+  background-color: #268a0a; /* Nền khi hover */
+}
+.kimochi .list-edm li:hover {
+  background-color: #006666; /* Nền khi hover */
+}
+/* Hiển thị thời gian phát nhạc */
+#currentTime,
+#durationTime {
+  font-weight: bold;
+  color: #39ff14; /* Màu chữ sáng */
+}
+.kimochi #currentTime,
+.kimochi #durationTime {
+  font-weight: bold;
+  color: #00ffff; /* Màu chữ sáng */
+}
+/* Chỉ số bài hát hiện tại và tổng số */
+#currentIndex,
+#totalSongs {
+  color: #39ff14; /* Màu xanh nổi bật */
+}
+/* Chỉ số bài hát hiện tại và tổng số */
+.kimochi #currentIndex,
+.kimochi #totalSongs {
+  color: #00ffff; /* Màu xanh nổi bật */
+}
+/* Tiêu đề bài hát */
+#currentSongTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f5f5f5; /* Màu tiêu đề sáng */
+  margin-bottom: 10px;
+}
+
+/* Hình tròn chứa thông tin bài hát */
+.current-song-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  position: relative; /* Để quản lý vị trí của pseudo-element */
+}
+
+.circle {
+  width: 200px;
+  height: 200px;
+  background-color: #1e1e1e; /* Nền tối */
+  border-radius: 50%; /* Hình tròn */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 5px solid transparent; /* Đặt viền trong suốt để dễ dàng tạo hiệu ứng sóng */
+  animation: none; /* Không có animation mặc định */
+  padding: 10px; /* Để đảm bảo các phần tử không bị chèn vào viền */
+  box-sizing: border-box; /* Đảm bảo padding không ảnh hưởng đến kích thước tổng thể */
+  border-color: #39ff14;
+  animation: wave 1s infinite;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+}
+.kimochi .circle {
+  border: 5px solid transparent;
+  border-color: #33cccc;
+  animation: none;
+  animation: wave-kimochi 1s infinite;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 1)),
+    url("https://images7.alphacoders.com/133/thumb-1920-1338840.png");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+}
+
+/* Căn giữa các phần tử trong hình tròn */
+.circle p {
+  margin: 0; /* Đặt lại margin để không có khoảng cách không cần thiết */
+  text-align: center; /* Giữa chữ */
+  color: #f5f5f5; /* Màu chữ sáng */
+}
+/* Hiệu ứng sóng nhạc trên viền */
+@keyframes wave {
+  0% {
+    border-color: #268a0a;
+    box-shadow: 0 0 0 0 #268a0a;
+  }
+  50% {
+    border-color: #39ff14;
+    box-shadow: 0 0 20px 20px #268a0a;
+  }
+  100% {
+    border-color: #268a0a;
+    box-shadow: 0 0 0 0 #268a0a;
+  }
+}
+@keyframes wave-kimochi {
+  0% {
+    border-color: #00aaaa;
+    box-shadow: 0 0 0 0 #006666;
+  }
+  50% {
+    border-color: #33cccc;
+    box-shadow: 0 0 20px 20px #006666;
+  }
+  100% {
+    border-color: #00aaaa;
+    box-shadow: 0 0 0 0 #006666;
+  }
+}
+/* Căn giữa thanh kéo */
+#seekBar {
+  width: 80%; /* Đặt chiều rộng cho thanh kéo */
+}
+
+/* Kích thước ô nhập tốc độ */
+#speedInput {
+  width: 60px;
+  font-size: 14px;
+  padding: 3px;
+}
+
+/* Hiện thông báo toast */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(76, 175, 80, 0.9); /* Màu nền xanh lá */
+  color: white;
+  padding: 15px 25px;
+  border-radius: 5px;
+  z-index: 1000;
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+#volume-slider {
+  width: 150px; /* Chiều dài của thanh trượt */
+  height: 8px; /* Chiều cao của thanh trượt (nếu cần) */
+}
+
+canvas {
+  border: 1px solid #007bff;
+  margin-top: 20px;
+}

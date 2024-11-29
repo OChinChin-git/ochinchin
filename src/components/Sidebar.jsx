@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate và useLocation
-import './Sidebar.css'; // Import CSS cho Sidebar
+import '../styles/Sidebar.css'; // Import CSS cho Sidebar
 
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(''); // Lưu trữ mục đang được chọn

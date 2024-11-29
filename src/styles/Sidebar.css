@@ -1,3 +1,8 @@
+.kimochi .left-menu-icon:hover,
+.kimochi .sidebar .left-menu-icon.active
+{
+  color: #00FFFF;
+}
 .sidebar {
   width: 50px;
   height: 100%;
@@ -24,7 +29,7 @@
 }
 
 .left-menu-icon:hover {
-  color: #45a100; /* Màu khi hover */
+  color: #39FF14; /* Màu khi hover */
   transform: scale(1.2); /* Phóng to khi hover */
 }
 
@@ -39,7 +44,7 @@
   left: 35px; /* Căn giữa tooltip theo chiều ngang của phần tử */
   top: -4px; /* Đảm bảo tooltip nằm ngang với phần tử */
    background-color: #333;
-  color: #fff;
+  color: #39FF14;
   padding: 5px 8px;
   border-radius: 4px;
   white-space: nowrap;
@@ -48,10 +53,12 @@
   z-index: 10;
   opacity: 0.9;
 }
-
+.kimochi [data-tooltip]:hover::after {
+  color: #00FFFF;
+}
 /* CSS cho phần tử active trong sidebar */
 .sidebar .left-menu-icon.active {
-  color: #45a100; /* Màu khi hover */
+  color: #39FF14; /* Màu khi hover */
   transform: scale(1.2); /* Phóng to khi hover */
 }
 .sidebar.active {

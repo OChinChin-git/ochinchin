@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import './App.css'; // Import CSS chung
+import './script/App.js';
+import './script/AntiDevTools.js';
 
 const App = () => {
   return (

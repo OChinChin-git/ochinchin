@@ -1,4 +1,202 @@
 /* src/App.css */
 body {
   font-family: "Roboto", sans-serif;
+ user-select: none; /* Ngừng chọn chữ trên toàn bộ trang */
+}
+
+/* Cho phép chọn chữ ở các trường nhập liệu như input, textarea */
+input, textarea {
+    user-select: text; /* Cho phép chọn chữ trong input và textarea */
+}
+
+.notification {
+  display: none; /* Ẩn thông báo mặc định */
+  position: absolute;
+  top: 50%; /* Canh giữa theo chiều dọc */
+  left: 50%; /* Canh giữa theo chiều ngang */
+  transform: translate(-50%, -50%); /* Căn giữa tuyệt đối */
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 18px;
+  text-align: center;
+  z-index: 10000; /* Đảm bảo thông báo luôn trên lớp nền */
+  pointer-events: all; /* Bật sự kiện chuột cho thông báo */
+}
+/* Media Query cho màn hình nhỏ */
+@media (max-width: 1000px) {
+  .navbar-container {
+    padding: 0 10px; /* Giảm padding bên trong */
+  }
+
+  .logo {
+    font-size: 20px; /* Giảm kích thước logo */
+  }
+
+  .menu-container {
+    flex: 2; /* Giảm không gian menu */
+  }
+
+  .menu-list-item {
+    margin-right: 20px; /* Giảm khoảng cách giữa các item trong menu */
+  }
+
+  .profile-container {
+    flex: 6; /* Giảm không gian profile */
+  }
+
+  .profile-text-container {
+    margin: 0 20px; /* Giảm margin profile text */
+  }
+
+  .profile-picture {
+    width: 28px; /* Giảm kích thước ảnh đại diện */
+    height: 28px;
+  }
+
+  .toggle {
+    width: 30px; /* Giảm kích thước toggle */
+    height: 15px;
+  }
+
+  .toggle-ball {
+    width: 12px; /* Giảm kích thước ball */
+    height: 12px;
+  }
+}
+@media (max-width: 1000px) and (max-height: 600px) { 
+  /* Kiểm tra khi màn hình dọc và chiều cao nhỏ hơn chiều rộng */
+  .overlay {
+    display: block; /* Hiển thị lớp nền khi màn hình dọc */
+  }
+
+  .notification {
+    display: block; /* Hiển thị thông báo khi màn hình dọc */
+  }
+}
+#dropdownMenu {
+    position: absolute;
+    top: 41px; /* Đẩy dropdown xuống ngay bên dưới profile-container */
+    background-color: #000; /* Nền đen */
+  color: #fff; /* Chữ trắng */
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 150px;
+    z-index: 1;
+    display: none; /* Ẩn dropdown theo mặc định */
+}
+
+#dropdownMenu div {
+    padding: 5px 0;
+}
+
+#dropdownMenu button {
+    width: 100%;
+    padding: 5px;
+    background-color: #c9d6ff;
+    border: none;
+    color: blueviolet;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+#dropdownMenu button:hover {
+    color: blue;
+    text-decoration: underline;
+}
+.button-container button {
+    margin-bottom: 10px; /* Tạo khoảng cách dưới mỗi nút */
+  }
+@media screen and (max-width: 845px) {
+  /* Navbar */
+  .navbar-container {
+    padding: 0 4px; /* Giảm padding cho navbar */
+  }
+
+  .menu-container {
+    flex: 0.1; /* Giảm độ rộng menu-container (nếu cần) */
+  }
+
+  .menu-list-item {
+    padding: 2px 4px; /* Giảm padding cho các item trong menu */
+    font-size: 14px; /* Giảm kích thước chữ cho các item trong menu */
+  }
+  .profile-text{
+    font-size: 14px;
+  }.sidebar i {
+    font-size: 22px; /* Giảm kích thước icon trên màn hình nhỏ */
+    margin: 12px 0;   /* Giảm khoảng cách giữa các icon */
+  }
+  .featured-title{
+    width: 160px;
+    
+  }
+  .featured-title-text {
+    font-size:18px;
+  }
+  .featured-desc {
+    font-size:14px;
+  }
+  
+}
+@media screen and (max-width: 686px) {
+  /* Navbar */
+  .navbar-container {
+    padding: 0 4px; /* Giảm padding cho navbar */
+  }
+
+  .menu-container {
+    flex: 0.1; /* Giảm độ rộng menu-container (nếu cần) */
+  }
+.profile-text{
+    font-size: 10px;
+  }
+
+  .menu-list-item {
+    padding: 1px 2px; /* Giảm padding cho các item trong menu */
+    font-size: 10px; /* Giảm kích thước chữ cho các item trong menu */
+  }
+
+
+  .sidebar i {
+    font-size: 22px; /* Giảm kích thước icon trên màn hình nhỏ */
+    margin: 12px 0;   /* Giảm khoảng cách giữa các icon */
+  }
+}
+@media screen and (max-width: 590px) {
+  .menu-container{
+    display: none;
+  }
+  .profile-text{
+    font-size: 18px;
+  }
+
+  }
+
+/* Các chấm liti */
+.liti-effect {
+    position: absolute;
+    border-radius: 50%;
+    width: 6px; /* Đường kính của chấm */
+    height: 6px;
+    background-color: #39FF14; /* Màu chấm sáng */
+    opacity: 0;
+    animation: ripple 0.6s forwards;
+    pointer-events: none; /* Chắc chắn các chấm không ảnh hưởng đến các sự kiện khác */
+}
+.kimochi .liti-effect{
+  background-color: #00FFFF;
+}
+/* Hiệu ứng lan tỏa chấm */
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4); /* Chấm sẽ mở rộng */
+        opacity: 0;
+    }
 }

@@ -1,0 +1,145 @@
+
+
+      #feature-section.active,
+      #movie-list-section.active,
+      #video-manager-section.active{
+        display: block;
+      }
+/* Cấu trúc cơ bản */
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    
+    color: #333333;
+    
+}
+      
+.add-content {
+  margin-left: 25px;  /* Di chuyển tất cả phần tử con sang trái */
+ 
+}
+
+.add-content * {
+  margin-left: 0;     /* Loại bỏ margin mặc định */
+  padding: 0;         /* Loại bỏ padding mặc định */
+}
+.add-content-page{
+  margin-left:15px;
+}
+.add-content-title,
+.content-title,
+.content-desc{
+  text-align:left;
+}
+.add-content-title{
+  font-size:26px;
+}
+.content-title{
+  font-size: 23px;
+  color: #39FF14;
+}
+.kimochi .content-title{
+  color:#00FFFF;
+}
+.content-desc{
+  font-size: 14px;
+}
+.save-content-button {
+  margin-left:0px;
+ display: flex;
+  justify-content: flex-start; 
+  width:140px;
+}
+.movie-list-items{
+  text-align:left;
+  margin-top:10px;
+}
+/* Form, bảng và các container */
+.section {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#order-content-section {
+    
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#movie-list-table, #order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  color: blue;
+}
+
+#movie-list-table th, #order-table th,
+#movie-list-table td, #order-table td {
+    padding: 8px;
+    border: 1px solid #cccccc;
+    text-align: left;
+}
+
+#movie-list-table th, #order-table th {
+    background-color: #3498db;
+    color:  lightgreen;
+}
+
+.video-item {
+    margin-bottom: 15px;
+}
+
+.video-details {
+    margin-top: 8px;
+    background-color: #f9f9f9;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.toggle-details {
+    margin-top: 8px;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 50px; /* Di chuyển toggle details sang trái 50px */
+}
+
+.toggle-details:hover {
+    background-color: #e67e22;
+}
+
+
+
+
+select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+
+/* Hiệu ứng nổi bật khi chọn hàng */
+tr.highlight {
+ 
+  border: 2px solid #007bff;  /* Viền xanh để làm nổi bật */
+}
+
+tr {
+  transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động mượt mà khi thay đổi vị trí */
+}
+
+tr.moving {
+  transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động cho hàng khi đổi vị trí */
+}
+.horizontal-container {
+  display: flex;
+  align-items: left; /* Căn giữa các phần tử theo chiều dọc */
+  gap: 10px; /* Khoảng cách giữa các phần tử */
+}
