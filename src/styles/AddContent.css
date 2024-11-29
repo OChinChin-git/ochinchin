@@ -22,10 +22,20 @@ body {
 
 .add-content * {
   margin-left: 0;     /* Loại bỏ margin mặc định */
-  padding: 0;         /* Loại bỏ padding mặc định */
+  padding: 0; 
+  /* Loại bỏ padding mặc định */
 }
 .add-content-page{
   margin-left:15px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+  min-height: 100vh;
+}
+.kimochi .add-content-page{
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
 }
 .add-content-title,
 .content-title,
