@@ -1,13 +1,45 @@
 // FeaturedContent.jsx
-import React from 'react';
-import "../styles/AddContent.css";
+import React,{useState,useEffect}from 'react';
+import "../../styles/AddContent.css";
+import {loadOption} from "/src/components/AddContent.js";
+
 const FeaturedContent = () => {
+  const [options, setOptions] = useState([]); // State để lưu các option
+  const [selectedContent, setSelectedContent] = useState(""); // State để lưu lựa chọn của người dùng
+  
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        // Gọi hàm loadOption để tải các giá trị (ví dụ: "feature")
+        const data = await loadOption("feature"); // Bạn có thể thay "feature" bằng giá trị khác
+        setOptions(data);
+        console.log(data)// Cập nhật state options với dữ liệu lấy được
+      } catch (error) {
+        console.error("Lỗi khi tải options:", error);
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
   return (
           <div id="feature-section" className="section">
             <h2 className="content-title">Featured Movie</h2>
       <p className="content-desc">Những bộ phim nổi bật, đáng xem!</p>
             <label className="selectLabel">Chọn Featured Content:
-            <select id="select-feature">
+            <select id="select-feature"
+              value={selectedContent}
+              >
+              <option value="">New</option>
+              {options.length > 0 ? (
+            options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))
+          ) : (
+            <option value="">Không có nội dung</option>
+          )}
             </select>
             <button id="load-feature">Tải Featured Content</button>
             </label>

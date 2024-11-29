@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
-import "../styles/AddContent.css";
+import React, { useState,useEffect } from 'react';
+import "../../styles/AddContent.css";
+import {loadOption} from "/src/components/AddContent.js";
 const VideoManager = () => {
   const [videoTitle, setVideoTitle] = useState('');
   const [videoDescription, setVideoDescription] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [videoThumbnail, setVideoThumbnail] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-
+  const [videoOptions, setVideoOptions] = useState([]);
+  const [selectedVideo,setSelectedVideo] = useState();
   // Hàm xử lý khi tải video
+  const fetchVideo = async() =>{
+    try{const data= await loadOption("videos");
+        setVideoOptions(data);
+       }catch(error){
+         
+       }
+  }
+  useEffect(() =>{
+    fetchVideo();
+  },[]);
   const handleLoadVideo = () => {
-    // Logic tải video (ví dụ: fetch từ API, hoặc từ danh sách có sẵn)
+    videoOptions.current.value
+    
   };
 
   // Hàm xử lý khi tải URL Youtube
@@ -33,12 +46,16 @@ const VideoManager = () => {
   return (
     <div id="video-manager-section" className="section">
       <h2 className="content-title">Video</h2>
-      <p className="title-desc">Dán link youtube hoặc url vào, youtube sẽ tự chuyển đổi</p>
+      <p className="content-desc">Dán link youtube hoặc url vào, youtube sẽ tự chuyển đổi</p>
 
       {/* Dropdown để chọn video đã có */}
         <label className="selectLabel">Chọn video có sẵn:
-        <select id="add-video-to-list">
-          {/* Các video có sẵn sẽ được nạp vào đây */}
+        <select id="add-video-to-list" value={selectedVideo}>
+        <option value="">New</option>
+          {videoOptions.length >0 ?(
+          videoOptions.map((video) => (
+          <option value={video} key={video}>
+              {video}</option> ))):""}
         </select>
         <button id="load-video" onClick={handleLoadVideo}>Tải Video</button>
           </label>

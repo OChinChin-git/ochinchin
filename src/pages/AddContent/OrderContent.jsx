@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import "../styles/AddContent.css";
+import "../../styles/AddContent.css";
 const OrderContent = () => {
 
   return (

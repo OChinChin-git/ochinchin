@@ -384,7 +384,7 @@ if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
           Bài tiếp theo
         </button>
         <div className="speed-control">
-          <label htmlFor="speedInput">Tốc độ:</label>
+          <label className="speed-input-button">Tốc độ:
           <input
             type="number"
             id="speedInput"
@@ -396,7 +396,7 @@ if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
           />
           <button id="setSpeedBtn" onClick={handleSpeedChange}>
             Đặt tốc độ
-          </button>
+          </button></label>
         </div>
       </div>
 

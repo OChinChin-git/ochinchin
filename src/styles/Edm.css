@@ -222,3 +222,15 @@ canvas {
   border: 1px solid #007bff;
   margin-top: 20px;
 }
+.speed-input-button{
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: row; /* Sắp xếp theo chiều ngang */
+  align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
+  justify-content: flex-start; /* Căn trái theo chiều ngang */
+  gap: 5px; /* Khoảng cách giữa các phần tử */
+  font-size: 16px; /* Kích thước chữ */
+  height: 100%; /* Đảm bảo chiều cao của container */
+  margin:0px;
+  font-style:normal;
+  
+}

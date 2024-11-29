@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import FeaturedContent from './FeaturedContent';
-import MovieList from './MovieList';
-import VideoManager from './VideoManager';
-import OrderContent from './OrderContent';
-import DeleteContent from './DeleteContent';
+import FeaturedContent from './AddContent/FeaturedContent';
+import MovieList from './AddContent/MovieList';
+import VideoManager from './AddContent/VideoManager';
+import OrderContent from './AddContent/OrderContent';
+import DeleteContent from './AddContent/DeleteContent';
 import "../styles/AddContent.css";
 
 const AddContent = () => {
