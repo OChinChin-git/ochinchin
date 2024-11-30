@@ -1,0 +1,68 @@
+
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated1 {
+    animation: color-change 1s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated2 {
+    animation: color-change 2s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated3 {
+    animation: color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated4 {
+    animation: color-change 4s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-background1 {
+    animation: background-color-change 1s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-background2 {
+    animation: background-color-change 2s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-background3 {
+    animation: background-color-change 3s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Định dạng tiêu đề với hiệu ứng hoạt hình đổi màu */
+.animated-background4 {
+    animation: background-color-change 4s infinite; /* Thêm hiệu ứng hoạt hình */
+}
+/* Hiệu ứng hoạt hình đổi màu */
+@keyframes color-change {
+0% {
+color: var(--color-1);
+}
+25% {
+color: var(--color-2);
+}
+50% {
+color: var(--color-3);
+}
+75% {
+color: var(--color-4);
+}
+100% {
+color: var(--color-1);
+}
+}
+@keyframes background-color-change {
+0% {
+background-color: var(--color-1);
+}
+25% {
+background-color: var(--color-2);
+}
+50% {
+background-color: var(--color-3);
+}
+75% {
+background-color: var(--color-4);
+}
+100% {
+background-color: var(--color-1);
+}
+}

@@ -1,0 +1,69 @@
+/* Container của toast */
+.toast {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8); /* Nền đen */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 18px;
+  max-width: 300px;
+  width: auto;
+  display: flex;
+  flex-direction: column; /* Chuyển sang hướng cột để cho phép icon và text nằm riêng */
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  border: none; /* Không có viền chung cho tất cả */
+}
+
+/* Hiển thị toast khi thêm lớp show */
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Các kiểu toast khác nhau */
+.toast-success {
+  background-color: rgba(0, 0, 0, 0.8); /* Nền đen */
+  border: 3px solid #4CAF50; /* Viền xanh cho thành công */
+}
+
+.toast-error {
+  background-color: rgba(0, 0, 0, 0.8); /* Nền đen */
+  border: 3px solid #F44336; /* Viền đỏ cho lỗi */
+}
+
+.toast-info {
+  background-color: rgba(0, 0, 0, 0.8); /* Nền đen */
+  border: 3px solid #268A0A; /* Viền xanh lá cho thông tin */
+  color: #39FF14; /* Màu chữ thông tin */
+}
+
+.kimochi .toast-info {
+  background-color: rgba(0, 0, 0, 0.8); /* Nền đen */
+  border: 3px solid #006666; /* Viền xanh lá cho thông tin */
+  color: #00FFFF; /* Màu chữ thông tin */
+}
+
+/* Icon trong toast */
+.toast-icon {
+  position: absolute;  /* Đặt vị trí của icon ra ngoài toast */
+  top: 0px;            /* Đưa icon lên góc trên */
+  left: 15px;             /* Canh giữa icon */
+  transform: translateX(-50%); /* Căn giữa chính xác */
+  font-size: 18px;       /* Kích thước icon */
+  color: white;          /* Màu icon mặc định là trắng */
+}
+
+
+
+/* Điều chỉnh vị trí chữ để không bị đè lên icon */
+.toast-message {
+   margin-left :10px;/* Đảm bảo văn bản không bị đè lên icon */
+  flex-grow: 1;      /* Để nội dung chiếm hết không gian còn lại */
+  text-align: center; /* Căn giữa văn bản */
+}
