@@ -38,6 +38,7 @@ button:hover {
 }
 input[type="number"],
 input[type="text"],
+input[type="email"],
 select{
     padding: 6px;
     border: 1.2px solid #268A0A; /* Viền xanh lá */
@@ -48,6 +49,7 @@ select{
 }
 input[type="number"]:focus,
 input[type="text"]:focus,
+input[type="email"]:focus,
  select:focus{
     border: 2px solid #66FF33; /* Viền sáng khi focus */
   outline:none;
@@ -63,12 +65,14 @@ select:hover{
 }
 .kimochi input[type="number"] ,
 .kimochi input[type="text"],
+.kimochi input[type="email"],
 .kimochi select{
     border: 1.2px solid #006666;
     color: #00FFFF;
 }
 .kimochi input[type="number"]:focus,
 .kimochi input[type="text"]:focus,
+.kimochi input[type="email"]:focus,
 .kimochi select:focus{
     border: 2px solid #00FFFF;
   outline:none;
@@ -77,6 +81,7 @@ select:hover{
 
 .kimochi input[type="number"]:hover,
 .kimochi input[type="text"]:hover,
+.kimochi input[type="email"]:hover,
 .kimochi select:hover{
     background-color: #000000; /* Nền khi hover */
     color: #006666; /* Màu chữ khi hover */
@@ -87,7 +92,6 @@ select:hover{
 input[type="password"] {
     padding: 4px;
   font-size:12px;
-    margin-right: 5px;
     border: 1.2px solid #268A0A; /* Viền xanh lá */
     border-radius: 5px;
     background-color: #1e1e1e; /* Nền tối */

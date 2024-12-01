@@ -111,8 +111,23 @@
 
 .profile-text-container {
   margin: 0 20px;
+  color:#39FF14;
+  display:flex;
+  gap:5px;
+  align-items: center;
 }
-
+.toggleProfile{
+  font-size:20px;
+}
+.toggleProfile:hover{
+  color:#229900;
+}
+.kimochi .profile-text-container{
+  color:#00FFFF;
+}
+.kimochi .toggleProfile:hover{
+  color:#229999;
+}
 .profile-picture {
   width: 32px;
   height: 32px;
@@ -152,4 +167,35 @@
 .kimochi .toggle-ball {
   background-color: white;
   transform: translateX(-20px);
+}
+.dropdownMenu {
+    position: absolute;
+    top: 41px; /* Đẩy dropdown xuống ngay bên dưới profile-container */
+    background-color: #000; /* Nền đen */
+    left:50px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 150px;
+    z-index: 1;
+    display: none; /* Ẩn dropdown theo mặc định */
+}
+
+.dropdownMenu div {
+    padding: 5px 0;
+}
+
+.dropdownMenu button {
+    width: 100%;
+    padding: 5px;
+    margin:0px;
+    border: none;
+    
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.dropdownMenu button:hover {
+    
+    text-decoration: underline;
 }

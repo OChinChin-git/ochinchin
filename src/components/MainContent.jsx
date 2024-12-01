@@ -7,6 +7,7 @@ import Content from "../pages/AddContent";
 import Data from "../pages/Data";
 import Kimochi from "../pages/Kimochi";
 import Home from "../pages/Home";
+import Login from "../pages/Login"
 import { ToastProvider } from './ToastContext';
 const MainContent = () => {
   return (
@@ -21,6 +22,7 @@ const MainContent = () => {
             <Route path="/kimochi" element={<Kimochi />} />
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login/>}/>
           </Routes>
         </div>
           </ToastProvider>

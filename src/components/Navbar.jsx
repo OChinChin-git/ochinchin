@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import "../styles/Animated.css";
@@ -7,7 +7,7 @@ const Navbar = () => {
   const [activeItem, setActiveItem] = React.useState("");
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [isOpen, setIsOpen] = useState(false); 
   // Cập nhật activeItem khi đường dẫn thay đổi
   useEffect(() => {
     const path = location.pathname;
@@ -70,7 +70,12 @@ const Navbar = () => {
       }
     };
   }, []); // Chỉ chạy một lần khi component mount
-
+  const handleProfileOpen=()=>{
+    setIsOpen(!isOpen);
+  }
+  const handleLoginButton = ()=>{
+    navigate('/login');
+  }
   return (
     <div className="navbar">
       <div className="navbar-container">
@@ -96,7 +101,18 @@ const Navbar = () => {
           <img className="profile-picture" alt="Profile" />
           <div className="profile-text-container">
             <span className="profile-text">Profile</span>
-            <i className="fas fa-caret-down"></i>
+            <div onClick={handleProfileOpen} style={{cursor:"pointer"}}>
+            <i className={`fas ${isOpen ?" fa-caret-up":"fa-caret-down"} toggleProfile`}></i>
+              </div>
+              <div className="dropdownMenu" style={!isOpen?{display:"none"}:{display:"block"}}>
+    <div id="name">Name: <span id="loggedUserName"></span></div>
+    <div id="email">Email: <span id="loggedUserEmail"></span></div>
+    
+    <div class="button-container">
+      <button id="changeProfileButton">Change Profile</button>
+      <button type="button" onClick={handleLoginButton}>Login</button>
+    </div>
+  </div>
           </div>
         </div>
         <div className="toggle">
