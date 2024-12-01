@@ -5,8 +5,10 @@
       #video-manager-section.active{
         display: block;
       }
-/* Cấu trúc cơ bản */
-
+.dragging {
+  opacity: 0.5;
+  background-color: #f0f0f0;  /* Bạn có thể thay đổi màu nền của hàng đang kéo */
+}
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -14,28 +16,22 @@ body {
     color: #333333;
     
 }
-      
-.add-content {
-  margin-left: 25px;  /* Di chuyển tất cả phần tử con sang trái */
- 
-}
-
-.add-content * {
-  margin-left: 0;     /* Loại bỏ margin mặc định */
-  padding: 0; 
-  /* Loại bỏ padding mặc định */
+.add-content-content{
+  padding: 20px 20px 30px;
+  
 }
 .add-content-page{
-  margin-left:15px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
   position: relative;
   min-height: 100vh;
+  
 }
 .kimochi .add-content-page{
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+background-size: cover;
 }
 .add-content-title,
 .content-title,
@@ -53,8 +49,14 @@ body {
   color:#00FFFF;
 }
 .content-desc{
+  color:#229900;
   font-size: 14px;
 }
+.kimochi .content-desc{
+  font-size: 14px;
+  color: #229999;
+}
+
 .save-content-button {
   margin-left:0px;
  display: flex;
@@ -67,7 +69,6 @@ body {
 }
 /* Form, bảng và các container */
 .section {
-    margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -82,33 +83,26 @@ body {
   display: flex; /* Sử dụng flexbox */
   flex-direction: row; /* Sắp xếp theo chiều ngang */
   align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
-  justify-content: flex-start; /* Căn trái theo chiều ngang */
+  justify-content: flex-start; /* Căn trái các phần tử */
   gap: 10px; /* Khoảng cách giữa các phần tử */
   font-size: 18px; /* Kích thước chữ */
-  height: 100%; /* Đảm bảo chiều cao của container */
-  margin:0px;
-  
+  height: 100%; /* Chiều cao của container */
+  margin: 0;
+}
+
+.selectLabel label, .selectLabel button {
+  flex-shrink: 0; /* Không cho label và button co lại */
+}
+
+.selectLabel select {
+  flex-grow: 1; /* Để select chiếm hết không gian còn lại */
+  width: 0; /* Đặt chiều rộng ban đầu bằng 0 */
+  max-width: 100%; /* Đảm bảo select không vượt quá container */
+  min-width: 0; /* Đảm bảo select không có chiều rộng tối thiểu */
 }
 
 
-#movie-list-table, #order-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  color: blue;
-}
 
-#movie-list-table th, #order-table th,
-#movie-list-table td, #order-table td {
-    padding: 8px;
-    border: 1px solid #cccccc;
-    text-align: left;
-}
-
-#movie-list-table th, #order-table th {
-    background-color: #3498db;
-    color:  lightgreen;
-}
 
 .video-item {
     margin-bottom: 15px;

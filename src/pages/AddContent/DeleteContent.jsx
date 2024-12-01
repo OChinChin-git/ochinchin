@@ -1,20 +1,23 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useRef } from 'react';
 import "../../styles/AddContent.css";
-import {loadOption} from "/src/components/AddContent.js"
+import {loadOption,deleteContent} from "/src/components/AddContent.js"
+import {useToast} from "/src/components/ToastContext"
+import {useLoader} from "/src/components/LoaderContext";
 
 const DeleteContent = () => {
   const [isDeleteVisible, setIsDeleteVisible] = useState(false); // Kiểm tra xem phần xóa có hiển thị không
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Kiểm tra xem phần mật khẩu có hiển thị không
-  const [selectedContentType, setSelectedContentType] = useState("feature"); // Loại nội dung được chọn để xóa
-  const [password, setPassword] = useState(''); // Trạng thái lưu mật khẩu nhập vào
+  const [selectedContentType, setSelectedContentType] = useState("feature"); 
   const [selectedDeleteContent, setSelectedDeleteContent] = useState();
   const [deleteOptions,setDeleteOptions] = useState([]);
-  
+  const passwordRef =useRef();
+  const {showToast} =useToast();
+  const {showLoader,hideLoader} =useLoader();
+
   const fetchDeleteContent = async() =>{
     let deleteContentOptions = "";
     if(selectedContentType === "feature"){
       deleteContentOptions = "feature"
-    }else if(selectedContentType === "movie-list"){
+    }else if(selectedContentType === "movieList"){
        deleteContentOptions = "movieList";
     }else {
       deleteContentOptions ="videos"
@@ -25,6 +28,7 @@ const DeleteContent = () => {
   }
   useEffect(() =>{
     fetchDeleteContent();
+    
   },[selectedContentType]);
   // Hàm để toggle phần nhập mật khẩu
   const handleDeleteContentClick = () => {
@@ -32,8 +36,26 @@ const DeleteContent = () => {
   };
 
   // Hàm để toggle hiển thị phần mật khẩu
-  const handlePasswordClick = () => {
-    setIsPasswordVisible(!isPasswordVisible); // Chuyển trạng thái của phần mật khẩu
+  const handlePasswordClick = async() => {
+   if(passwordRef.current.value !=="ochinchin"){
+     showToast("Sai mật khẩu");
+   }
+    try{
+      const isConfirm = confirm("Chắc chắn xóa chứ?");
+      if(!isConfirm){
+        showToast("Đã hủy");
+        return
+      }
+      showLoader("Đang xóa: " + selectedContentType + selectedDeleteContent);
+      await deleteContent(selectedContentType,selectedDeleteContent);
+      showToast("Xóa thành công","success");
+       setIsDeleteVisible(!isDeleteVisible)
+      fetchDeleteContent();
+    }catch(error){
+      alert(error)
+    }finally{
+      hideLoader();
+    }
   };
 
   // Hàm để xử lý việc thay đổi loại nội dung khi người dùng chọn
@@ -51,8 +73,8 @@ const DeleteContent = () => {
           value={selectedContentType} 
           onChange={handleContentTypeChange}>
           <option value="feature">Feature</option>
-          <option value="movie-list">Movie List</option>
-          <option value="video">Video</option>
+          <option value="movieList">Movie List</option>
+          <option value="videos">Video</option>
         </select>
           </label>
       </div>
@@ -60,7 +82,8 @@ const DeleteContent = () => {
       {/* Phần chọn nội dung cần xóa */}
       <div>
         <label>Chọn nội dung cần xóa:
-        <select id="content-list" value={selectedDeleteContent}>
+        <select id="content-list" value={selectedDeleteContent} onChange={(e)=>setSelectedDeleteContent(e.target.value)}>
+          <option value="">--Chọn nội dung cần xóa--</option>
           { deleteOptions.length >0 ?(
           deleteOptions.map((deleteOption) => (
           <option value={deleteOption} key={deleteOption}>
@@ -85,8 +108,8 @@ const DeleteContent = () => {
             type="password"
             id="password"
             placeholder="Nhập mật khẩu để xác nhận xóa"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)} // Lưu giá trị mật khẩu vào state
+            ref={passwordRef}
+           
           />
           </label>
           <button id="confirm-delete-btn" 

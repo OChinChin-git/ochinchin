@@ -29,13 +29,10 @@ const db = getFirestore(app);
 
 
 const typeRef = doc(db,"content","type");
-function getCol(ref,col){
-  return collection(ref,col);
-}
 
 async function getDocsId(type) {
   try {
-    const colRef = getCol(typeRef, type);
+    const colRef = collection(typeRef,type);
     const docIds = [];
     
     // Lấy tài liệu từ Firestore
@@ -54,11 +51,14 @@ async function getDocsId(type) {
     return [];
   }
 }
-
+function getTypeRef(type){
+  return collection(typeRef,type);
+}
 //Kiểm tra xem file tồn tại không
-async function checkIfDocExists(collectionPath, docId) {
+async function checkIfDocExists(type, docId) {
   try {
-    const docRef = doc(db, collectionPath, docId); // Tham chiếu đến tài liệu
+    const ref = getTypeRef(type);
+    const docRef = doc(ref, docId); // Tham chiếu đến tài liệu
     const docSnap = await getDoc(docRef); // Lấy tài liệu từ Firestore
 
     if (docSnap.exists()) {
@@ -70,33 +70,47 @@ async function checkIfDocExists(collectionPath, docId) {
     return false;
   }
 }
+function isYoutubeUrl(url) {
+  const youtubePattern = /^(https?\:\/\/)?(www\.)?(youtube|youtu)\.(com|be)\//;
+  if (youtubePattern.test(url)) {
+    
+    return true; // URL là YouTube
+  }
+  return false; // URL không phải YouTube
+}
+function getYoutubeId(url) {
+  const regex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|\S+\/v\/|(?:\S+)?(?:[?&]v=|\S+\/))([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11}))/;
+  const match = url.match(regex);
+  return match ? (match[1] || match[2]) : null;
+}
 
+function getYoutubeThumbnail(url) {
+  const id = getYoutubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+}
+export function processUrl(url) {
+  if (url && isYoutubeUrl(url)) {
+     
+    return getYoutubeThumbnail(url) || url; 
+  }
+  return url;
+}
 //save 
-export async function saveDoc(collectionPath, docId, data) {
+export async function saveDoc(type, docId, data) {
   try {
-    const exists = await checkIfDocExists(collectionPath, docId); // Kiểm tra tài liệu đã tồn tại
+
+     const ref=getTypeRef(type);
+    const exists = await checkIfDocExists(type,docId); // Kiểm tra tài liệu đã tồn tại
     if (exists) {
       const confirmOverwrite = confirm(
         "Tài liệu đã tồn tại. Bạn có muốn ghi đè không?"
       );
       if (!confirmOverwrite) {
-        alert("Lưu tài liệu bị hủy.");
-        return false;
+        return 'canceled';
       }
     }
-    
-    const docRef = doc(db, collectionPath, docId); // Tham chiếu đến tài liệu
+    const docRef = doc(ref, docId); // Tham chiếu đến tài liệu
     await setDoc(docRef, data); // Lưu dữ liệu vào Firestore
-    
-    const selectMovieList = document.getElementById("select-movie-list");
-    const selectFeature = document.getElementById("select-feature");
-    const selectExistingVideo = document.getElementById(
-      "select-existing-video"
-    );
-    const videoDropdown = document.getElementById("video-dropdown");
-    const addVideoList = document.getElementById("add-video-to-list");
-
-    return true;
   } catch (error) {
     alert(`Lỗi khi lưu tài liệu: ${error.message}`);
   }
@@ -117,5 +131,150 @@ export async function loadOption(contentType){
   }catch(error){
     return [];
     
+  }
+}
+export async function loadDoc(type,docId){
+  try{
+    const ref = getTypeRef(type);
+   const docRef = await doc(ref,docId);
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists()){
+      return docSnap.data();
+    }else{
+      alert(type+" "+docId +" Không tồn tại");
+      return null;
+    }
+  }catch(error){
+    alert(error);
+  }
+}
+
+// Lấy giá trị hiện tại từ Firestore
+async function getCurrentValuesFromFirestore(orderRef) {
+  const orderDoc = await getDoc(orderRef);
+  if (!orderDoc.exists()) return [];
+
+  const data = orderDoc.data();
+  return Object.keys(data).map((key) => data[key]);
+}
+
+// Lấy giá trị mới từ các collections
+async function getNewValues() {
+  const featureRef = await getTypeRef("feature");
+  const movieListRef = await getTypeRef("movieList");
+  const [featureDocs, movieListDocs] = await Promise.all([
+    getDocs(featureRef),
+    getDocs(movieListRef),
+  ]);
+
+  const newValues = [];
+
+  featureDocs.forEach((doc) => {
+    newValues.push(`feature ${doc.id}`);
+  });
+
+  movieListDocs.forEach((doc) => {
+    newValues.push(`movieList ${doc.id}`);
+  });
+
+  return newValues;
+}
+
+// Hàm cập nhật Firestore với thứ tự giá trị đã xử lý
+async function updateFirestore(orderRef, finalValues) {
+  let updatedData = {};
+
+  // Duyệt qua danh sách giá trị đã xử lý để tạo lại các field
+  finalValues.forEach((value, index) => {
+    updatedData[index + 1] = value; // Field là số thứ tự (1, 2, 3, ...)
+  });
+
+  // Ghi đè toàn bộ dữ liệu vào Firestore
+  await setDoc(orderRef, updatedData);
+}
+export async function syncOrderData() {
+  try {
+    const orderRef = doc(db, "content", "order"); // Tham chiếu tới tài liệu `order`
+
+    // Lấy giá trị hiện tại từ Firestore
+    const currentValues = await getCurrentValuesFromFirestore(orderRef);
+
+    // Lấy các giá trị mới từ feature và movieList
+    const newValues = await getNewValues();
+
+    // Dò và xử lý các giá trị
+    let finalValues = [];
+
+    // 1. Giữ nguyên giá trị có trong currentValues và newValues
+    currentValues.forEach((value) => {
+      if (newValues.includes(value)) {
+        finalValues.push(value);
+      }
+    });
+
+    // 2. Thêm các giá trị mới vào cuối
+    newValues.forEach((value) => {
+      if (!currentValues.includes(value)) {
+        finalValues.push(value);
+      }
+    });
+
+    // Cập nhật Firestore với danh sách giá trị đã xử lý
+    await updateFirestore(orderRef, finalValues);
+
+    console.log("Dữ liệu đã đồng bộ thành công!");
+    
+  } catch (error) {
+    console.error("Lỗi khi đồng bộ dữ liệu:", error);
+    
+  }
+}
+export async function loadOrder(){
+  try{
+    const docRef = await doc(db,"content","order");
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists()){
+      const data = docSnap.data();
+      const result=[];
+      for(const key in data){
+        if(data.hasOwnProperty(key)){
+          const value = data[key];
+          const[type,...rest] = value.split(' ');
+          const name = rest.join(' ');
+          result.push({
+            type:type,
+            name:name,
+          });
+        }
+      }
+      return result;
+    }else{
+      alert("Không tồn tại ")
+    }
+  }catch(error){
+    alert(error);
+  }
+}
+export async function saveOrder(data){
+  try{
+      const docRef = await doc(db,"content","order");
+  const saveData = [];
+  data.map((v) =>{
+    const value = v.type + ' ' +v.name;
+    saveData.push(value)
+  })
+  await updateFirestore(docRef,saveData);
+  }catch(error){
+    alert(error)
+  }
+
+}
+export async function deleteContent(type,name){
+  try{
+    const ref = getTypeRef(type);
+    const docRef = doc(ref,name);
+    await deleteDoc(docRef);
+  }catch(error){
+    alert(error)
   }
 }

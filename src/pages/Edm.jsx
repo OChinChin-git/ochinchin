@@ -323,6 +323,7 @@ if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
   };
   
   return (
+    <div className="edm-container">
     <div className="edmphiphai">
       <h1 className="animated2">Phi phai</h1>
       <div>
@@ -448,6 +449,7 @@ if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
         onEnded={nextSong}
       ></audio>
     </div>
+      </div>
   );
 };
 

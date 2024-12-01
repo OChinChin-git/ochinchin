@@ -1,14 +1,22 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useRef } from 'react';
 import "../../styles/AddContent.css";
-import {loadOption} from "/src/components/AddContent.js";
+import {loadOption,saveDoc,processUrl,loadDoc} from "/src/components/AddContent.js";
+import {useToast} from "/src/components/ToastContext"
+import {useLoader} from "/src/components/LoaderContext";
+
 const VideoManager = () => {
-  const [videoTitle, setVideoTitle] = useState('');
-  const [videoDescription, setVideoDescription] = useState('');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [videoThumbnail, setVideoThumbnail] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
+  const {showToast} =useToast();
+  const {showLoader,hideLoader} =useLoader();
+  
   const [videoOptions, setVideoOptions] = useState([]);
-  const [selectedVideo,setSelectedVideo] = useState();
+  const [selectedVideo,setSelectedVideo] = useState("");
+  const youtubeUrlRef = useRef();
+  const videoThumbnailRef = useRef();
+  const videoUrlRef = useRef();
+  const videoTitleRef=useRef();
+  const videoDescRef=useRef();
+  const formRef = useRef();
+  const [isSave,setIsSave] = useState(false);
   // Hàm xử lý khi tải video
   const fetchVideo = async() =>{
     try{const data= await loadOption("videos");
@@ -17,32 +25,80 @@ const VideoManager = () => {
          
        }
   }
+  useEffect(() => {
+  fetchVideo(); // Gọi fetchVideo lần đầu
+}, []);
   useEffect(() =>{
+    if(isSave){
     fetchVideo();
-  },[]);
-  const handleLoadVideo = () => {
-    videoOptions.current.value
-    
-  };
+    setIsSave(false)
+    }
+  },[isSave]);
 
   // Hàm xử lý khi tải URL Youtube
   const handleLoadUrl = () => {
-    // Logic xử lý tải URL Youtube, nếu có
+    const url = youtubeUrlRef.current.value;
+    videoUrlRef.current.value = url;
+    videoThumbnailRef.current.value = url;
   };
 
   // Hàm xử lý gửi form
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Logic lưu video, ví dụ: gửi form tới API hoặc Firestore
-    console.log({
-      videoTitle,
-      videoDescription,
-      youtubeUrl,
-      videoThumbnail,
-      videoUrl,
-    });
+  const handleSubmit = async(event) => {
+    event.preventDefault();
+     
+    const videoTitle = videoTitleRef.current.value;
+    const videoUrl = videoUrlRef.current.value;
+    const thumbnailUrl = processUrl(videoThumbnailRef.current.value);
+    const data={
+      videoTitle: videoTitle,
+      videoDescription:videoDescRef.current.value,
+      videoUrl:videoUrl,
+      videoThumbnail: thumbnailUrl ,
+    }
+    
+    showLoader("Đang lưu video: "+videoTitle);
+    try{
+    const result = await saveDoc("videos",videoTitle,data);
+      if(result === 'canceled'){
+        showToast("Đã hủy")
+        return
+      }
+      showToast("Lưu thành công video: " +videoTitle,"success")
+      formRef.current.reset();
+      setIsSave(true);
+    }catch(error){
+    alert("lỗi rồi "+ error)}
+    finally{
+      hideLoader("");
+    }
   };
 
+    const handleLoadVideo = async() => {
+    if(selectedVideo===""){
+      const isConfirm = confirm("Chưa có video nào được chọn, làm trống các ô")
+      if(!isConfirm){
+        showToast("Đã hủy");
+        return
+      }
+      formRef.current.reset();
+      showToast("Đã làm trống ")
+    }else{
+      try{
+        showLoader("Đang load video: "+ selectedVideo);
+        const data = await loadDoc("videos",selectedVideo);
+        if(data){
+          videoTitleRef.current.value = data.videoTitle;
+          videoUrlRef.current.value = data.videoUrl;
+          videoThumbnailRef.current.value = data.videoThumbnail;
+          videoDescRef.current.value= data.videoDescription;
+        }
+      }catch(error){
+        alert(error)
+      }finally{
+        hideLoader();
+      }
+    }
+  };
   return (
     <div id="video-manager-section" className="section">
       <h2 className="content-title">Video</h2>
@@ -50,7 +106,7 @@ const VideoManager = () => {
 
       {/* Dropdown để chọn video đã có */}
         <label className="selectLabel">Chọn video có sẵn:
-        <select id="add-video-to-list" value={selectedVideo}>
+        <select id="add-video-to-list" value={selectedVideo} onChange={(e) =>setSelectedVideo(e.target.value)}>
         <option value="">New</option>
           {videoOptions.length >0 ?(
           videoOptions.map((video) => (
@@ -61,7 +117,7 @@ const VideoManager = () => {
           </label>
       
       {/* Form thêm video mới */}
-      <form id="new-video-form" onSubmit={handleSubmit}>
+      <form id="new-video-form" ref={formRef} onSubmit={handleSubmit}>
         <div id="video-form">
           <label >Tiêu đề video:
           <input
@@ -69,8 +125,7 @@ const VideoManager = () => {
             name="videoTitle"
             id="videoTitle"
             placeholder="Nhập tiêu đề video"
-            value={videoTitle}
-            onChange={(e) => setVideoTitle(e.target.value)}
+            ref={videoTitleRef}
           /></label>
 
           <label >Mô tả:
@@ -79,8 +134,7 @@ const VideoManager = () => {
             name="videoDescription"
             id="videoDescription"
             placeholder="Nhập mô tả video"
-            value={videoDescription}
-            onChange={(e) => setVideoDescription(e.target.value)}
+            ref={videoDescRef}
           /></label>
             
           
@@ -99,8 +153,7 @@ const VideoManager = () => {
             name="youtubeUrl"
             id="youtubeUrl"
             placeholder="Nhập URL youtube hoặc bỏ qua"
-            value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
+            ref={youtubeUrlRef}
           />
           </label>
 
@@ -113,8 +166,8 @@ const VideoManager = () => {
             name="videoThumbnail"
             id="videoThumbnail"
             placeholder="Nhập URL thumbnail"
-            value={videoThumbnail}
-            onChange={(e) => setVideoThumbnail(e.target.value)}
+            ref={videoThumbnailRef}
+          
           /></label>
 
           <label >URL Video:
@@ -123,8 +176,8 @@ const VideoManager = () => {
             name="videoUrl"
             id="videoUrl"
             placeholder="Nhập URL video"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
+            ref={videoUrlRef}
+            
           /></label>
 
           <button type="submit" className="save-content-button">Lưu Video</button>

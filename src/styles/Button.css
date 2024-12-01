@@ -40,7 +40,6 @@ input[type="number"],
 input[type="text"],
 select{
     padding: 6px;
-    margin-right: 5px;
     border: 1.2px solid #268A0A; /* Viền xanh lá */
     border-radius: 5px;
     background-color: #1e1e1e; /* Nền tối */
@@ -130,6 +129,64 @@ input[type="password"]:hover {
     color: #006666; /* Màu chữ khi hover */
     border: 2px solid #00FFFF; /* Màu viền sáng cyan khi hover */
     box-shadow: 0 0 15px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi hover */
+}
+/* Phong cách cho tất cả các bảng */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  color: #39FF14; /* Chữ xanh lá giống input */
+  
+}
+
+table th, table td {
+  padding: 2px; /* Padding giống input */
+  border: 2px solid #268A0A; /* Viền xanh lá */
+  border-radius: 5px; /* Bo góc giống input */
+  background-color: #1e1e1e; /* Nền tối giống input */
+  color: #39FF14; /* Chữ xanh lá giống input */
+  transition: all 0.3s ease; /* Tạo hiệu ứng chuyển tiếp */
+  font-size:14px;
+}
+table td button {
+  margin: 0; /* Bỏ margin của nút trong các cell */
+  padding: 2px 6px; /* Tùy chỉnh padding nếu cần */
+ 
+}
+/* Hiệu ứng khi focus cho tất cả các ô bảng */
+table th:focus, table td:focus {
+  border: 2px solid #66FF33; /* Viền sáng khi focus */
+  outline: none;
+  box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi focus */
+}
+
+/* Hiệu ứng khi hover cho tất cả các ô bảng */
+table th:hover, table td:hover {
+  background-color: #000000; /* Nền tối khi hover */
+  color: #268A0A; /* Màu chữ khi hover */
+  border: 2px solid #66FF33; /* Viền sáng khi hover */
+  box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi hover */
+}
+
+/* Khi bảng có lớp kimochi */
+.kimochi table th, .kimochi table td {
+  border: 2px solid #006666; /* Viền cyan */
+  color: #00FFFF; /* Chữ cyan */
+}
+
+/* Hiệu ứng khi focus cho bảng kimochi */
+.kimochi table th:focus, .kimochi table td:focus {
+  border: 2px solid #00FFFF; /* Viền sáng cyan khi focus */
+  outline: none;
+  box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi focus */
+}
+
+/* Hiệu ứng khi hover cho bảng kimochi */
+.kimochi table th:hover, .kimochi table td:hover {
+  background-color: #000000; /* Nền tối khi hover */
+  color: #006666; /* Màu chữ khi hover */
+  border: 2px solid #00FFFF; /* Viền sáng cyan khi hover */
+  box-shadow: 0 0 15px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi hover */
 }
 
 

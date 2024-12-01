@@ -34,6 +34,7 @@ const AddContent = () => {
 
   return (
     <div className="add-content-page">
+      <div className="add-content-content">
       <h1 className="add-content-title animated3">Thêm Content</h1>
 
       {/* Dropdown cho phép chọn loại nội dung */}
@@ -55,6 +56,7 @@ const AddContent = () => {
       <div className="content-display">
         {renderContent()}
       </div>
+        </div>
     </div>
   );
 };

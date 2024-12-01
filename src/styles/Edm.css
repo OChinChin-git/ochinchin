@@ -6,18 +6,19 @@ body {
   color: white;
 }
 .edmphiphai {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
   position: relative;
-  
+  padding: 0px 0px 30px;
 }
 .kimochi .edmphiphai {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
   position: relative;
 }
+
 /* Vùng chứa controls */
 .controls {
   display: flex;
@@ -41,7 +42,7 @@ body {
   max-height: 150px;
   overflow-y: auto;
   border: 1px solid #3e3e3e; /* Viền xám */
-  margin: 40px 10px;
+  margin: 0px 10px;
   padding: 10px 20px;
   background-color: #1e1e1e; /* Nền danh sách tối */
 
@@ -236,4 +237,18 @@ canvas {
   margin:0px;
   font-style:normal;
   
+}
+@media screen and (max-width: 800px) {
+  .edmphiphai {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
+    url("https://i.pinimg.com/736x/2c/df/f7/2cdff7af62b8ba0fb5ed206255e02470.jpg");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+
+}
+.kimochi .edmphiphai {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
+    url("https://i.pinimg.com/736x/03/82/94/038294aa97a514c28aaafeecf315829a.jpg");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+  position: relative;
+}
 }
