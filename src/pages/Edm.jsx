@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/Edm.css";
-import "../styles/Button.css";
+
 import { useLoader } from "../components/LoaderContext";
 import {useToast} from "../components/ToastContext";
 const Edm = () => {
@@ -324,6 +323,7 @@ if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
   
   return (
     <div className="edm-container">
+      <link href="/src/styles/Edm.css" rel="stylesheet"/>
     <div className="edmphiphai">
       <h1 className="animated2">Phi phai</h1>
       <div>

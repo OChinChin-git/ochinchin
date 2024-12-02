@@ -1,8 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
-import "../styles/Animated.css";
-
+import ProfileDropdown from './ProfileDropdown';
 const Navbar = () => {
   const [activeItem, setActiveItem] = React.useState("");
   const navigate = useNavigate();
@@ -78,6 +77,7 @@ const Navbar = () => {
   }
   return (
     <div className="navbar">
+      
       <div className="navbar-container">
         <div className="logo-container">
           <h1 className="logo animated4">OChinChin</h1>
@@ -104,15 +104,11 @@ const Navbar = () => {
             <div onClick={handleProfileOpen} style={{cursor:"pointer"}}>
             <i className={`fas ${isOpen ?" fa-caret-up":"fa-caret-down"} toggleProfile`}></i>
               </div>
-              <div className="dropdownMenu" style={!isOpen?{display:"none"}:{display:"block"}}>
-    <div id="name">Name: <span id="loggedUserName"></span></div>
-    <div id="email">Email: <span id="loggedUserEmail"></span></div>
-    
-    <div class="button-container">
-      <button id="changeProfileButton">Change Profile</button>
-      <button type="button" onClick={handleLoginButton}>Login</button>
-    </div>
-  </div>
+        <ProfileDropdown
+          isOpen={isOpen}
+          handleProfileOpen={handleProfileOpen}
+          handleLoginButton={handleLoginButton}
+        />
           </div>
         </div>
         <div className="toggle">

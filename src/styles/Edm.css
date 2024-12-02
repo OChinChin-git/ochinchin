@@ -1,16 +1,12 @@
-/* Toàn bộ trang */
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #000000; /* Màu nền tối */
-  color: white;
-}
+
 .edmphiphai {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
   position: relative;
   padding: 0px 0px 30px;
+    text-align: center;
+  background-color: #000000; /* Màu nền tối */
 }
 .kimochi .edmphiphai {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),

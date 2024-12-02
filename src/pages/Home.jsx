@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLoader } from "../components/LoaderContext"; // Import useLoader từ context
-import "../styles/Home.css"; // Đường dẫn tới file CSS của bạn
-import "../styles/Animated.css"; // Đường dẫn tới file CSS của bạn
-import "../styles/Button.css"
+
 import { useToast } from '../components/ToastContext';
 import {
   getFirestore,
@@ -26,6 +24,7 @@ const firebaseConfig = {
 // Khởi tạo Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 const Home = () => {
   const [content, setContent] = useState([]); // Lưu nội dung từ Firestore
@@ -139,7 +138,9 @@ const loadContent = async () => {
 
   // Render nội dung
 return (
+  
   <div className="home-container">
+    <link href="/src/styles/Home.css" rel="stylesheet"/>
     {/* Kiểm tra nếu chưa có nội dung, sẽ hiển thị loader của bạn */}
     {content.length === 0 ? (
       // Không cần div loader nữa vì loader của bạn sẽ hiển thị từ `useLoader`

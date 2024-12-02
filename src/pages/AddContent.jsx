@@ -4,7 +4,6 @@ import MovieList from './AddContent/MovieList';
 import VideoManager from './AddContent/VideoManager';
 import OrderContent from './AddContent/OrderContent';
 import DeleteContent from './AddContent/DeleteContent';
-import "../styles/AddContent.css";
 
 const AddContent = () => {
   const [contentType, setContentType] = useState(''); // Theo dõi lựa chọn từ dropdown
@@ -34,6 +33,7 @@ const AddContent = () => {
 
   return (
     <div className="add-content-page">
+      <link href="/src/styles/AddContent.css" rel="stylesheet"/>
       <div className="add-content-content">
       <h1 className="add-content-title animated3">Thêm Content</h1>
 
