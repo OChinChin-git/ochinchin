@@ -1,5 +1,5 @@
 import {useState,useRef,useEffect}from 'react';
-import {signInWithGoogle,signUp} from "../components/firebaseAuth.js"
+import {signInWithGoogle,signUp,login} from "../components/firebaseAuth.js"
 import { useLoader } from "../components/LoaderContext";
 import {useToast} from "../components/ToastContext";
 
@@ -18,10 +18,27 @@ const Login=()=>{
   const handleSignUp=()=>{
     setIsSignUp(!isSignUp);
   }
+  const [isLogin,setIsLogin] = useState(false);
+  const checkIsLogin = ()=>{
+    const check = localStorage.getItem("loggedInUserId");
+    if(check == null){
+      return
+    }
+    setIsLogin(true);
+  }
+  useEffect(()=>{
+    checkIsLogin();
+  },[]);
+  
   const handleSignInWithGoogle = async()=>{
     try{
     showLoader("Đang đăng nhập với google");
     const final = await signInWithGoogle();
+    if(final == "kimochi"){
+        setTimeout(()=>{
+          window.location.href = '/'
+        },1500);
+    }
     if(final =="FirebaseError: Firebase: Error (auth/popup-closed-by-user)."){
       showToast("Đã hủy","error");
       return
@@ -63,11 +80,11 @@ const Login=()=>{
         return
       }
       if(final =="kimochi"){
-        showToast("Đăng kí thành công, sang trang login","success");
+        showToast("Đăng kí thành công !","success");
         registerRef.current.reset();
         setTimeout(()=>{
-          setIsSignUp(!isSignUp);
-        },1000);
+          window.location.href = '/'
+        },1500);
       }
     }catch(error){
       alert(error);
@@ -76,12 +93,33 @@ const Login=()=>{
     }
   }
     const handleSubmitLogin = async()=>{
-    
+      event.preventDefault();
+    try{
+      showLoader("Đang đăng nhập");
+      const email = loginEmailRef.current.value;
+      const pass = loginPasswordRef.current.value;
+      const final = await login(email,pass);
+      if(final =="kimochi"){
+        showToast("Login thành công!","success");
+         setTimeout(()=>{
+          window.location.href = '/'
+        },1500);
+      }else{
+        alert(final);
+
+      }
+    }catch(error){
+      alert(error);
+    }finally{
+      hideLoader();
+    }
   }
+
   return(
-    <div className="login-background"  >
+    <>
+    <div className="login-background"  style={!isLogin ? {display: ""}:{display:"none"}}>
       <link href="/src/styles/Login.css" rel="stylesheet"/>
-  <div className="login-container" style={!isSignUp ? {display: ""}:{display:"none"}} >
+  <div className="login-container" style={isSignUp ? {display: ""}:{display:"none"}} >
   <h1 className="form-title animated3" >Register</h1>
   <form  ref={registerRef} onSubmit={handleSubmitSignUp}>
     <div  className="messageDiv" ></div>
@@ -125,7 +163,7 @@ const Login=()=>{
   </div>
 </div>
 
-<div className="login-container" style={isSignUp ?{display: ""}:{display:"none"}} >
+<div className="login-container" style={!isSignUp ?{display: ""}:{display:"none"}} >
     <h1 className="form-title animated3">Login</h1>
     <form  ref={loginRef} onSubmit={handleSubmitLogin}>
       <div  className="messageDiv"></div>
@@ -165,6 +203,8 @@ const Login=()=>{
     </div>
 </div>
     </div>
+      <div style={isLogin ? {display: ""}:{display:"none"}}><p>Đã đăng nhập rồi yamate</p></div>
+    </>
       )
 }
 export default Login;

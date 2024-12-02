@@ -3,7 +3,9 @@ body {
   font-family: "Roboto", sans-serif;
  user-select: none; /* Ngừng chọn chữ trên toàn bộ trang */
 }
-
+body{
+  background-color: #000000;
+}
 /* Cho phép chọn chữ ở các trường nhập liệu như input, textarea */
 input, textarea {
     user-select: text; /* Cho phép chọn chữ trong input và textarea */

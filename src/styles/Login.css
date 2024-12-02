@@ -33,6 +33,18 @@ background-size: cover;
   margin: 20px auto;
   box-sizing: border-box; /* Bao gồm padding và border vào kích thước */
 }
+@media screen and (max-width: 500px) {
+  .login-container {
+    transform: scale(0.8); /* Thu nhỏ container còn 50% */
+    transform-origin: center top; /* Giữ điểm gốc tại trung tâm */
+  }
+}
+@media screen and (max-height:500px){
+  .login-container{
+    transform:scale(0.9);
+    transform-origin: center top;
+  }
+}
 .kimochi .login-container{
   box-shadow: 0 20px 35px rgba(0, 255, 255, 0.2);
 }

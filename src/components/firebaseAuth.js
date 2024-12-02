@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
  import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
- import{getFirestore, setDoc, doc} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
+ import{getFirestore, setDoc, doc,getDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
  
  // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -24,11 +24,19 @@ export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    console.log("User Info:", user);
-
-    // Lưu thông tin người dùng vào localStorage hoặc chuyển hướng người dùng
+    const ref = doc(db,"users",user.uid);
+      const displayName = user.displayName; // Tên hiển thị
+  const photoURL = user.photoURL; // Ảnh đại diện
+  const email = user.email; // Email
+    const data ={
+    displayName: displayName,
+    name: displayName,
+    avatar: photoURL,
+    email: email,
+    }
+    await setDoc(ref,data)
     localStorage.setItem("loggedInUserId", user.uid);
-    window.location.href = '/'; // Chuyển hướng sau khi đăng nhập thành công
+    return "kimochi"
   } catch (error) {
   return error;
   }
@@ -43,12 +51,13 @@ export async function signUp(name, email, password) {
       email: email,
       name: name,
       displayName: displayName,
-      photoUrl: photoUrl,
+      avatar: photoUrl,
     };
     const docRef = doc(db, "users", user.uid);
     
     try {
       await setDoc(docRef, userData);
+      localStorage.setItem('loggedInUserId', user.uid);
       return "kimochi";
     } catch (error) {
       alert(`Error saving user data: ${error.message}`);  // Hiển thị thông báo lỗi khi lưu dữ liệu
@@ -63,3 +72,36 @@ export async function signUp(name, email, password) {
     }
   }
 }
+export async function login(email,password){
+  try{
+    const userCredential = await signInWithEmailAndPassword(auth,email,password);
+    const user = userCredential.user;
+    localStorage.setItem('loggedInUserId', user.uid)
+    return "kimochi"
+  }catch(error){
+    if(error.code === 'auth/invalid-credential'){
+      return "Sai mật khẩu hoặc email"
+    }else{
+      return "Tài khoản không tồn tại"
+    }
+  }
+}
+export async function getUserProfile(uid){
+  try{
+    const ref = doc(db,"users",uid)
+    const data = await getDoc(ref);
+    return data.data();
+  }catch(error){
+    alert(error);
+  }
+}
+export async function changeUserProfile(uid,name,avt){
+  try{
+    const ref = doc(db,"users",uid);
+    await updateDoc(ref, {
+      displayName:name,
+      avatar:avt,
+    });
+  }catch(error){
+    alert(error)}
+};

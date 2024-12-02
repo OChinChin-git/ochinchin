@@ -170,17 +170,20 @@
 }
 .dropdownMenu {
     position: absolute;
-    top: 41px; /* Đẩy dropdown xuống ngay bên dưới profile-container */
-    background-color: #000; /* Nền đen */
-    left:50px;
-    border: 1px solid #ccc;
+    top: 41px; 
+    border:1px solid #39FF14;
     padding: 10px;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     min-width: 150px;
     z-index: 1;
-    display: none; /* Ẩn dropdown theo mặc định */
+    display: none;
+    left:100px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius:10px ;
 }
-
+.kimochi .dropdownMenu{
+  border:1px solid #00FFFF;
+}
 .dropdownMenu div {
     padding: 5px 0;
 }
