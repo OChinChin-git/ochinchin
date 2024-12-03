@@ -6,8 +6,9 @@
   width: 260px;  /* Để nó tự động chiếm hết chiều rộng */
 }
 .featured-title-text {
-  font-size: 24px;
+  font-size: 19px;
   color: #4dbf00;
+  font-style:oblique;
 }
 
 .featured-desc {
@@ -35,13 +36,16 @@
 .movie-list {
   display: flex;
   align-items: center;
-  height: auto;  /* Không giới hạn chiều cao */
+  height: auto;
   transform: translateX(0);
-  transition: all 1s ease-in-out;
+  transition: transform 1.5s ease-in-out; /* Đảm bảo có hiệu ứng chuyển động */
 }
+
 .movie-list-title{
-  font-size:24px;
+  font-size:22px;
   text-align:left;
+  font-style:oblique;
+  font-weight:normal;
 }
 .movie-list-item {
   margin-right: 30px;
@@ -51,7 +55,7 @@
 .movie-list-item:hover .movie-list-item-img {
   transform: scale(1.2);
   margin: 0 30px;
-  opacity: 0.5;
+  opacity: 0.2;
 }
 
 .movie-list-item:hover .movie-list-item-title,
@@ -69,9 +73,9 @@
 
 /* Tiêu đề */
 .movie-list-item-title {
-  background-color: #333;  /* Nền của Tiêu đề */
-  padding: 0 10px;  /* Padding của chữ, để nền không bị chật */
-  font-size: 17px;
+  background-color: transparent; 
+  padding: 0px; 
+  font-size: 15px;
   font-weight: bold;
   position: absolute;
   top: 10%;
@@ -80,7 +84,6 @@
   transition: 1s all ease-in-out;
   color: #39FF14;
 
-  /* Nền sẽ tự động thay đổi chiều rộng theo chữ */
   white-space: nowrap;  /* Ngăn dòng tự xuống hàng */
   overflow-x: auto;  /* Thêm thanh cuộn ngang nếu nội dung quá dài */
   width: auto;  /* Giảm chiều rộng cố định để chiều dài nền tự động theo chữ */
@@ -89,11 +92,12 @@
 
 /* Mô tả */
 .movie-list-item-desc {
-  background-color: #333;  /* Nền của Mô tả */
-  padding: 10px;  /* Padding giúp nền bao quanh nội dung */
-  font-size: 14px;
+  background-color: transparent; 
+  padding: 0px;
+  font-size: 13px;
+ 
   position: absolute;
-  top: 35%;
+  top: 55px;
   left: 50px;
   opacity: 0;
   transition: 1s all ease-in-out;
@@ -119,8 +123,16 @@
 /* Đảm bảo phần tử cha có position: relative để định vị mũi tên */
 .movie-list-wrapper {
   position: relative;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+  background-position:center center;
 }
-
+.kimochi .movie-list-wrapper{
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+  background-size: cover;
+}
 .arrow-left, .arrow {
   font-size: 80px;
   position: absolute;

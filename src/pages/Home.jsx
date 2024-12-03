@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import { useLoader } from "../components/LoaderContext"; // Import useLoader từ context
 
 import { useToast } from '../components/ToastContext';
@@ -163,6 +163,10 @@ return (
 
 // Component hiển thị Feature
 const Feature = ({ data }) => {
+  const handleWatchVideo = (event)=>{
+    const id = event.target.getAttribute("id");
+    window.location.href = "/" + id;
+  }
   return (
     <div
       className="featured-content"
@@ -178,17 +182,66 @@ const Feature = ({ data }) => {
         <span className="featured-title-text  animated3">{data.title}</span>
         <p className="featured-desc">{data.featuredDesc}</p>
       </div>
-      <button className="featured-button" data-video-url={data.videoUrl}>
+      <button className="featured-button" 
+        id={data.videoId}
+        onClick={handleWatchVideo}
+        >
         WATCH
       </button>
     </div>
   );
 };
 
-// Component hiển thị danh sách Movie
+
 const MovieList = ({ data }) => {
   const { name, videos } = data;
+  const movieListRef = useRef(null); // Tham chiếu tới danh sách video
 
+const handleLeftArrow = () => {
+  const movieList = movieListRef.current;
+  const itemWidth = 290; // Độ rộng mỗi item
+  const currentX = getCurrentTranslateX(movieList);
+
+  // Thêm hiệu ứng chuyển động chậm 1.5s
+  movieList.style.transition = "transform 1s ease-in-out"; 
+
+  // Nếu vị trí hiện tại không phải là 0, di chuyển lùi
+  if (currentX < 0) {
+    movieList.style.transform = `translateX(${currentX + itemWidth}px)`;
+  } else {
+    movieList.style.transform = "translateX(0)";
+  }
+};
+
+const handleRightArrow = () => {
+  const movieList = movieListRef.current;
+  const itemWidth = 290; // Độ rộng mỗi item
+  const containerWidth = movieList.offsetWidth; // Chiều rộng container
+  const itemsWidth = videos.length * itemWidth; // Tổng chiều rộng các item
+  const currentX = getCurrentTranslateX(movieList);
+
+  // Thêm hiệu ứng chuyển động chậm 1.5s
+  movieList.style.transition = "transform 1s ease-in-out"; 
+
+  // Kiểm tra nếu còn đủ không gian để di chuyển sang phải
+  if (Math.abs(currentX) + containerWidth < itemsWidth) {
+    movieList.style.transform = `translateX(${currentX - itemWidth}px)`;
+  } else {
+    movieList.style.transform = "translateX(0)";
+  }
+};
+
+// Hàm lấy giá trị translateX hiện tại
+const getCurrentTranslateX = (element) => {
+  const matrix = window.getComputedStyle(element).transform;
+  if (matrix === "none") return 0;
+  const values = matrix.split(",");
+  return parseFloat(values[4]) || 0;
+};
+const handleWatchButton = ()=>{
+  const id = event.target.getAttribute("video-id");
+  window.location.href = "/"+id;
+}
   return (
     <div className="movie-list-container">
       {/* Tiêu đề với hiệu ứng */}
@@ -196,7 +249,7 @@ const MovieList = ({ data }) => {
 
       <div className="movie-list-wrapper">
         {/* Bao bọc video trong "movie-list" */}
-        <div className="movie-list">
+        <div className="movie-list" ref={movieListRef}>
           {videos.map((video, index) => (
             <div key={index} className="movie-list-item">
               <img
@@ -207,7 +260,11 @@ const MovieList = ({ data }) => {
               />
               <span className="movie-list-item-title">{video.videoTitle}</span>
               <p className="movie-list-item-desc">{video.videoDescription}</p>
-              <button className="movie-list-item-button" data-video-url={video.videoUrl}>
+              <button
+                className="movie-list-item-button"
+                video-id={video.videoId}
+                onClick={handleWatchButton}
+              >
                 Watch
               </button>
             </div>
@@ -215,10 +272,19 @@ const MovieList = ({ data }) => {
         </div>
 
         {/* Mũi tên điều hướng */}
-        <i className="fas fa-chevron-right arrow"></i>
-        <i className="fas fa-chevron-left arrow-left"></i>
+        <i
+          className="fas fa-chevron-right arrow"
+          onClick={handleRightArrow}
+        ></i>
+        <i
+          className="fas fa-chevron-left arrow-left"
+          onClick={handleLeftArrow}
+        ></i>
       </div>
     </div>
   );
 };
+
+
+
 export default Home;

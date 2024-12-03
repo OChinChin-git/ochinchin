@@ -25,6 +25,11 @@ export async function signInWithGoogle() {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     const ref = doc(db,"users",user.uid);
+    const docSnap = await getDoc(ref);
+    if(docSnap.exists()){
+       localStorage.setItem("loggedInUserId", user.uid);
+      return "kimochi"
+    }
       const displayName = user.displayName; // Tên hiển thị
   const photoURL = user.photoURL; // Ảnh đại diện
   const email = user.email; // Email

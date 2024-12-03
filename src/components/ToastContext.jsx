@@ -14,10 +14,10 @@ const preloadAudio = () => {
   const successAudio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3');
   
   // Cài đặt các thuộc tính âm thanh như volume, playbackRate ngay khi tải
-  errorAudio.volume = 0.6;
+  errorAudio.volume = 0.7;
   errorAudio.playbackRate = 1.25;
   
-  successAudio.volume = 0.5;
+  successAudio.volume = 0.45;
   successAudio.playbackRate = 1.25;
   
   // Trả về âm thanh đã tải sẵn

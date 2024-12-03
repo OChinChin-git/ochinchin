@@ -100,7 +100,34 @@ export async function saveDoc(type, docId, data) {
   try {
 
      const ref=getTypeRef(type);
+    const idRef = getTypeRef("videosId");
+    const docRef = doc(ref, docId);
     const exists = await checkIfDocExists(type,docId); // Kiểm tra tài liệu đã tồn tại
+    if(type=="videos"){
+      if(!exists){
+      const videoId ="video-"+Date.now();
+      const idDocRef = doc(idRef,videoId);
+      data.videoId = videoId;
+      const idData ={
+        videoId:videoId,
+        videoTitle: data.videoTitle,
+      }
+      await setDoc(idDocRef,idData)
+      }
+
+    }
+    if(type=="feature"){
+      if(!exists){
+        const videoId ="featuredVideo-"+Date.now();
+        const idDocRef = doc(idRef,videoId);
+        data.videoId = videoId;
+        const idData = {
+          videoId:videoId,
+          videoTitle:data.title,
+        }
+        await setDoc(idDocRef,idData)
+      }
+    }
     if (exists) {
       const confirmOverwrite = confirm(
         "Tài liệu đã tồn tại. Bạn có muốn ghi đè không?"
@@ -108,9 +135,9 @@ export async function saveDoc(type, docId, data) {
       if (!confirmOverwrite) {
         return 'canceled';
       }
-    }
-    const docRef = doc(ref, docId); // Tham chiếu đến tài liệu
-    await setDoc(docRef, data); // Lưu dữ liệu vào Firestore
+      await updateDoc(docRef, data); 
+    }else{ 
+      await setDoc(docRef, data); }
   } catch (error) {
     alert(`Lỗi khi lưu tài liệu: ${error.message}`);
   }

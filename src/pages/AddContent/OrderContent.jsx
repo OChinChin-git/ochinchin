@@ -58,7 +58,6 @@ const OrderContent = () => {
     try {
       showLoader("Đang lưu");
       const data = contentList;
-      alert(JSON.stringify(contentList, null, 2)); // Dễ dàng đọc, thụt lề 2 khoảng trắng
       await saveOrder(data);
       showToast("Lưu thành công");
     } catch (error) {

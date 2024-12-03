@@ -40,6 +40,13 @@ const FeaturedContent = () => {
     fetchOptions("feature");
     fetchOptions("videos");
   }, []);
+  useEffect(()=>{
+    if(isSubmit==true){
+    fetchOptions("feature");
+    setIsSubmit(false);
+    }
+
+  },[isSubmit]);
   useEffect(( ) =>{
     if(isSubmit){
       fetchOptions("feature");

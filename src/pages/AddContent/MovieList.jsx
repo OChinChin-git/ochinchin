@@ -14,8 +14,8 @@ const MovieList = () => {
   const formRef = useRef();
   const [videoList,setVideoList] =useState([]);
   const {showToast} = useToast();
-  const {showLoader,hideLoader} = useLoader();
-  
+  const {showLoader,hideLoader} = useLoader();  
+  const [isSubmit,setIsSubmit] =useState(false);
   const fetchOption = async(type) =>{
   try{
     const data= await loadOption(type);
@@ -32,6 +32,12 @@ const MovieList = () => {
     fetchOption("movieList");
     fetchOption("videos")
   },[]);
+  useEffect(()=>{
+    if(isSubmit==true){
+      fetchOption("movieList")
+      setIsSubmit(false);
+    }
+  },[isSubmit])
 const handleLoadML = async()=>{
   if(selectedML === ""){
     const isConfirm = confirm("Chưa có list nào được chọn, làm trống list ?");
@@ -74,6 +80,7 @@ const handleSubmit = async() =>{
       return
     }
     showToast("Lưu thành công","success");
+    setIsSubmit(true);
     formRef.current.reset();
     setVideoList([]);
   }catch(error){
