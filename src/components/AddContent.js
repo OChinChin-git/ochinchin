@@ -105,7 +105,7 @@ export async function saveDoc(type, docId, data) {
     const exists = await checkIfDocExists(type,docId); // Kiểm tra tài liệu đã tồn tại
     if(type=="videos"){
       if(!exists){
-      const videoId ="video-"+Date.now();
+      const videoId ="v"+Date.now();
       const idDocRef = doc(idRef,videoId);
       data.videoId = videoId;
       const idData ={
@@ -118,7 +118,7 @@ export async function saveDoc(type, docId, data) {
     }
     if(type=="feature"){
       if(!exists){
-        const videoId ="featuredVideo-"+Date.now();
+        const videoId ="f" +Date.now();
         const idDocRef = doc(idRef,videoId);
         data.videoId = videoId;
         const idData = {

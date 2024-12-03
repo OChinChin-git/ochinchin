@@ -6,6 +6,7 @@ const Data = lazy(() => import('../pages/Data'));
 const Kimochi = lazy(() => import('../pages/Kimochi'));
 const Home = lazy(() => import('../pages/Home'));
 const Login = lazy(() => import('../pages/Login'));
+const Video = lazy(()=> import ('../pages/Video'));
 import "../styles/MainContent.css";
 import '../styles/Button.css';
 const MainContent = () => {
@@ -21,6 +22,7 @@ const MainContent = () => {
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/video" element={<Video/>}/>
             </Routes>
           </div>
         </Suspense>

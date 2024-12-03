@@ -165,7 +165,7 @@ return (
 const Feature = ({ data }) => {
   const handleWatchVideo = (event)=>{
     const id = event.target.getAttribute("id");
-    window.location.href = "/" + id;
+    window.location.href = "/video?" + id;
   }
   return (
     <div
@@ -240,7 +240,7 @@ const getCurrentTranslateX = (element) => {
 };
 const handleWatchButton = ()=>{
   const id = event.target.getAttribute("video-id");
-  window.location.href = "/"+id;
+  window.location.href = "/video?"+id;
 }
   return (
     <div className="movie-list-container">
