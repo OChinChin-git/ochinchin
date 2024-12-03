@@ -67,17 +67,23 @@ const convertUrl = (url) => {
   useState(()=>{
     videoInfo();
 },[])
+//
+//
+//
+//
   return(
-    <div>
+    <div className="video-block">
       <link rel="stylesheet" href="src/styles/Video.css"></link>
       <div className="video-container">
-        <iframe frameborder="0" allowfullscreen src={videoUrl}></iframe>
-        <div className="video-title animated2" value={videoTitle}>{videoTitle}</div>
+        <iframe frameborder="0" allowfullscreen allowtransparency="true" src={videoUrl} className="video"></iframe>
+        <div className="title animated2" value={videoTitle}>{videoTitle}</div>
       </div>
       
-      <div className="chat">
-        <p>Chat</p>
-        
+      <div className="chat" >
+        <div className="avatar">
+        </div>
+        <div className="chat-content">
+        </div>
       </div>
     </div>
   )

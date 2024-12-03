@@ -1,22 +1,39 @@
 .featured-content {
-  padding: 20px 50px;
-  text-align: left;  /* Căn các phần tử con về phía bên trái */
+  padding: 10px 30px;
+  text-align: left;
+
 }
 .featured-title {
   width: 260px;  /* Để nó tự động chiếm hết chiều rộng */
+  
 }
 .featured-title-text {
   font-size: 19px;
   color: #4dbf00;
-  font-style:oblique;
+  font-style: oblique;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  position: relative; /* Tạo môi trường cho pseudo-element */
+}
+
+.featured-title-text:hover {
+  overflow-x: auto; /* Hiện thanh cuộn ngang khi hover */
 }
 
 .featured-desc {
   width: 100%;  /* Làm cho mô tả chiếm hết chiều rộng */
   color: lightgray;
   margin:5px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  
 }
-
+.featured-desc:hover{
+  overflow-x: auto; /* Hiện thanh cuộn ngang khi hover */
+}
 .featured-button {
   margin-left:0px;
   position: relative;  /* Đảm bảo không bị kéo giãn */
@@ -24,7 +41,7 @@
 
 
 .movie-list-container {
-  padding-left: 50px;  /* Padding trái */
+  padding-left: 30px;  /* Padding trái */
   padding-right: 0px; /* Padding phải */
 }
 
@@ -83,13 +100,16 @@
   opacity: 0;
   transition: 1s all ease-in-out;
   color: #39FF14;
-
+  text-overflow: ellipsis;
   white-space: nowrap;  /* Ngăn dòng tự xuống hàng */
-  overflow-x: auto;  /* Thêm thanh cuộn ngang nếu nội dung quá dài */
+  overflow:hidden;  /* Thêm thanh cuộn ngang nếu nội dung quá dài */
   width: auto;  /* Giảm chiều rộng cố định để chiều dài nền tự động theo chữ */
   max-width: 250px;  /* Giới hạn chiều rộng tối đa */
 }
-
+.movie-list-item-title:hover{
+  overflow-x:auto;
+  text-overflow:unset;
+}
 /* Mô tả */
 .movie-list-item-desc {
   background-color: transparent; 
@@ -104,13 +124,14 @@
 
   /* Giới hạn chiều cao và thêm thanh cuộn dọc */
   max-height: 70px;  /* Giảm chiều cao mô tả */
-  overflow-y: auto;  /* Thêm thanh cuộn dọc nếu nội dung quá dài */
-
+  overflow: hidden;  /* Thêm thanh cuộn dọc nếu nội dung quá dài */
   /* Nền sẽ tự động thay đổi chiều rộng theo nội dung */
   width: auto;  /* Giảm chiều rộng cố định để chiều dài nền tự động theo chữ */
   max-width: 250px;  /* Giới hạn chiều rộng tối đa */
 }
-
+.movie-list-item-desc:hover{
+  overflow-y:auto;
+}
 .movie-list-item-button {
   position: absolute;
   bottom: 15px;

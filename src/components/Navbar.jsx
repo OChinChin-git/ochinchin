@@ -15,7 +15,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false); 
   const [name,setName]=useState("");
   const [email,setEmail]=useState("");
-  const[isLoggedIn,setIsLoggedIn] = useState();
+  const[isLoggedIn,setIsLoggedIn] = useState(false);
   const [uid, setUid] = useState(localStorage.getItem("loggedInUserId"));
   const [avt,setAvt] = useState("");
   // Cập nhật activeItem khi đường dẫn thay đổi

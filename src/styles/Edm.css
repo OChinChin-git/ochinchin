@@ -47,10 +47,12 @@ position: relative;
   margin: 0px 10px;
   padding: 10px 20px;
   background-color: #1e1e1e; /* Nền danh sách tối */
-
+ overflow:hidden;
   border-radius: 5px;
 }
-
+.list-edm:hover{
+  overflow-y:auto;
+}
 .list-edm li {
   cursor: pointer;
   padding: 4px;
@@ -58,6 +60,7 @@ position: relative;
   margin: 5px 0;
   border-radius: 3px;
   transition: background-color 0.3s ease;
+  
 }
 
 /* Giao diện danh sách */
@@ -67,6 +70,7 @@ position: relative;
   padding: 10px;
   background-color: #000000;
   color: white;
+ 
 }
 
 .list-edm li.active {

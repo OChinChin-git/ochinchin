@@ -62,7 +62,6 @@ const Sidebar = () => {
       <i
         className={`left-menu-icon fas fa-film ${activeItem === 'video' ? 'active' : ''}`}
         data-tooltip="Video"
-        onClick={() => handleMenuClick('/video', 'video')} // Điều hướng đến /video
       ></i>
     </div>
   );

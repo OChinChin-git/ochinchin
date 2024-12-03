@@ -1,99 +1,51 @@
-
-/* Phần chat chiếm ít không gian hơn */
-.chat {
-  display:none;
-  flex: auto;  /* Giảm tỷ lệ flex để chat chiếm ít không gian hơn */
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 10px;  /* Giảm padding trong chat */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  height: calc(100vh - 50px);  /* Đảm bảo chiều cao phần chat không vượt quá màn hình */
-  overflow-y: auto; /* Nếu chat dài hơn, sẽ có thanh cuộn */
-  box-sizing: border-box; /* Đảm bảo không bị tràn */
-  max-width: 30%; /* Giới hạn chiều rộng tối đa của phần chat */
+.video-block{
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+    width:100%;
+  height:100%;
+  align-items:center;
+  margin:0;
 }
-
-.chat h2 {
-  font-size: 20px; /* Giảm font size tiêu đề chat */
-  font-weight: bold;
-  margin-bottom: 8px; /* Giảm khoảng cách giữa tiêu đề chat và tin nhắn */
+.kimochi .video-block{
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
 }
-
-.chat .message {
-  margin-bottom: 12px; /* Giảm khoảng cách giữa các tin nhắn */
-}
-
-.chat .message .username {
-  font-weight: bold;
-  color: #333;
-}
-
-.chat .message .message-text {
-  font-size: 14px;
-  color: #555;
-}
-
 .video-container {
-  flex: 3;  /* Điều chỉnh tỷ lệ chiều rộng */
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  padding:4px 4px 0px;
-  box-sizing: border-box; /* Đảm bảo không bị tràn */
-  height: calc(100vh - 50px); /* Trừ đi chiều cao thanh điều hướng (ví dụ 60px) */
-  overflow: hidden;  /* Đảm bảo phần thừa không hiển thị */
-  
+  height:calc(100vh - 50px);
+  display:flex;
+  flex-direction:column;
+  margin: 0;
+  align-items:center;
 }
 
 
-#video-iframe {
-  width: 100%;
-  height: calc(100vh - 90px) ; /* Giảm chiều cao của video */
-  border-radius: 8px;
-  margin-bottom: 2px; /* Giảm khoảng cách giữa video và tiêu đề */
+.video {
+  height: calc(100% - 60px);
+  width:calc(100% - 20px);
+  margin:10px 10px 0;
+  border-radius:16px;
+  border:2px solid #39FF14;
 }
-
-.video-title {
-  font-size: 20px; /* Giảm font size tiêu đề */
-  font-weight: bold;
-  color: #333;
-  margin: 1px 0;  /* Giảm khoảng cách giữa tiêu đề và mô tả */
-  color: #4dbf00
+.kimochi .video{
+  border:2px solid #00FFFF;
 }
-
-.video-description {
-  font-size: 14px;  /* Giảm font size mô tả */
-  color: #666;
-  line-height: 1.5;
-  background-color: #fafafa;
-  border-radius: 8px;
-  padding: 8px;  /* Giảm padding trong mô tả */
-  display: inline-block;
-  max-width: 100%;
-  word-wrap: break-word;
-  margin-top: 1px;  /* Giảm khoảng cách giữa mô tả và phần còn lại */
-  
-  /* Giới hạn chiều cao và thêm thanh cuộn dọc nếu cần */
-  max-height: 50px;  /* Chiều cao tối đa của phần mô tả */
-  overflow-y: auto;   /* Thêm thanh cuộn dọc nếu nội dung dài hơn chiều cao */
+.title {
+  margin:3px 10px;
+  font-style:oblique;
+  font-size:18px;
+  white-space:nowrap;
+  overflow:hidden;
+  max-width:calc(100% - 20px);
 }
-
+.title:hover {
+  overflow-x: auto; /* Hiện thanh cuộn khi hover */
+}
+.chat{
+  display:none;
+}
 /* Thiết lập layout cho màn hình nhỏ */
-@media (max-width: 768px) {
-  .content-container {
-    flex-direction: column;
-    gap: 5px; /* Giảm khoảng cách giữa các phần */
-  }
+/* @media (max-width: 768px) {
 
-  .video-container {
-    flex: 1;
-    height: 250px; /* Điều chỉnh lại chiều cao cho video */
-  }
-
-  .chat {
-    flex: 1;
-    height: 250px; /* Điều chỉnh lại chiều cao cho chat */
-    max-width: 100%; /* Đảm bảo chiều rộng chat không vượt quá màn hình nhỏ */
-  }
-}
+} */
