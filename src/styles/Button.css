@@ -1,0 +1,263 @@
+button {
+    padding: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 5px 5px;
+    background-color: #111111;
+    color: #39FF14;
+    border: 1.2px solid #268A0A;
+    border-radius: 5px;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:active {
+    transform: scale(1.2); /* Khi nhấn nút, kích thước sẽ lớn lên */
+    box-shadow: 0 0 15px #39FF14; /* Áp dụng hiệu ứng bóng đổ xanh sáng khi nhấn */
+}
+
+button:hover {
+    background-color: #000000; /* Màu nền khi hover */
+    color: #268A0A; /* Màu chữ khi hover */
+    border: 2px solid #66FF33; /* Màu viền sáng khi hover */
+    box-shadow: 0 0 20px 5px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng viền khi hover */
+    transform: translateY(-4px); /* Di chuyển nút lên một chút */
+}
+
+.kimochi button {
+    color: #00FFFF;
+    border: 1.2px solid #00FFFF;
+    transition: all 0.3s ease;
+}
+
+.kimochi button:hover {
+    color: #006666;
+    border: 2px solid #006666;
+    box-shadow: 0 0 20px 5px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan */
+    transform: translateY(-4px); /* Tạo hiệu ứng di chuyển lên một chút */
+}
+input[type="number"],
+input[type="text"],
+input[type="email"],
+select{
+    padding: 6px;
+    border: 1.2px solid #268A0A; /* Viền xanh lá */
+    border-radius: 5px;
+    background-color: #1e1e1e; /* Nền tối */
+    color: #39FF14; /* Chữ xanh lá */
+    transition: all 0.3s ease; /* Tạo hiệu ứng chuyển tiếp */
+}
+input[type="number"]:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+ select:focus{
+    border: 2px solid #66FF33; /* Viền sáng khi focus */
+  outline:none;
+    box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi focus */
+}
+input[type="number"]:hover,
+input[type="text"]:hover,
+select:hover{
+    background-color: #000000; /* Màu nền khi hover */
+    color: #268A0A; /* Màu chữ khi hover */
+    border: 2px solid #66FF33; /* Màu viền sáng khi hover */
+    box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng bóng viền khi hover */
+}
+.kimochi input[type="number"] ,
+.kimochi input[type="text"],
+.kimochi input[type="email"],
+.kimochi select{
+    border: 1.2px solid #006666;
+    color: #00FFFF;
+}
+.kimochi input[type="number"]:focus,
+.kimochi input[type="text"]:focus,
+.kimochi input[type="email"]:focus,
+.kimochi select:focus{
+    border: 2px solid #00FFFF;
+  outline:none;
+    box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.7);
+}
+
+.kimochi input[type="number"]:hover,
+.kimochi input[type="text"]:hover,
+.kimochi input[type="email"]:hover,
+.kimochi select:hover{
+    background-color: #000000; /* Nền khi hover */
+    color: #006666; /* Màu chữ khi hover */
+    border: 2px solid #00FFFF; /* Màu viền sáng cyan khi hover */
+    box-shadow: 0 0 15px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi hover */
+}
+/* CSS cho các trường nhập mật khẩu */
+input[type="password"] {
+    padding: 4px;
+  font-size:12px;
+    border: 1.2px solid #268A0A; /* Viền xanh lá */
+    border-radius: 5px;
+    background-color: #1e1e1e; /* Nền tối */
+    color: #39FF14; /* Chữ xanh lá */
+    transition: all 0.3s ease; /* Tạo hiệu ứng chuyển tiếp */
+}
+
+/* Hiệu ứng khi focus vào input mật khẩu */
+input[type="password"]:focus {
+    border: 2px solid #66FF33; /* Viền sáng khi focus */
+    outline: none;
+    box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi focus */
+}
+
+/* Hiệu ứng khi hover vào input mật khẩu */
+input[type="password"]:hover {
+    background-color: #000000; /* Màu nền khi hover */
+    color: #268A0A; /* Màu chữ khi hover */
+    border: 2px solid #66FF33; /* Màu viền sáng khi hover */
+    box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng bóng viền khi hover */
+}
+
+/* Dành cho lớp .kimochi - hiệu ứng với màu cyan */
+.kimochi input[type="password"] {
+    border: 1.2px solid #006666;
+    color: #00FFFF;
+}
+
+/* Hiệu ứng khi focus vào input mật khẩu trong lớp .kimochi */
+.kimochi input[type="password"]:focus {
+    border: 2px solid #00FFFF;
+    outline: none;
+    box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.7);
+}
+
+/* Hiệu ứng khi hover vào input mật khẩu trong lớp .kimochi */
+.kimochi input[type="password"]:hover {
+    background-color: #000000; /* Nền khi hover */
+    color: #006666; /* Màu chữ khi hover */
+    border: 2px solid #00FFFF; /* Màu viền sáng cyan khi hover */
+    box-shadow: 0 0 15px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi hover */
+}
+/* Phong cách cho tất cả các bảng */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  color: #39FF14; /* Chữ xanh lá giống input */
+  
+}
+
+table th, table td {
+  padding: 2px; /* Padding giống input */
+  border: 2px solid #268A0A; /* Viền xanh lá */
+  border-radius: 5px; /* Bo góc giống input */
+  background-color: #1e1e1e; /* Nền tối giống input */
+  color: #39FF14; /* Chữ xanh lá giống input */
+  transition: all 0.3s ease; /* Tạo hiệu ứng chuyển tiếp */
+  font-size:14px;
+}
+table td button {
+  margin: 0; /* Bỏ margin của nút trong các cell */
+  padding: 2px 6px; /* Tùy chỉnh padding nếu cần */
+ 
+}
+/* Hiệu ứng khi focus cho tất cả các ô bảng */
+table th:focus, table td:focus {
+  border: 2px solid #66FF33; /* Viền sáng khi focus */
+  outline: none;
+  box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi focus */
+}
+
+/* Hiệu ứng khi hover cho tất cả các ô bảng */
+table th:hover, table td:hover {
+  background-color: #000000; /* Nền tối khi hover */
+  color: #268A0A; /* Màu chữ khi hover */
+  border: 2px solid #66FF33; /* Viền sáng khi hover */
+  box-shadow: 0 0 10px 2px rgba(102, 255, 51, 0.7); /* Áp dụng hiệu ứng phát sáng khi hover */
+}
+
+/* Khi bảng có lớp kimochi */
+.kimochi table th, .kimochi table td {
+  border: 2px solid #006666; /* Viền cyan */
+  color: #00FFFF; /* Chữ cyan */
+}
+
+/* Hiệu ứng khi focus cho bảng kimochi */
+.kimochi table th:focus, .kimochi table td:focus {
+  border: 2px solid #00FFFF; /* Viền sáng cyan khi focus */
+  outline: none;
+  box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi focus */
+}
+
+/* Hiệu ứng khi hover cho bảng kimochi */
+.kimochi table th:hover, .kimochi table td:hover {
+  background-color: #000000; /* Nền tối khi hover */
+  color: #006666; /* Màu chữ khi hover */
+  border: 2px solid #00FFFF; /* Viền sáng cyan khi hover */
+  box-shadow: 0 0 15px 2px rgba(0, 255, 255, 0.7); /* Áp dụng hiệu ứng phát sáng cyan khi hover */
+}
+
+
+/* Áp dụng cho tất cả các thanh cuộn ngang và dọc */
+::-webkit-scrollbar {
+  width: 13px;  /* Độ rộng thanh cuộn dọc */
+  height: 9px; /* Độ cao thanh cuộn ngang */
+}
+/* Thanh cuộn (thumb) */
+::-webkit-scrollbar-thumb {
+  background-color:  #999999;/* Màu thanh cuộn */
+  border-radius: 14px; /* Bo góc */
+  border:1px solid #39FF14; /* Viền quanh thanh cuộn */
+}
+/* Track của thanh cuộn */
+::-webkit-scrollbar-track {
+  background-color: #111111; /* Màu track */
+  border-radius: 8px;
+  border:1px solid #000000;
+}
+/* Khi hover trên thanh cuộn (thumb) */
+::-webkit-scrollbar-thumb:hover {
+  border:1.2px solid #45a100; 
+  background-color: #444444; 
+}
+/* Khi hover trên track của thanh cuộn */
+::-webkit-scrollbar-track:hover {
+  background-color: #222222; 
+  border:1px solid #000000;
+}
+/* Áp dụng cho thanh cuộn (thumb) */
+.kimochi ::-webkit-scrollbar-thumb {
+  border:1px solid #00CCCC; 
+}
+/* Áp dụng cho thanh cuộn (thumb) khi hover */
+.kimochi ::-webkit-scrollbar-thumb:hover {
+ border:1.2px solid #008080; 
+}
+
+/* Tất cả label */
+label {
+  display: flex; /* Dùng flexbox để dễ điều chỉnh layout */
+  flex-direction: column; /* Sắp xếp các phần tử con theo chiều dọc */
+  text-align: left;
+  font-size: 14px; /* Kích thước chữ */
+  font-style: oblique; /* Chữ nghiêng */
+  color: #39FF14;
+  margin-bottom: 5px; /* Khoảng cách giữa label và phần tử tiếp theo */
+}
+.kimochi label{
+  color: #00FFFF;
+}
+
+
+h3 {
+    font-size: 16px; /* Giảm kích thước chữ cho tiêu đề danh sách */
+    color: #39FF14; /* Màu chữ mặc định */
+
+}
+h3:hover {
+    color: #268A0A; /* Màu chữ khi hover */
+
+}
+.kimochi h3 {
+    color: #00FFFF; /* Màu chữ khi ở trong class .kimochi */
+}
+.kimochi h3:hover {
+    color: #006666; /* Màu chữ khi hover */
+
+}

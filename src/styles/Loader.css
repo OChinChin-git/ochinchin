@@ -1,0 +1,70 @@
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Tạo nền mờ */
+  display: none; /* Ẩn mặc định */
+  justify-content: center;
+  align-items: center;
+  z-index: 999999999;
+}
+.loader-container.visible {
+  display: flex; /* Hiển thị loader khi có class 'visible' */
+}
+.ring {
+  width: 200px;
+  height: 200px;
+  border: 0px solid transparent;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.ring:nth-child(1) {
+  border-bottom-width: 8px;
+  border-color: #FF00FF; /* Neon hồng sáng */
+  animation: rotate1 2s linear infinite;
+}
+
+.ring:nth-child(2) {
+  border-right-width: 8px;
+  border-color: #00FFFF; /* Neon xanh ngọc sáng */
+  animation: rotate2 2s linear infinite;
+}
+
+.ring:nth-child(3) {
+  border-right-width: 8px;
+  border-color: #00FF00; /* Neon xanh lá sáng */
+  animation: rotate3 2s linear infinite;
+}
+@keyframes rotate1 {
+  0% {
+    transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+  }
+}
+
+@keyframes rotate2 {
+  0% {
+    transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+  }
+}
+
+@keyframes rotate3 {
+  0% {
+    transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+  }
+}
+
+.loader-text {
+  text-align: center;
+}

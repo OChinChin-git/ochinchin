@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+}
+.container {
+  min-height: 100%;  /* Đảm bảo chiều cao container chiếm toàn bộ màn hình */
+  background-color: black;
+
+}
+
+.background-video {
+  position: fixed; /* Cố định video */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo video phủ đầy mà không bị méo */
+  z-index: -1; /* Đảm bảo video nằm dưới nội dung */
+}
+.content-container {
+  margin: 0px 0px 0px 50px;
+}
