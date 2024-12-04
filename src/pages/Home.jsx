@@ -1,6 +1,6 @@
 import React, { useEffect, useState,useRef,useCallback } from "react";
 import { useLoader } from "../components/LoaderContext"; // Import useLoader từ context
-
+import "../styles/Home.css"
 import { useToast } from '../components/ToastContext';
 import {
   getFirestore,
@@ -11,14 +11,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
 
-// Cấu hình Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
-  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
-  projectId: "thanhchimbe-d29a4",
-  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
-  messagingSenderId: "661307532795",
-  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
+  apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
+  authDomain: "ochinchin-7b3d8.firebaseapp.com",
+  projectId: "ochinchin-7b3d8",
+  storageBucket: "ochinchin-7b3d8.firebasestorage.app",
+  messagingSenderId: "364411060998",
+  appId: "1:364411060998:web:b7f31215e5cb0d0fbf1487",
+  measurementId: "G-BFRZ15ZNEC"
 };
 
 // Khởi tạo Firebase
@@ -52,7 +52,6 @@ const Home = () => {
 const loadContent = async () => {
   try {
     showLoader("Đang tải, vui lòng chờ..."); // Hiển thị loader với thông báo
-    showToast("Hello tôi là ochinchin, chào mừng bạn đến với trang web của tôi");
     const orderData = await fetchOrderData();
 
     // Tạo promises để tải đồng thời các mục feature và movieList
@@ -140,7 +139,7 @@ const loadContent = async () => {
 return (
   
   <div className="home-container">
-    <link href="/src/styles/Home.css" rel="stylesheet"/>
+    
     {/* Kiểm tra nếu chưa có nội dung, sẽ hiển thị loader của bạn */}
     {content.length === 0 ? (
       // Không cần div loader nữa vì loader của bạn sẽ hiển thị từ `useLoader`

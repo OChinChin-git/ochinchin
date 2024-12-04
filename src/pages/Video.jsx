@@ -5,6 +5,7 @@ import { useLoader } from "../components/LoaderContext";
 import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
 import {sendChats,getTime,getChats} from '/src/components/Video';
+import "../styles/Video.css"
 const Video =()=>{
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
@@ -84,7 +85,7 @@ const convertUrl = (url) => {
   };
   const handleSendMessage = async()=>{
     try{
-    const userId = localStorage.getItem("loggedInUserId") || "9wnUNGgC7zTRjpVbfqcCN0HtXz23";
+    const userId = localStorage.getItem("loggedInUserId") || "9njjU8JwUWeO0DqITxs3Q6Ldtvq1";
     const time = getTime();
     await sendChats(videoId,time,userId,messageRef.current.value);
     messageRef.current.value="";
@@ -142,7 +143,7 @@ const updateChats = (newChats) => {
   return(
 <div className="video-block">
   
-  <link rel="stylesheet" href="src/styles/Video.css"></link>
+  
   <div className="video-container">
     <iframe frameborder="0" allowfullscreen allowtransparency="true" src={videoUrl} className="video"></iframe>
     <div className="title animated2" value={videoTitle}>{videoTitle}</div>

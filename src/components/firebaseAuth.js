@@ -3,14 +3,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/fireba
  import{getFirestore, setDoc, doc,getDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
  
  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
-    authDomain: "thanhchimbe-d29a4.firebaseapp.com",
-    projectId: "thanhchimbe-d29a4",
-    storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
-    messagingSenderId: "661307532795",
-    appId: "1:661307532795:web:4a211686f935f6d1a2175e"
-  };
+ const firebaseConfig = {
+  apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
+  authDomain: "ochinchin-7b3d8.firebaseapp.com",
+  projectId: "ochinchin-7b3d8",
+  storageBucket: "ochinchin-7b3d8.firebasestorage.app",
+  messagingSenderId: "364411060998",
+  appId: "1:364411060998:web:b7f31215e5cb0d0fbf1487",
+  measurementId: "G-BFRZ15ZNEC"
+};
 
  // Initialize Firebase
  const app = initializeApp(firebaseConfig);

@@ -2,7 +2,7 @@ import {useState,useRef,useEffect}from 'react';
 import {signInWithGoogle,signUp,login} from "../components/firebaseAuth.js"
 import { useLoader } from "../components/LoaderContext";
 import {useToast} from "../components/ToastContext";
-
+import "../styles/Login.css"
 
 const Login=()=>{
   const [isSignUp,setIsSignUp]=useState(false);
@@ -118,7 +118,7 @@ const Login=()=>{
   return(
     <>
     <div className="login-background"  style={!isLogin ? {display: ""}:{display:"none"}}>
-      <link href="/src/styles/Login.css" rel="stylesheet"/>
+      
   <div className="login-container" style={isSignUp ? {display: ""}:{display:"none"}} >
   <h1 className="form-title animated3" >Register</h1>
   <form  ref={registerRef} onSubmit={handleSubmitSignUp}>
