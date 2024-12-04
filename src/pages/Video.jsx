@@ -4,7 +4,7 @@ import {getVideo} from '../components/Video'
 import { useLoader } from "../components/LoaderContext"; 
 import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
-
+import {sendChats,getTime,getChats} from '/src/components/Video';
 const Video =()=>{
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
@@ -74,70 +74,158 @@ const convertUrl = (url) => {
   const [isCloseChat,setIsCloseChat] = useState(false);
   const messageRef = useRef();
   const [messages,setMessages] = useState([]);
-  
+  const [isCloseLatestChat,setIsCloseLatestChat] = useState(true);
+  const latestMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+  const chatContainerRef = useRef(null); // Tham chiếu đến container chứa tin nhắn
+  const audioRef = useRef(null); // Tham chiếu đến âm thanh
+
   const handleCloseChat = ()=>{
     setIsCloseChat(!isCloseChat)
   };
-  const handleSendMessage = ()=>{
-    const avt = "https://www.dropbox.com/scl/fi/o0nyh6atfock3fxrjcu8j/andanh.png?rlkey=bgbperz5j18dden4j4vll416q&dl=1";
-    const name= "OChinChin"
-    const message = messageRef.current.value;
-    if(message.trim() !== ''){
-      setMessages((prevMessage) =>[...prevMessage, {text:message,avt:avt,name:name,time: new Date().toLocaleTimeString()}]);
-       messageRef.current.value="";
+  const handleSendMessage = async()=>{
+    try{
+    const userId = localStorage.getItem("loggedInUserId") || "9wnUNGgC7zTRjpVbfqcCN0HtXz23";
+    const time = getTime();
+    await sendChats(videoId,time,userId,messageRef.current.value);
+    messageRef.current.value="";
+    }catch(error){
+      alert(error);
     }
   }
+  const handleKeyDown = (e) =>{
+    if(e.key ==="Enter"){
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }
+  const handleCloseLatestChat = ()=>{
+    setIsCloseLatestChat(true);
+  }
+  useEffect(()=>{
+     if(messages.length >0){
+    setIsCloseLatestChat(false);
+     }
+  },[latestMessage])
+  const chatStyle = !isCloseChat
+    ? isCloseLatestChat
+      ? { display: "none" }
+      : { display: "" }
+    : { display: "none" };
+  // Hàm cập nhật tin nhắn
+  const updateChats = (newChats) => {
+    setMessages(newChats);
+    // Cuộn xuống cuối khi có tin nhắn mới
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+    // Phát âm thanh khi có tin nhắn mới
+    if (audioRef.current) {
+      audioRef.current.play();
+    }
+  };
+
+  useEffect(() => {
+    // Gọi getChats với videoId và callback updateChats để cập nhật dữ liệu chat
+    const unsubscribe = getChats(videoId, updateChats);
+    // Hủy đăng ký khi component unmount để tránh memory leaks
+    return () => unsubscribe();
+  }, [videoId]);
 //
 //
 //
 //
   return(
-    <div className="video-block">
-      <link rel="stylesheet" href="src/styles/Video.css"></link>
-      <div className="video-container">
-        <iframe frameborder="0" allowfullscreen allowtransparency="true" src={videoUrl} className="video"></iframe>
-        <div className="title animated2" value={videoTitle}>{videoTitle}</div>
+<div className="video-block">
+  
+  <link rel="stylesheet" href="src/styles/Video.css"></link>
+  <div className="video-container">
+    <iframe frameborder="0" allowfullscreen allowtransparency="true" src={videoUrl} className="video"></iframe>
+    <div className="title animated2" value={videoTitle}>{videoTitle}</div>
+  </div>
+      
+  <div className="chat" style={isCloseChat ? {display:""} : {display:"none"}}>
+    <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2024/11/27/audio_f886133b6d.mp3" preload="auto" />
+
+    <button className="x-button" onClick={handleCloseChat}>x</button>
+    <div className="chat-container" ref={chatContainerRef}>
+    {messages.length >0 ? (messages.map ((msg,index) =>(
+    <div className="chat-content"
+      key={index}
+      >
+      <img 
+        className="avatar" 
+        src={msg.avatar}
+        alt="User Avatar"
+      />
+      <div className="message">
+        <p className="user-name">{msg.displayName}</p>
+        <p className="message-text">{msg.message} </p>
+        <p className="message-time">{msg.time} </p>
       </div>
-      
-<div className="chat" style={isCloseChat ? {display:""} : {display:"none"}}>
-  <button className="x-button" onClick={handleCloseChat}>x</button>
-  <div className="chat-container">
-  {messages.map((msg,index) =>(
-  <div className="chat-content"
-    key={index}
-    >
-    <img 
-      className="avatar" 
-      src={msg.avt}
-      alt="User Avatar"
-    />
-    <div className="message">
-      <p className="user-name">{msg.name}</p>
-      <p className="message-text">{msg.text} </p>
-      <p className="message-time">{msg.time} </p>
+    </div>
+      ))) : (  <div className="chat-content"
+
+      >
+      <img 
+        className="avatar" 
+        src={"https://www.dropbox.com/scl/fi/k8qnmihjagt0iqvsis354/icon1.jpg?rlkey=0wfxydgqudsdmxpy8bntyj7dq&dl=1"}
+        alt="User Avatar"
+      />
+      <div className="message">
+        <p className="user-name">OChinChin</p>
+        <p className="message-text">Chưa có ai chat, hãy là người đầu tiên 😎</p>
+        <p className="message-time">{new Date().toLocaleTimeString() }</p>
+      </div>
+    </div> )}
+      </div>
+    <div className="input-container">
+      <input 
+        type="text" 
+        className="input-chat" 
+        placeholder="Nhập tin nhắn..."
+        ref={messageRef}
+        onKeyDown={handleKeyDown}
+      />
+      <button 
+        type="button" 
+        className="input-button"
+        onClick={handleSendMessage}
+
+      >
+        Gửi
+      </button>
     </div>
   </div>
-    ))}
-    </div>
-  <div className="input-container">
-    <input 
-      type="text" 
-      className="input-chat" 
-      placeholder="Nhập tin nhắn..."
-      ref={messageRef}
-    />
-    <button 
-      type="button" 
-      className="input-button"
-      onClick={handleSendMessage}
-      
+  
+ 
+  <div className="latest-chat" 
+   style={chatStyle}
+    
     >
-      Gửi
-    </button>
-  </div>
+    <div className="latest-chat-header">
+      <p className="latest-chat-text">Chat mới nhất</p>
+      <button className="x-button" onClick={handleCloseLatestChat}>x</button>
+    </div>
+      <div className="latest-chat-container">
+        {latestMessage && (
+          <div className="chat-content">
+            <img 
+              className="avatar" 
+              src={latestMessage.avatar}
+              alt="User Avatar"
+            />
+            <div className="message">
+              <p className="user-name">{latestMessage.displayName}</p>
+              <p className="message-text">{latestMessage.message}</p>
+              <p className="message-time">{latestMessage.time}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+  <button className="chat-toggle" onClick={handleCloseChat} style={isCloseChat ? {display: "none"} : {display: ""} }>Chat</button>
 </div>
-<button className="chat-toggle" onClick={handleCloseChat} style={isCloseChat ? {display: "none"} : {display: ""} }>Chat</button>
-    </div>
   )
 }
 export default Video;

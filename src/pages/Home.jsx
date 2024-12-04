@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState,useRef,useCallback } from "react";
 import { useLoader } from "../components/LoaderContext"; // Import useLoader từ context
 
 import { useToast } from '../components/ToastContext';
@@ -196,52 +196,56 @@ const Feature = ({ data }) => {
 const MovieList = ({ data }) => {
   const { name, videos } = data;
   const movieListRef = useRef(null); // Tham chiếu tới danh sách video
+  const [isArrowClickable, setIsArrowClickable] = useState(true); // Trạng thái click mũi tên
 
-const handleLeftArrow = () => {
-  const movieList = movieListRef.current;
-  const itemWidth = 290; // Độ rộng mỗi item
-  const currentX = getCurrentTranslateX(movieList);
+    const setArrowCooldown = () => {
+      setIsArrowClickable(false);
+      setTimeout(() => {
+        setIsArrowClickable(true); // Cho phép click lại sau 1 giây
+      }, 1000); // Đặt thời gian cooldown là 1 giây
+    };
+    const handleLeftArrow = useCallback(() => {
+      if (!isArrowClickable) return;
+      setArrowCooldown();
+      const movieList = movieListRef.current;
+      const itemWidth = 290;
+      const currentX = getCurrentTranslateX(movieList);
+      movieList.style.transition = "transform 1s ease-in-out"; 
+      if (currentX < 0) {
+        movieList.style.transform = `translateX(${currentX + itemWidth}px)`;
+      } else {
+        movieList.style.transform = "translateX(0)";
+      }
+    }, [isArrowClickable]);
 
-  // Thêm hiệu ứng chuyển động chậm 1.5s
-  movieList.style.transition = "transform 1s ease-in-out"; 
+    const handleRightArrow = useCallback(() => {
+      if (!isArrowClickable) return;
+       setArrowCooldown(); 
+      const movieList = movieListRef.current;
+      const itemWidth = 290;
+      const containerWidth = movieList.offsetWidth;
+      const itemsWidth = videos.length * itemWidth;
+      const currentX = getCurrentTranslateX(movieList);
+      movieList.style.transition = "transform 1s ease-in-out"; 
+      if (Math.abs(currentX) + containerWidth < itemsWidth) {
+        movieList.style.transform = `translateX(${currentX - itemWidth}px)`;
+      } else {
+        movieList.style.transform = "translateX(0)";
+      }
+    }, [isArrowClickable,videos]);
 
-  // Nếu vị trí hiện tại không phải là 0, di chuyển lùi
-  if (currentX < 0) {
-    movieList.style.transform = `translateX(${currentX + itemWidth}px)`;
-  } else {
-    movieList.style.transform = "translateX(0)";
-  }
-};
 
-const handleRightArrow = () => {
-  const movieList = movieListRef.current;
-  const itemWidth = 290; // Độ rộng mỗi item
-  const containerWidth = movieList.offsetWidth; // Chiều rộng container
-  const itemsWidth = videos.length * itemWidth; // Tổng chiều rộng các item
-  const currentX = getCurrentTranslateX(movieList);
-
-  // Thêm hiệu ứng chuyển động chậm 1.5s
-  movieList.style.transition = "transform 1s ease-in-out"; 
-
-  // Kiểm tra nếu còn đủ không gian để di chuyển sang phải
-  if (Math.abs(currentX) + containerWidth < itemsWidth) {
-    movieList.style.transform = `translateX(${currentX - itemWidth}px)`;
-  } else {
-    movieList.style.transform = "translateX(0)";
-  }
-};
-
-// Hàm lấy giá trị translateX hiện tại
-const getCurrentTranslateX = (element) => {
-  const matrix = window.getComputedStyle(element).transform;
-  if (matrix === "none") return 0;
-  const values = matrix.split(",");
-  return parseFloat(values[4]) || 0;
-};
-const handleWatchButton = ()=>{
-  const id = event.target.getAttribute("video-id");
-  window.location.href = "/video?"+id;
-}
+    // Hàm lấy giá trị translateX hiện tại
+    const getCurrentTranslateX = (element) => {
+      const matrix = window.getComputedStyle(element).transform;
+      if (matrix === "none") return 0;
+      const values = matrix.split(",");
+      return parseFloat(values[4]) || 0;
+    };
+    const handleWatchButton = ()=>{
+      const id = event.target.getAttribute("video-id");
+      window.location.href = "/video?"+id;
+    }
   return (
     <div className="movie-list-container">
       {/* Tiêu đề với hiệu ứng */}

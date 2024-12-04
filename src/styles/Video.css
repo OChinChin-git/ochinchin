@@ -49,6 +49,31 @@
 /* @media (max-width: 768px) {
 
 } */
+.latest-chat{
+  position:fixed;
+  bottom:82px;
+  right:12px;
+  z-index:102;
+  border:2px solid #39FF14;
+  border-radius:14px;
+  padding:5px 0px 0px 5px;
+  width:300px;
+
+}
+.latest-chat-text{
+  color:#229900;
+  text-decoration:underline;
+  font-size:14px;
+}
+.latest-chat-container{
+    max-height:60px;
+  overflow:hidden;
+  margin:5px;
+}
+
+.latest-chat-container:hover{
+  overflow-y:auto;
+}
 .chat {
   position: fixed; 
   bottom:50px; 
