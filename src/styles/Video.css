@@ -60,10 +60,16 @@
   width:300px;
 
 }
+.kimochi .latest-chat {
+  border:2px solid #00FFFF;
+}
 .latest-chat-text{
   color:#229900;
   text-decoration:underline;
   font-size:14px;
+}
+.kimochi .latest-chat-text {
+  color:#229999;
 }
 .latest-chat-container{
     max-height:60px;
@@ -87,6 +93,9 @@
   border:2px solid #39FF14;
   border-radius:16px;
   width:300px;
+}
+.kimochi .chat{
+  border:2px solid #00FFFF;
 }
 .x-button{
   padding:0px 5px;
@@ -129,6 +138,9 @@
   padding:6px;
   margin-bottom:5px;
 }
+.kimochi .message{
+  border: 1px solid #229999;
+}
 .user-name{
   margin-bottom:3px;
   margin-left:5px;
@@ -136,13 +148,16 @@
   transform: skew(-10deg);
   font-size:15px;
 }
+.kimochi .user-name{
+  color:#00FFFF;
+}
 .message-text{
-  font-size:13.5px;
+  font-size:14px;
   margin-bottom:3px;
   color:white;
 }
 .message-time{
-  font-size:12px;
+  font-size:11px;
   color:white;
 }
 .input-container{

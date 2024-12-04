@@ -112,17 +112,22 @@ const convertUrl = (url) => {
       : { display: "" }
     : { display: "none" };
   // Hàm cập nhật tin nhắn
-  const updateChats = (newChats) => {
-    setMessages(newChats);
-    // Cuộn xuống cuối khi có tin nhắn mới
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-    // Phát âm thanh khi có tin nhắn mới
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-  };
+const updateChats = (newChats) => {
+  setMessages(newChats);
+
+  // Cuộn xuống cuối khi có tin nhắn mới
+  if (chatContainerRef.current) {
+    chatContainerRef.current.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: 'smooth', // Thêm tùy chọn cuộn mượt
+    });
+  }
+
+  // Phát âm thanh khi có tin nhắn mới
+  if (audioRef.current) {
+    audioRef.current.play();
+  }
+};
 
   useEffect(() => {
     // Gọi getChats với videoId và callback updateChats để cập nhật dữ liệu chat
@@ -144,7 +149,7 @@ const convertUrl = (url) => {
   </div>
       
   <div className="chat" style={isCloseChat ? {display:""} : {display:"none"}}>
-    <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2024/11/27/audio_f886133b6d.mp3" preload="auto" />
+    <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto" />
 
     <button className="x-button" onClick={handleCloseChat}>x</button>
     <div className="chat-container" ref={chatContainerRef}>
