@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-  import{getFirestore, setDoc, doc,getDoc,updateDoc,collection,getDocs,onSnapshot,Timestamp} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
+  import{getFirestore, 
+         setDoc, doc,getDoc,
+         updateDoc,
+         collection,
+         getDocs,onSnapshot,
+         Timestamp,
+         deleteDoc,
+         FieldValue,
+         serverTimestamp} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
  
   const firebaseConfig = {
     apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
@@ -60,24 +68,48 @@ export const getVideo = async(id)=>{
   return finalData;
 }
 
-export const getTime = () => {
-  const timestamp = Timestamp.now();
-
-  // Chuyển đổi timestamp thành thời gian dễ đọc
-  const date = timestamp.toDate(); // Chuyển timestamp thành đối tượng Date của JavaScript
-  const hours = String(date.getHours()).padStart(2, '0');  // Đảm bảo giờ có 2 chữ số
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Đảm bảo phút có 2 chữ số
-  const seconds = String(date.getSeconds()).padStart(2, '0'); // Đảm bảo giây có 2 chữ số
-  const milliseconds = String(date.getMilliseconds()).padStart(3, '0'); // Đảm bảo mili giây có 3 chữ số
-  const day = String(date.getDate()).padStart(2, '0'); // Đảm bảo ngày có 2 chữ số
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Đảm bảo tháng có 2 chữ số
-  const year = date.getFullYear();
-
-  // Chuyển đổi thành chuỗi số, định dạng: "YYYYMMDDHHMMSSMMM"
-  const formattedTime = `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
-  return formattedTime;
+export const getTime = async () => {
+  const userDoc = doc(db, "users", "user_id"); // Thay "user_id" bằng ID cụ thể
+  try {
+  await setDoc(userDoc, { createdAt: serverTimestamp() }, { merge: true });
+} catch (error) {
+  alert(`Lỗi khi lưu Firestore: ${error.message}`);
+  console.error(error);
 }
 
+
+  // Lấy thời gian vừa lưu
+  const docSnap = await getDoc(userDoc);
+  if (docSnap.exists()) {
+
+    const timestamp = docSnap.data()?.createdAt;
+
+    if (timestamp && timestamp instanceof Timestamp) {
+
+      const date = timestamp.toDate();
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+      const xyz = `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
+
+      return xyz;
+    } else {
+      alert("createdAt không phải là kiểu Timestamp!");
+      console.error("createdAt không phải là Timestamp!");
+      return null;
+    }
+  } else {
+    alert("Không tìm thấy tài liệu trong Firestore");
+    console.error("Không tìm thấy tài liệu!");
+    return null;
+  }
+};
 const getUserData = async (id) => {
   const docRef = doc(db, "users", id);
   try {
@@ -221,3 +253,55 @@ export const sendChats = async(id,time,userId,message) =>{
     alert(error);
   }
 }
+export const trackVisitor = () => {
+  // Kiểm tra nếu visitorId đã tồn tại trong localStorage
+  let visitorId = localStorage.getItem('visitorId');
+  if (!visitorId) {
+    visitorId = Date.now().toString(); // Tạo ID mới nếu chưa tồn tại
+    localStorage.setItem('visitorId', visitorId); // Lưu vào localStorage
+  }
+  console.log("Tracking visitor with ID:", visitorId);
+
+  const visitorRef = doc(db, 'activeVisitors', visitorId);
+  setDoc(visitorRef, { active: true })
+    .then(() => console.log("Visitor set as active in Firestore."))
+    .catch((error) => console.log("Error setting visitor active status:", error));
+
+  const handleBeforeUnload = () => {
+    console.log("Removing visitor with ID:", visitorId);
+    deleteDoc(visitorRef)
+      .then(() => console.log("Visitor removed from Firestore."))
+      .catch((error) => console.log("Error removing visitor:", error));
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  return () => {
+    console.log("Removing 'beforeunload' event listener.");
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    deleteDoc(visitorRef)
+      .then(() => console.log("Visitor removed during cleanup."))
+      .catch((error) => console.log("Error removing visitor during cleanup:", error));
+
+  };
+};
+
+export const getActiveVisitorsCount = (setActiveVisitors) => {
+  const visitorsRef = collection(db, 'activeVisitors');
+  console.log("Listening for changes in activeVisitors collection at path:", 'activeVisitors');
+
+  const unsubscribe = onSnapshot(visitorsRef, (snapshot) => {
+    const activeVisitorsCount = snapshot.size;  // Sử dụng snapshot.size để đếm số lượng tài liệu
+    console.log("Active visitors count updated:", activeVisitorsCount);
+    setActiveVisitors(activeVisitorsCount);
+
+    setTimeout(()=>{
+      trackVisitor();
+    },1000)
+      // Gọi hàm trackVisitor để theo dõi mỗi khi có sự thay đổi trong số lượng người dùng
+  }, (error) => {
+    console.log("Error getting active visitors count:", error);
+  });
+
+  return unsubscribe;
+};

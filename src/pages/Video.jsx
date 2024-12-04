@@ -4,7 +4,7 @@ import {getVideo} from '../components/Video'
 import { useLoader } from "../components/LoaderContext"; 
 import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
-import {sendChats,getTime,getChats} from '/src/components/Video';
+import {sendChats,getTime,getChats,trackVisitor, getActiveVisitorsCount} from '/src/components/Video';
 import "../styles/Video.css"
 const Video =()=>{
   const { showLoader, hideLoader } = useLoader(); // Use loader context
@@ -85,8 +85,12 @@ const convertUrl = (url) => {
   };
   const handleSendMessage = async()=>{
     try{
+      if(messageRef.current.value.length ==""){
+        messageRef.current.focus();
+        return
+      }
     const userId = localStorage.getItem("loggedInUserId") || "9njjU8JwUWeO0DqITxs3Q6Ldtvq1";
-    const time = getTime();
+    const time = await getTime();
     await sendChats(videoId,time,userId,messageRef.current.value);
     messageRef.current.value="";
     }catch(error){
@@ -140,6 +144,21 @@ const updateChats = (newChats) => {
 //
 //
 //
+  const [activeVisitors, setActiveVisitors] = useState(0);
+
+  useEffect(() => {
+    // Bắt đầu theo dõi khi component được mount
+    const stopTracking = trackVisitor();
+
+    // Lắng nghe số lượng người truy cập từ Firestore và cập nhật thông qua callback
+    const unsubscribe = getActiveVisitorsCount(setActiveVisitors); // setActiveVisitors là callback
+
+    // Cleanup khi component unmount
+    return () => {
+      unsubscribe(); // Dừng lắng nghe số lượng người truy cập
+      stopTracking(); // Dừng theo dõi người truy cập
+    };
+  }, []);
   return(
 <div className="video-block">
   
@@ -151,7 +170,9 @@ const updateChats = (newChats) => {
       
   <div className="chat" style={isCloseChat ? {display:""} : {display:"none"}}>
     <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto" />
-
+    <div>
+      <h3>Số người truy cập hiện tại: {activeVisitors}</h3>
+    </div>
     <button className="x-button" onClick={handleCloseChat}>x</button>
     <div className="chat-container" ref={chatContainerRef}>
     {messages.length >0 ? (messages.map ((msg,index) =>(
