@@ -1,0 +1,173 @@
+
+.login-background{
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+  min-height: 100vh;
+position: relative;
+  display: flex;
+  justify-content: center;
+}
+.kimochi .login-background{
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+background-size: cover;
+}
+.form-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin:0 0 10px;
+}
+.login-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 20px 35px rgba(57, 255, 20, 0.2);
+  background: rgba(0, 0, 0, 0.7);
+  width: 450px;
+  padding: 20px 50px;
+  margin: 20px auto;
+  box-sizing: border-box; /* Bao gồm padding và border vào kích thước */
+}
+@media screen and (max-width: 500px) {
+  .login-container {
+    transform: scale(0.8); /* Thu nhỏ container còn 50% */
+    transform-origin: center top; /* Giữ điểm gốc tại trung tâm */
+  }
+}
+@media screen and (max-height:500px){
+  .login-container{
+    transform:scale(0.9);
+    transform-origin: center top;
+  }
+}
+.kimochi .login-container{
+  box-shadow: 0 20px 35px rgba(0, 255, 255, 0.2);
+}
+.input-group {
+  display: flex;
+  flex-direction: row; /* Các phần tử nằm ngang */
+  align-items: center ; /* Căn giữa theo chiều dọc */
+  position: relative; /* Cần thiết để định vị icon bên trong input */
+
+}
+
+.input-group i {
+  position: absolute; /* Đặt icon bên trong input */
+  left: 10px; /* Khoảng cách từ bên trái */
+  top:30px;
+  pointer-events: none; /* Ngăn icon nhận sự kiện chuột */
+}
+
+
+.input-group input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #757575;
+  padding: 6px;
+  padding-left: 2.5rem; /* Đảm bảo có đủ không gian cho icon */
+  font-size: 15px;
+  min-width: calc(150% - 50px); /* Đảm bảo input chiếm hết chiều rộng của .input-group */
+  box-sizing: border-box; /* Bao gồm padding và border vào kích thước */
+}
+
+.input-group input::placeholder {
+  color: transparent;
+}
+
+.input-group label {
+  cursor: auto;
+  transition: 0.3s ease all;
+}
+
+.kimochi .input-group input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #757575;
+  padding:6px;
+  padding-left: 2.5rem; 
+  font-size: 15px;
+ 
+}
+.links{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  
+}
+.links p{
+  color:#229900;
+  text-decoration:underline;
+}
+.kimochi .links p{
+  color:#299999;
+  text-decoration:underline;
+}
+.links *{
+  margin:0px 10px;
+}
+.sign-in{
+  margin:10px 0px;
+  width:100%;
+}
+.recover{
+    text-align:right;
+    font-size:1rem;
+    margin-bottom:1rem;
+
+}
+.recover a{
+    text-decoration:none;
+    color:rgb(125,125,235);
+}
+.recover a:hover{
+    color:blue;
+    text-decoration:underline;
+}
+
+.or{
+    font-size:1.1rem;
+    margin-top:0.5rem;
+    text-align:center;
+  color:#39FF14;
+}
+.kimochi .or{
+  color:#00FFFF;
+}
+.icons{
+    text-align:center;
+  color:#229900;
+  font-style:oblique;
+}
+.kimochi .icons{
+  color:#229999;
+}
+.icons i{
+    color:#39FF14;
+    padding:0.8rem 1.5rem;
+    border-radius:10px;
+    font-size:1.5rem;
+    cursor:pointer;
+    border:2px solid #39FF14;
+    margin:0 15px;
+    transition:1s;
+}
+.icons i:hover{
+    background:#111111;
+  color:#229900;
+    font-size:1.6rem;
+    border:2px solid #229900;
+}
+.kimochi .icons i{
+  color:#00FFFF;
+  border:2px solid #00FFFF;
+}
+.kimochi .icons i:hover{
+  color:#229999;
+  border:2px solid #229999;
+}

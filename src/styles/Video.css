@@ -1,0 +1,180 @@
+.video-block{
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+    width:100%;
+  height:100%;
+  align-items:center;
+  margin:0;
+}
+.kimochi .video-block{
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+  background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
+}
+.video-container {
+  height:calc(100vh - 50px);
+  display:flex;
+  flex-direction:column;
+  margin: 0;
+  align-items:center;
+  z-index:100;
+}
+
+
+.video {
+  height: calc(100% - 60px);
+  width:calc(100% - 20px);
+  margin:10px 10px 0;
+  border-radius:16px;
+  border:2px solid #39FF14;
+  z-index:100;
+}
+.kimochi .video{
+  border:2px solid #00FFFF;
+}
+.title {
+  margin:3px 10px;
+  font-style:oblique;
+  font-size:18px;
+  white-space:nowrap;
+  overflow:hidden;
+  max-width:calc(100% - 20px);
+}
+.title:hover {
+  overflow-x: auto; /* Hiện thanh cuộn khi hover */
+}
+
+/* Thiết lập layout cho màn hình nhỏ */
+/* @media (max-width: 768px) {
+
+} */
+.latest-chat{
+  position:fixed;
+  bottom:82px;
+  right:12px;
+  z-index:102;
+  border:2px solid #39FF14;
+  border-radius:14px;
+  padding:5px 0px 0px 5px;
+  width:300px;
+
+}
+.kimochi .latest-chat {
+  border:2px solid #00FFFF;
+}
+.latest-chat-text{
+  color:#229900;
+  text-decoration:underline;
+  font-size:14px;
+}
+.kimochi .latest-chat-text {
+  color:#229999;
+}
+.latest-chat-container{
+    max-height:60px;
+  overflow:hidden;
+  margin:5px;
+}
+
+.latest-chat-container:hover{
+  overflow-y:auto;
+}
+.chat {
+  position: fixed; 
+  bottom:50px; 
+  right: 12px; 
+  display: flex;
+  flex-direction: column;
+  z-index: 101;
+  max-height:calc(100% - 100px);
+  background: rgba(0,0,0,0.7);
+  padding:10px 0px 0px 10px;
+  border:2px solid #39FF14;
+  border-radius:16px;
+  width:300px;
+}
+.kimochi .chat{
+  border:2px solid #00FFFF;
+}
+.x-button{
+  padding:0px 5px;
+  top:0px;
+  right:0px;
+  position:absolute;
+  
+}
+.chat-toggle{
+  bottom:43px;
+  right: 20px;
+  position:fixed;
+  z-index:101;
+  padding: 6px 16px;
+}
+.chat-container{
+  max-height:300px;
+  overflow:hidden;
+}
+.chat-container:hover{
+  overflow-y:auto;
+}
+.chat-content{
+  display:flex;
+  flex-direction:row;
+  gap:6px;
+  margin-right:5px;
+}
+.avatar{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+}
+.message{
+  display:flex;
+  flex-direction:column;
+  border: 1px solid #229900;
+  border-radius:12px;
+  background: rgba(0,0,0,0.7);
+  padding:6px;
+  margin-bottom:5px;
+}
+.kimochi .message{
+  border: 1px solid #229999;
+}
+.user-name{
+  margin-bottom:3px;
+  margin-left:5px;
+  color:#39FF14;
+  transform: skew(-10deg);
+  font-size:15px;
+}
+.kimochi .user-name{
+  color:#00FFFF;
+}
+.message-text{
+  font-size:14px;
+  margin-bottom:3px;
+  color:white;
+}
+.message-time{
+  font-size:11px;
+  color:white;
+}
+.input-container{
+  width:100%;
+  display:flex;
+  flex-direction:row;
+  height:38px;
+  align-items:center;
+}
+.input-chat{
+  flex-grow: 1; 
+  height: 10px;
+  padding: 6px 10px;
+}
+.input-button{
+  justify-content:right;
+  border-radius:12px;
+  padding:6px 20px;
+  margin-left:calc(auto - 5px);
+}

@@ -1,0 +1,195 @@
+.featured-content {
+  padding: 10px 30px;
+  text-align: left;
+
+}
+.featured-title {
+  width: 260px;  /* Để nó tự động chiếm hết chiều rộng */
+  
+}
+.featured-title-text {
+  font-size: 19px;
+  color: #4dbf00;
+  font-style: oblique;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  position: relative; /* Tạo môi trường cho pseudo-element */
+}
+
+.featured-title-text:hover {
+  overflow-x: auto; /* Hiện thanh cuộn ngang khi hover */
+}
+
+.featured-desc {
+  width: 100%;  /* Làm cho mô tả chiếm hết chiều rộng */
+  color: lightgray;
+  margin:5px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  
+}
+.featured-desc:hover{
+  overflow-x: auto; /* Hiện thanh cuộn ngang khi hover */
+}
+.featured-button {
+  margin-left:0px;
+  position: relative;  /* Đảm bảo không bị kéo giãn */
+}
+
+
+.movie-list-container {
+  padding-left: 30px;  /* Padding trái */
+  padding-right: 0px; /* Padding phải */
+}
+
+.movie-list-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.movie-list {
+  display: flex;
+  align-items: center;
+  height: auto;
+  transform: translateX(0);
+  transition: transform 1.5s ease-in-out; /* Đảm bảo có hiệu ứng chuyển động */
+}
+
+.movie-list-title{
+  font-size:22px;
+  text-align:left;
+  font-style:oblique;
+  font-weight:normal;
+}
+.movie-list-item {
+  margin-right: 30px;
+  position: relative;
+}
+
+.movie-list-item:hover .movie-list-item-img {
+  transform: scale(1.2);
+  margin: 0 30px;
+  opacity: 0.2;
+}
+
+.movie-list-item:hover .movie-list-item-title,
+.movie-list-item:hover .movie-list-item-desc,
+.movie-list-item:hover .movie-list-item-button {
+  opacity: 1;
+}
+
+.movie-list-item-img {
+  transition: all 1s ease-in-out;
+  width: 260px;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* Tiêu đề */
+.movie-list-item-title {
+  background-color: transparent; 
+  padding: 0px; 
+  font-size: 15px;
+  font-weight: bold;
+  position: absolute;
+  top: 10%;
+  left: 50px;
+  opacity: 0;
+  transition: 1s all ease-in-out;
+  color: #39FF14;
+  text-overflow: ellipsis;
+  white-space: nowrap;  /* Ngăn dòng tự xuống hàng */
+  overflow:hidden;  /* Thêm thanh cuộn ngang nếu nội dung quá dài */
+  width: auto;  /* Giảm chiều rộng cố định để chiều dài nền tự động theo chữ */
+  max-width: 250px;  /* Giới hạn chiều rộng tối đa */
+}
+.movie-list-item-title:hover{
+  overflow-x:auto;
+  text-overflow:unset;
+}
+/* Mô tả */
+.movie-list-item-desc {
+  background-color: transparent; 
+  padding: 0px;
+  font-size: 13px;
+ 
+  position: absolute;
+  top: 55px;
+  left: 50px;
+  opacity: 0;
+  transition: 1s all ease-in-out;
+
+  /* Giới hạn chiều cao và thêm thanh cuộn dọc */
+  max-height: 70px;  /* Giảm chiều cao mô tả */
+  overflow: hidden;  /* Thêm thanh cuộn dọc nếu nội dung quá dài */
+  /* Nền sẽ tự động thay đổi chiều rộng theo nội dung */
+  width: auto;  /* Giảm chiều rộng cố định để chiều dài nền tự động theo chữ */
+  max-width: 250px;  /* Giới hạn chiều rộng tối đa */
+}
+.movie-list-item-desc:hover{
+  overflow-y:auto;
+}
+.movie-list-item-button {
+  position: absolute;
+  bottom: 15px;
+  left: 50px;
+  opacity: 0;
+  transition: opacity 1s ease-in-out, visibility 0s 1s; /* Hiệu ứng chuyển opacity trong 1s, visibility 0s sau 1s */
+
+}
+
+/* Đảm bảo phần tử cha có position: relative để định vị mũi tên */
+.movie-list-wrapper {
+  position: relative;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+  background-position:center center;
+}
+.kimochi .movie-list-wrapper{
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
+  background-size: cover;
+}
+.arrow-left, .arrow {
+  font-size: 80px;
+  position: absolute;
+  top: 50%; /* Đặt mũi tên vào giữa */
+  transform: translateY(-50%); /* Canh giữa mũi tên */
+  color: lightgray;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.arrow-left {
+  left: 0;
+}
+
+.arrow {
+  right: 0;
+}
+
+/* Khi di chuột vào container, hiển thị mũi tên */
+.movie-list-wrapper:hover .arrow-left,
+.movie-list-wrapper:hover .arrow {
+  opacity: 1;
+}
+
+.container.active {
+  background-color: white;
+}
+
+.movie-list-title.active {
+  color: black;
+}
+
+
+
+.kimochi .movie-list-item-title{
+  color: #00DDFF;
+}
