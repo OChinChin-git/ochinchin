@@ -154,59 +154,52 @@ const getChatsValue = (id, callback) => {
   }
 };
 const formatTime = (chatTime) => {
-  // Nếu chatTime quá dài, cắt bớt độ dài để chỉ lấy phần timestamp chính
-  const chatTimeMillis = parseInt(chatTime.slice(0, 13), 10); // Lấy 13 ký tự đầu tiên
+  // Lấy 13 ký tự đầu (timestamp chính)
+  const chatTimeMillis = Date.parse(
+    `${chatTime.slice(0, 4)}-${chatTime.slice(4, 6)}-${chatTime.slice(6, 8)}T` +
+    `${chatTime.slice(8, 10)}:${chatTime.slice(10, 12)}:${chatTime.slice(12, 14)}.${chatTime.slice(14, 17)}Z`
+  );
 
   if (isNaN(chatTimeMillis)) {
     return "Thời gian không hợp lệ";
   }
 
-  // Tạo đối tượng Date từ chatTimeMillis (thời gian chat)
+  // Tạo đối tượng Date từ timestamp
   const chatDate = new Date(chatTimeMillis);
-
-  // Kiểm tra nếu chatDate không hợp lệ
   if (isNaN(chatDate.getTime())) {
     return "Thời gian không hợp lệ";
   }
 
-  // Tính toán các giá trị chênh lệch (giây, phút, giờ, ngày, tháng, năm)
+  // Tính chênh lệch thời gian
   const seconds = (Date.now() - chatTimeMillis) / 1000;
   const minutes = seconds / 60;
   const hours = minutes / 60;
   const days = hours / 24;
-  const months = days / 30; // 1 tháng = 30 ngày
-  const years = days / 365; // 1 năm = 365 ngày
+  const months = days / 30;
+  const years = days / 365;
 
   let formattedTime = "";
 
-  // Nếu dưới 24 giờ, hiển thị thời gian theo giờ phút giây của "hôm nay"
-  if (days < 1) {
+    if (days < 1) {
     // Cắt chuỗi timestamp để lấy giờ, phút, giây
     const hours = chatTime.slice(8, 10); // Lấy 2 ký tự đầu tiên sau ngày (Giờ)
     const minutes = chatTime.slice(10, 12); // Lấy 2 ký tự sau giờ (Phút)
     const seconds = chatTime.slice(12, 14); // Lấy 2 ký tự sau phút (Giây)
     
     formattedTime = `${hours}:${minutes}:${seconds} hôm nay`;
-  } 
-  // Nếu dưới 48 giờ, hiển thị "Hôm qua"
-  else if (days < 2) {
+  }  else if (days < 2) {
     formattedTime = "Hôm qua";
-  } 
-  // Nếu dưới 30 ngày, hiển thị "X ngày trước"
-  else if (days < 30) {
+  } else if (days < 30) {
     formattedTime = `${Math.floor(days)} ngày trước`;
-  } 
-  // Nếu dưới 12 tháng, hiển thị "X tháng trước"
-  else if (months < 12) {
+  } else if (months < 12) {
     formattedTime = `${Math.floor(months)} tháng trước`;
-  } 
-  // Nếu trên 1 năm, hiển thị "X năm trước"
-  else {
+  } else {
     formattedTime = `${Math.floor(years)} năm trước`;
   }
 
   return formattedTime;
 };
+
 
 
 export const getChats = (id, callback) => {
