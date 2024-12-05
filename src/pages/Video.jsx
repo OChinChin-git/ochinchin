@@ -148,10 +148,10 @@ const updateChats = (newChats) => {
 
   useEffect(() => {
     // Bắt đầu theo dõi khi component được mount
-    const stopTracking = trackVisitor();
+    const stopTracking = trackVisitor(videoId);
 
     // Lắng nghe số lượng người truy cập từ Firestore và cập nhật thông qua callback
-    const unsubscribe = getActiveVisitorsCount(setActiveVisitors); // setActiveVisitors là callback
+    const unsubscribe = getActiveVisitorsCount(setActiveVisitors,videoId); // setActiveVisitors là callback
 
     // Cleanup khi component unmount
     return () => {
@@ -171,7 +171,7 @@ const updateChats = (newChats) => {
   <div className="chat" style={isCloseChat ? {display:""} : {display:"none"}}>
     <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto" />
     <div>
-      <h3>Số người truy cập hiện tại: {activeVisitors}</h3>
+      <h3>Số người đang xem: {activeVisitors}</h3>
     </div>
     <button className="x-button" onClick={handleCloseChat}>x</button>
     <div className="chat-container" ref={chatContainerRef}>

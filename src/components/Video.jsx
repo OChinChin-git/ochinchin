@@ -253,42 +253,36 @@ export const sendChats = async(id,time,userId,message) =>{
     alert(error);
   }
 }
-export const trackVisitor = () => {
+export const trackVisitor = (id) => {
   // Kiểm tra nếu visitorId đã tồn tại trong localStorage
   let visitorId = localStorage.getItem('visitorId');
   if (!visitorId) {
     visitorId = Date.now().toString(); // Tạo ID mới nếu chưa tồn tại
     localStorage.setItem('visitorId', visitorId); // Lưu vào localStorage
   }
-  console.log("Tracking visitor with ID:", visitorId);
 
-  const visitorRef = doc(db, 'activeVisitors', visitorId);
+  const visitorRef = doc(collection(doc(db, 'content/type/videosId',id),"activeVisitors"), visitorId);
   setDoc(visitorRef, { active: true })
     .then(() => console.log("Visitor set as active in Firestore."))
     .catch((error) => console.log("Error setting visitor active status:", error));
 
   const handleBeforeUnload = () => {
-    console.log("Removing visitor with ID:", visitorId);
     deleteDoc(visitorRef)
-      .then(() => console.log("Visitor removed from Firestore."))
-      .catch((error) => console.log("Error removing visitor:", error));
+      .catch((error) => alert("Error removing visitor:", error));
   };
 
   window.addEventListener('beforeunload', handleBeforeUnload);
 
   return () => {
-    console.log("Removing 'beforeunload' event listener.");
     window.removeEventListener('beforeunload', handleBeforeUnload);
     deleteDoc(visitorRef)
-      .then(() => console.log("Visitor removed during cleanup."))
-      .catch((error) => console.log("Error removing visitor during cleanup:", error));
+      .catch((error) => alert("Error removing visitor during cleanup:", error));
 
   };
 };
 
-export const getActiveVisitorsCount = (setActiveVisitors) => {
-  const visitorsRef = collection(db, 'activeVisitors');
-  console.log("Listening for changes in activeVisitors collection at path:", 'activeVisitors');
+export const getActiveVisitorsCount = (setActiveVisitors,id) => {
+  const visitorsRef = collection(doc(db, 'content/type/videosId',id),"activeVisitors");
 
   const unsubscribe = onSnapshot(visitorsRef, (snapshot) => {
     const activeVisitorsCount = snapshot.size;  // Sử dụng snapshot.size để đếm số lượng tài liệu
@@ -296,11 +290,11 @@ export const getActiveVisitorsCount = (setActiveVisitors) => {
     setActiveVisitors(activeVisitorsCount);
 
     setTimeout(()=>{
-      trackVisitor();
+      trackVisitor(id);
     },1000)
       // Gọi hàm trackVisitor để theo dõi mỗi khi có sự thay đổi trong số lượng người dùng
   }, (error) => {
-    console.log("Error getting active visitors count:", error);
+    alert("Error getting active visitors count:", error);
   });
 
   return unsubscribe;
