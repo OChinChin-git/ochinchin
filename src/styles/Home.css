@@ -5,13 +5,13 @@
 }
 .featured-title {
   width: 260px;  /* Để nó tự động chiếm hết chiều rộng */
-  
+  border-radius:14px;
 }
 .featured-title-text {
   font-size: 19px;
   color: #4dbf00;
   font-style: oblique;
-  max-width: 100%;
+  max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   display: block;

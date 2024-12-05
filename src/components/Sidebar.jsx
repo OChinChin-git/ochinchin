@@ -17,8 +17,8 @@ const Sidebar = () => {
       setActiveItem('edm');
     } else if (path === '/upload') {
       setActiveItem('upload');
-    } else if (path === '/data') {
-      setActiveItem('data');
+    } else if (path === '/room') {
+      setActiveItem('room');
     } else if (path === '/video') {
       setActiveItem('video');
     } else {
@@ -55,9 +55,9 @@ const Sidebar = () => {
         onClick={() => handleMenuClick('/upload', 'upload')} // Điều hướng đến /upload
       ></i>
       <i
-        className={`left-menu-icon fas fa-file ${activeItem === 'data' ? 'active' : ''}`}
-        data-tooltip="Data"
-        onClick={() => handleMenuClick('/data', 'data')} // Điều hướng đến /data
+        className={`left-menu-icon fas fa-door-open ${activeItem === 'room' ? 'active' : ''}`}
+        data-tooltip="Room"
+        onClick={() => handleMenuClick('/room', 'room')} // Điều hướng đến /data
       ></i>
       <i
         className={`left-menu-icon fas fa-film ${activeItem === 'video' ? 'active' : ''}`}

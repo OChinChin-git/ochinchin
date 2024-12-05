@@ -200,8 +200,6 @@ const formatTime = (chatTime) => {
   return formattedTime;
 };
 
-
-
 export const getChats = (id, callback) => {
   try {
     // Lắng nghe dữ liệu chat thay vì chỉ lấy một lần

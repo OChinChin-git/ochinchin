@@ -6,6 +6,7 @@ import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
 import {sendChats,getTime,getChats,trackVisitor, getActiveVisitorsCount} from '/src/components/Video';
 import "../styles/Video.css"
+
 const Video =()=>{
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
@@ -48,7 +49,37 @@ const convertUrl = (url) => {
     alert(error);
   }
 }
-
+const isValidUrl = (url) => {
+  const urlRegEx = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(\/[^\s]*)?$/;
+  return urlRegEx.test(url);
+};
+const convertIframe = (url)=>{
+  try{
+    isValidUrl(url)
+    if(!isValidUrl){
+      return url;
+    }
+    const isConfirm = confirm("Phát hiện url, thử chuyển đổi thành thẻ nhúng cho chat ?")
+    if(!isConfirm){
+        return url
+    }
+    let convertedUrl = convertToEmbedUrl(url);
+    convertedUrl = convertPornhubToEmbedUrl(convertedUrl);    
+    const iframeUrl = `
+    <div style="width: calc(840px * 0.2875); height: calc(450px * 0.2875); overflow: hidden; position: relative; border-radius: 8px;">
+      <iframe 
+        src="${convertedUrl}" 
+        style="width: 840px; height: 450px; border: 0; transform: scale(0.2875); transform-origin: top left;" 
+        allowfullscreen>
+      </iframe>
+    </div>
+    `;
+    return iframeUrl
+    
+  }catch(error){
+    alert(error)
+  }
+}
   const videoInfo = async()=>{
     try{
       showLoader("Đang tải video");
@@ -89,9 +120,11 @@ const convertUrl = (url) => {
         messageRef.current.focus();
         return
       }
+      const message = await convertIframe(messageRef.current.value);
+      
     const userId = localStorage.getItem("loggedInUserId") || "9njjU8JwUWeO0DqITxs3Q6Ldtvq1";
     const time = await getTime();
-    await sendChats(videoId,time,userId,messageRef.current.value);
+    await sendChats(videoId,time,userId,message);
     messageRef.current.value="";
     }catch(error){
       alert(error);
@@ -186,7 +219,10 @@ const updateChats = (newChats) => {
       />
       <div className="message">
         <p className="user-name">{msg.displayName}</p>
-        <p className="message-text">{msg.message} </p>
+        <p 
+          className="message-text" 
+          dangerouslySetInnerHTML={{ __html: msg.message }} 
+        />
         <p className="message-time">{msg.time} </p>
       </div>
     </div>
@@ -243,7 +279,10 @@ const updateChats = (newChats) => {
             />
             <div className="message">
               <p className="user-name">{latestMessage.displayName}</p>
-              <p className="message-text">{latestMessage.message}</p>
+              <p 
+                className="message-text" 
+                dangerouslySetInnerHTML={{ __html: latestMessage.message }} 
+              />
               <p className="message-time">{latestMessage.time}</p>
             </div>
           </div>
