@@ -146,16 +146,7 @@ export async function saveDoc(type, docId, data) {
 //load Option
 export async function loadOption(contentType){
   try{
-    if(contentType === "feature"){
-      return await getDocsId("feature");
-    }
-    if(contentType === "movieList"){
-      return await getDocsId("movieList")
-    }
-    if(contentType === "videos"){
-      return await getDocsId("videos")
-    }
-    return []
+      return await getDocsId(contentType);
   }catch(error){
     return [];
     

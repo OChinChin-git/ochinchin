@@ -48,6 +48,14 @@ const getTypeValue = async(type,data)=>{
       url: data.videoUrl,
     }
   }
+  if(type=="rooms"){
+      finalData={
+      title:data.title,
+      url: data.videoUrl,
+      host:data.host,
+      roomName:data.roomName,
+    }
+  }
   return finalData;
 }
 
@@ -64,6 +72,9 @@ export const getVideo = async(id)=>{
   }
   if(id.startsWith("f")){
     finalData = await getDocValue("feature",data.videoTitle);
+  }
+  if(id.startsWith("r")){
+    finalData=await getDocValue("rooms",data.videoTitle)
   }
   return finalData;
 }
@@ -284,6 +295,21 @@ export const getActiveVisitorsCount = (setActiveVisitors,id) => {
       trackVisitor(id);
     },1000)
       // Gọi hàm trackVisitor để theo dõi mỗi khi có sự thay đổi trong số lượng người dùng
+  }, (error) => {
+    alert("Error getting active visitors count:", error);
+  });
+
+  return unsubscribe;
+};
+export const getActiveVisitors = (id) => {
+  const visitorsRef = collection(doc(db, 'content/type/videosId',id),"activeVisitors");
+
+  const unsubscribe = onSnapshot(visitorsRef, (snapshot) => {
+    const activeVisitorsCount = snapshot.size;  // Sử dụng snapshot.size để đếm số lượng tài liệu
+    setTimeout(()=>{
+      trackVisitor(id);
+    },1000)
+      return activeVisitorsCount
   }, (error) => {
     alert("Error getting active visitors count:", error);
   });

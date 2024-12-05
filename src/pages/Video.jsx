@@ -20,13 +20,17 @@ const Video =()=>{
   const videoId = query.substring(1); // Lấy giá trị sau `?v`
   
 const convertToEmbedUrl = (url) => {
-  const youtubeRegEx = /(?:https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/|.*[?&]v=)|youtu\.be\/))([a-zA-Z0-9_-]{11})(?:[&?][^#]*)?/;
+  // Sửa biểu thức chính quy để bao gồm các URL YouTube live
+  const youtubeRegEx = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[&?][^#]*)?/;
+
   const match = url.match(youtubeRegEx);
   if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}`; 
+    return `https://www.youtube.com/embed/${match[1]}`; // Trả về URL nhúng
   }
-  return url; 
+
+  return url; // Nếu không phải URL YouTube hợp lệ, trả về URL gốc
 }
+
 
 
 const convertPornhubToEmbedUrl = (url) => {
@@ -51,12 +55,16 @@ const convertUrl = (url) => {
 }
 const isValidUrl = (url) => {
   const urlRegEx = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(\/[^\s]*)?$/;
+  if (url && !url.startsWith('http') && !url.startsWith('https')) {
+    return false; // Kiểm tra nếu URL không bắt đầu với 'http' hoặc 'https'
+  }
   return urlRegEx.test(url);
 };
+
 const convertIframe = (url)=>{
   try{
     isValidUrl(url)
-    if(!isValidUrl){
+    if(!isValidUrl(url)){
       return url;
     }
     const isConfirm = confirm("Phát hiện url, thử chuyển đổi thành thẻ nhúng cho chat ?")
@@ -192,6 +200,7 @@ const updateChats = (newChats) => {
       stopTracking(); // Dừng theo dõi người truy cập
     };
   }, []);
+  
   return(
 <div className="video-block">
   
