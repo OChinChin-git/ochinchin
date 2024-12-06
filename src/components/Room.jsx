@@ -59,6 +59,24 @@ export const addRoom = async(name,pass,title,url)=>{
     alert(error);
   }
 }
+export const updateRoom = async(name,pass,title,url)=>{
+  const docRef = doc(roomCol,name);
+  const docSnap = await getDoc(docRef);
+  if(!docSnap.exists()){
+    return 'lỗi'
+  }
+  try{
+    const data = {
+    roomPass:pass,
+    title:title,
+    videoUrl:url
+  }
+  await updateDoc(docRef,data);
+    return "kimochi"
+  }catch(error){
+    alert("update doc: " +error);
+  }
+}
 export const getRoomsId = async(name)=>{
   const data = await getDoc(doc(roomCol,name));
   const final = data.data();

@@ -10,9 +10,11 @@ import {
   getChats,
   trackVisitor,
   getActiveVisitorsCount,
-  resetActiveVisitors
+  resetActiveVisitors,
+  trackUpdateRoom
 } from "/src/components/Video";
 import "../styles/Video.css";
+import {updateRoom} from '../components/Room'
 
 const Video = () => {
   const { showLoader, hideLoader } = useLoader(); // Use loader context
@@ -112,10 +114,7 @@ const Video = () => {
       hideLoader();
     }
   };
-  useState(() => {
-    videoInfo();
-    resetActiveVisitors(videoId);
-  }, []);
+
   //
   //
   //
@@ -207,7 +206,10 @@ useEffect(() => {
   //
   //
   const [activeVisitors, setActiveVisitors] = useState(0);
-
+  useState(async()=>{
+    await resetActiveVisitors(videoId);
+  },[]);
+  
   useEffect(() => {
     // Bắt đầu theo dõi khi component được mount
     const stopTracking = trackVisitor(videoId);
@@ -225,6 +227,14 @@ useEffect(() => {
   const [roomPass, setRoomPass] = useState();
   const roomPassRef = useRef();
   const [isJoinRoom, setIsJoinRoom] = useState();
+  const [hostId,setHostId] = useState();
+  const [roomName,setRoomName] = useState();
+  const [selectVideo,setSelectVideo] = useState("");
+  const [isHost,setIsHost] = useState(false);
+  const videoTitleRef = useRef();
+  const videoUrlRef = useRef();
+  const [isRoomPass, setIsRoomPass] = useState();
+  const roomPassInputRef = useRef();
   const handleSetRoom = async () => {
     try {
       if (!videoId.startsWith("r")) {
@@ -234,18 +244,23 @@ useEffect(() => {
       if (data.roomPass !== false) {
         setIsPass(true);
         setIsJoinRoom(false);
+        setIsRoomPass(true);
         setRoomPass(data.roomPass);
+        roomPassInputRef.current.value = data.roomPass;
       } else {
         setIsPass(false);
         setIsJoinRoom(true);
+        setIsRoomPass(false);
       }
+      setHostId(data.host);
+      setRoomName(data.roomName);
+      videoTitleRef.current.value = data.title;
+      videoUrlRef.current.value = data.url;
     } catch (error) {
       alert(error);
     }
   };
-  useEffect(() => {
-    handleSetRoom();
-  }, []);
+  
   const handleJoinRoom = () => {
     const pass = roomPassRef.current.value;
     if (pass == "") {
@@ -259,20 +274,93 @@ useEffect(() => {
       setIsPass(false);
     }
   };
-
+  const checkIsHost = ()=>{
+      let hostLocalId = localStorage.getItem('visitorId');
+  if (!hostLocalId) {
+    hostLocalId = Date.now();
+    localStorage.setItem('visitorId', hostLocalId); // Lưu vào localStorage
+  }
+    
+    if(hostId == hostLocalId){
+      setIsHost(true);
+      setIsPass(false);
+      setIsJoinRoom(true);
+    }else{
+      setIsHost(false)
+    }
+  }
+  useEffect(()=>{
+    checkIsHost();
+  },[hostId]);
+  const [isCloseHost,setIsCloseHost] = useState(false);
+  const [isChangeSetting,setIsChangeSetting] = useState(false);
+  const handleCloseHost=()=>{
+    setIsCloseHost(!isCloseHost);
+  }
+  const handleSetIsPass = ()=>{
+    setIsRoomPass(!isRoomPass);
+  }
+  const handleChangeRoomSetting = async()=>{
+    const isConfirm = confirm("Xác nhận, thay đổi sẽ ảnh hưởng đến toàn bộ thành viên trong phòng...")
+      if(!isConfirm){
+        return
+      }
+    try{
+      showLoader("Đang cập nhật phòng")
+    const title =videoTitleRef.current.value;
+    const url = videoUrlRef.current.value;
+    let pass 
+    if(isRoomPass){
+      pass = roomPassInputRef.current.value;
+    }else{
+      pass = false;
+    }
+    const responseUpdate = await updateRoom(roomName,pass,title,url);
+    if(responseUpdate == 'lỗi'){
+      showToast("Lỗi","error");
+    }else if(responseUpdate == "kimochi"){
+      showToast("Cập nhật thành công!","success");
+    }else{
+      showToast('Đặc cầu')
+    }
+      setIsChangeSetting(true);
+    }catch(error){
+      alert("Lỗi changeRoomSetting: ",error)
+    }finally{
+      hideLoader();
+    }
+  }
+  useEffect(() => {
+    handleSetRoom();
+    checkIsHost();
+    videoInfo();
+  }, []);
+  
+useEffect(() => {
+  if (!roomName) {
+    return;
+  }
+  const unsubscribe = trackUpdateRoom(roomName, handleSetRoom, checkIsHost, videoInfo);
+  return () => {
+    if (typeof unsubscribe === 'function') {
+      unsubscribe();
+    } else {
+    }
+  };
+}, [roomName]);
 
   return (
     <div className="video-block">
       <div style={isJoinRoom ? { display: "" } : { display: "none" }}>
         <div className="video-container">
           <iframe
-            frameborder="0"
-            allowfullscreen
+            frameBorder="0"
+            allowFullScreen
             allowtransparency="true"
             src={videoUrl}
             className="video"
           ></iframe>
-          <div className="title animated2" value={videoTitle}>
+          <div className="title animated2" value={videoTitle }>
             {videoTitle}
           </div>
         </div>
@@ -335,6 +423,7 @@ useEffect(() => {
               placeholder="Nhập tin nhắn..."
               ref={messageRef}
               onKeyDown={handleKeyDown}
+              onFocus={(e)=>e.target.select()}
             />
             <button
               type="button"
@@ -388,12 +477,63 @@ useEffect(() => {
       >
         <label>
           Nhập mật khẩu để vào phòng
-          <input className="password-input" type="password" ref={roomPassRef} />
+          <input className="password-input" type="password" ref={roomPassRef} 
+            onFocus={(e)=>e.target.select()}/>
         </label>
         <button onClick={handleJoinRoom} className="join-button">
           Vào
         </button>
       </div>
+      <div className='host-container' style={{
+    display: (isJoinRoom && isHost && isCloseHost) ? "" : "none"
+  }}>
+        <button className="x-button" onClick={handleCloseHost}>x</button>
+        <div className="room-profile">
+          <div className="room-setting">
+            <label >Room name:
+              <p className="room-name">{roomName}</p>
+            </label>
+            <label className="select-label">Host hiện tại
+              <select>
+                <option className="">Bạn đang là host</option>
+              </select>
+            </label>
+            <p className="p-abc">Mật khẩu:<button onClick={handleSetIsPass} >{isRoomPass ? ("có") : ("Không") }</button></p>
+            <label style={isRoomPass ? {display:""} : {display:"none"} }>Mật khẩu:
+              <input type="password" className="room-pass" 
+                placeholder="Mật khẩu phòng"
+                ref={roomPassInputRef}
+                onFocus={(e)=>e.target.select()}
+                />
+            </label>
+            <label>Tên video
+            <input type="text" placeholder="Nhập tên video"
+              ref={videoTitleRef}
+              onFocus={(e)=>e.target.select()}
+              />
+            </label>
+            <label>link video
+              <input type="text" placeholder="nhập url video"
+                ref={videoUrlRef}
+                onFocus={(e)=>e.target.select()}
+                onKeyDown={(e)=>{
+                  if(e.key==="Enter"){
+                    handleChangeRoomSetting();
+                  }
+                }}
+                /> 
+            </label>
+            <button className="room-buttom" type="button" onClick={handleChangeRoomSetting}>Thay đổi</button>
+          </div>
+          <div className="room-users">
+            <ul>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <button className="host-button"
+        style={{display: (isJoinRoom && isHost && !isCloseHost) ? "" : "none"}} 
+        onClick={handleCloseHost}>Host</button>
     </div>
   );
 };

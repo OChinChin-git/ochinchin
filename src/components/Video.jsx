@@ -260,11 +260,12 @@ export const trackVisitor = (id) => {
   // Kiểm tra nếu visitorId đã tồn tại trong localStorage
   let visitorId = localStorage.getItem('visitorId');
   if (!visitorId) {
-    visitorId = Date.now();
+    visitorId = Date.now().toString();
     localStorage.setItem('visitorId', visitorId); // Lưu vào localStorage
   }
-
-  const visitorRef = doc(collection(doc(db, 'content/type/videosId',id),"activeVisitors"), visitorId);
+  const docRef =doc(db, 'content/type/videosId',id)
+  const collRef =collection(docRef,"activeVisitors")
+  const visitorRef = doc(collRef, visitorId);
   setDoc(visitorRef, { active: true })
     .catch((error) => console.log("Error setting visitor active status:", error));
 
@@ -335,14 +336,37 @@ export const resetActiveVisitors = async (id) => {
   try {
     // Truy cập tập hợp activeVisitors bên trong tài liệu videosId
     const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
-    
     // Lấy tất cả tài liệu bên trong tập hợp activeVisitors
     const snapshot = await getDocs(visitorsRef);
 
-    // Xóa từng tài liệu trong tập hợp
-    const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
-    await Promise.all(deletePromises);
+    // Nếu có tài liệu trong collection, tiến hành xóa
+    if (snapshot.docs.length > 0) {
+      const deletePromises = snapshot.docs.map((doc) => {
+        return deleteDoc(doc.ref);
+      });
+
+      // Chờ cho tất cả các tài liệu được xóa
+      await Promise.all(deletePromises);
+    } else {
+      console.log("No active visitors to delete.");
+    }
   } catch (error) {
     console.error("Error resetting active visitors:", error);
   }
 };
+export const trackUpdateRoom = (roomId, handleSetRoom, checkIsHost, videoInfo) => {
+  if (!roomId) {
+    return;
+  }
+  const roomRef = doc(db, 'content/type/rooms', roomId);
+  const unsubscribe = onSnapshot(roomRef, (docSnapshot) => {
+    const data = docSnapshot.data();
+    handleSetRoom();
+    checkIsHost();
+    videoInfo();
+  });
+  return unsubscribe;
+};
+export const getRoomVisitors = async()=>{
+  
+}
