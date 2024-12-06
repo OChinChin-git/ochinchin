@@ -334,4 +334,7 @@ export const getActiveVisitors = (setActiveVisitors, id) => {
 
   return unsubscribe;
 };
-
+export const resetActiveVisitors = async(id)=>{
+   const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
+  await deleteDoc(visitorsRef);
+}

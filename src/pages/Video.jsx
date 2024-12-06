@@ -4,7 +4,7 @@ import {getVideo} from '../components/Video'
 import { useLoader } from "../components/LoaderContext"; 
 import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
-import {sendChats,getTime,getChats,trackVisitor, getActiveVisitorsCount} from '/src/components/Video';
+import {sendChats,getTime,getChats,trackVisitor, getActiveVisitorsCount,resetActiveVisitors} from '/src/components/Video';
 import "../styles/Video.css"
 
 const Video =()=>{
@@ -106,6 +106,7 @@ const convertIframe = (url)=>{
   }
   useState(()=>{
     videoInfo();
+    resetActiveVisitors(videoId);
 },[])
 //
 //
