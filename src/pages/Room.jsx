@@ -82,21 +82,89 @@ const Room = ()=>{
       hideLoader();
     }
   }
-  const [selectRoom,setSelectRoom] = useState();
-  const [roomOptions,setRoomOptions] =useState({});
-  
-  const handleSelectRoom = (e)=>{
-    setSelectRoom(e.target.value);
+  const RoomList = () => {
+  const [roomOptions, setRoomOptions] = useState({});
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [roomCount,setRoomCount] = useState(0);
+  const [isCount,setIsCount] = useState(false);
+  const [rId,setRId]=useState("");
+  // Load danh sách phòng
+  useEffect(() => {
+    const fetchRooms = async () => {
+      const data = await loadOption("rooms");
+      setRoomOptions(data);
+    };
+    fetchRooms();
+  }, []);
+
+  // Tham gia phòng
+  const handleJoinRoom = async () => {
+    if (!selectedRoom) {
+      alert("Chưa chọn phòng nào!");
+      return;
+    }
+    try {
+      window.location.href = `/video?${rId}`;
+    } catch (error) {
+      alert("Lỗi khi tham gia phòng: " + error);
+    }
+  };
+useEffect(() => {
+  if (rId === "") {
+    return;
   }
-  useEffect (async()=>{
-  const data = await loadOption("rooms")
-  setRoomOptions(data);
-  },[])
-  const handleJoinRoom = async(r)=>{
-    const rId = await getRoomsId(r);
-    window.location.href= '/video?' + rId
+  const unsubscribe = getActiveVisitors(setRoomCount, rId);
+  return () => {
+    unsubscribe && unsubscribe(); // Kiểm tra nếu unsubscribe tồn tại
+  };
+}, [rId]);
+
+useEffect(() => {
+  if (selectedRoom === "") {
+     setIsCount(false)
+    return;
   }
+    setIsCount(true)
+  const fetchRoomId = async () => {
+    const roomIds = await getRoomsId(selectedRoom);
+    setRId(roomIds);
+  };
   
+  fetchRoomId();
+}, [selectedRoom]);
+
+  return (
+    <div >
+      <label className="selectLabel">
+        Chọn phòng:
+        <select
+          value={selectedRoom}
+          onChange={(e) => setSelectedRoom(e.target.value)}
+        >
+          <option value="">-- Chọn phòng --</option>
+          {Object.keys(roomOptions).length > 0 ? (
+            Object.entries(roomOptions).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))
+          ) : (
+            <option value="">Không có phòng nào</option>
+          )}
+        </select>
+      </label>
+      <p className="p-abc"
+        style={isCount ? {display:""} : {display:"none"} }
+        >Số người hiện tại: {roomCount}</p>
+      <button
+        className="room-button"
+        onClick={handleJoinRoom}
+      >
+        Vào phòng
+      </button>
+    </div>
+  );
+};
   return(
   <div className="room-background">
     <div className="room-container">
@@ -109,20 +177,7 @@ const Room = ()=>{
         </select>
       </label>
       
-      {chose === "room-list" &&(
-      <div className='room-list'>
-          <ul>
-            {roomOptions.length >0 ? (roomOptions.map((r)=>(
-              <li className="room-li" key={r}>
-                <a className="room-name">{r} </a>
-                <button className="room-buttom" onClick={()=> handleJoinRoom(r)}>Vào phòng</button>
-              </li>
-            ))) : (
-              <li className="room-li"> 
-              <a className="room-name">Không có phòng nào</a> </li>
-            )}
-          </ul>
-      </div>)}
+        {chose === "room-list" && <RoomList />}
       
       {chose ==="add-room" &&(
       <div className="add-room">
@@ -167,4 +222,5 @@ const Room = ()=>{
   </div>
   )
 }
+
 export default Room;

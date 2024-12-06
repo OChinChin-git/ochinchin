@@ -171,8 +171,10 @@ const updateChats = (newChats) => {
 
   // Phát âm thanh khi có tin nhắn mới
   if (audioRef.current) {
-    audioRef.current.play();
-  }
+  audioRef.current.volume = 0.5; // Điều chỉnh âm lượng (0.5 là 50% âm lượng)
+  audioRef.current.play(); // Phát âm thanh
+}
+
 };
 
   useEffect(() => {
@@ -200,10 +202,47 @@ const updateChats = (newChats) => {
       stopTracking(); // Dừng theo dõi người truy cập
     };
   }, []);
-  
+  const [isPass,setIsPass] = useState(false);
+  const [roomPass,setRoomPass]= useState();
+  const roomPassRef = useRef();
+  const [isJoinRoom,setIsJoinRoom] = useState();
+  const handleSetRoom = async()=>{
+    try{
+      if(!videoId.startsWith("r")){
+        return
+      }
+      const data = await getVideo(videoId);
+      if(data.roomPass !== false){
+        setIsPass(true);
+        setIsJoinRoom(false);
+        setRoomPass(data.roomPass);
+      }else{
+        setIsPass(false);
+        setIsJoinRoom(true)
+      }
+    }catch(error){
+      alert(error)
+    }
+  }
+  useEffect(()=>{
+    handleSetRoom();
+  },[])
+  const handleJoinRoom=()=>{
+    const pass = roomPassRef.current.value;
+    if(pass == ""){
+      showToast("Chưa nhập mật khẩu");
+      return
+    }
+    if(pass !== roomPass){
+      showToast("Sai mật khẩu")
+    }else{
+      setIsJoinRoom(true);
+  }
+  }
+
   return(
 <div className="video-block">
-  
+  <div style={isJoinRoom ? {display:""} : {display:"none"}}>
   
   <div className="video-container">
     <iframe frameborder="0" allowfullscreen allowtransparency="true" src={videoUrl} className="video"></iframe>
@@ -299,7 +338,18 @@ const updateChats = (newChats) => {
       </div>
     </div>
 
-  <button className="chat-toggle" onClick={handleCloseChat} style={isCloseChat ? {display: "none"} : {display: ""} }>Chat</button>
+  <button className="chat-toggle" onClick={handleCloseChat} 
+    style={isCloseChat ? {display: "none"} : {display: ""} }>Chat</button>
+  </div>
+  <div className="password-container"
+    style={isPass ? {display:""} : {display:"none"}}
+    >
+    
+    <label>Nhập mật khẩu để vào phòng
+      <input className="password-input" type="password" ref={roomPassRef}/>
+    </label>
+    <button onClick={handleJoinRoom} className="join-button" >Vào</button>
+  </div>
 </div>
   )
 }

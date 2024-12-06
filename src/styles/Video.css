@@ -59,7 +59,6 @@
   padding:5px 0px 0px 5px;
   background: rgba(0,0,0,0.7);
   width:300px;
-
 }
 .kimochi .latest-chat {
   border:2px solid #00FFFF;
@@ -73,7 +72,6 @@
   color:#229999;
 }
 .latest-chat-container{
-    max-height:60px;
   overflow:hidden;
   margin:5px;
 }
@@ -178,4 +176,15 @@
   border-radius:12px;
   padding:6px 20px;
   margin-left:calc(auto - 5px);
+}
+.password-container{
+  padding-top:40px;
+  display:flex;
+  justify-content:center;
+  align-items: flex-start;
+  height:calc(100vh - 90px);
+}
+.join-button{
+  top:10px;
+  padding:4px 14px;
 }

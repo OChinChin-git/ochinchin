@@ -54,6 +54,7 @@ const getTypeValue = async(type,data)=>{
       url: data.videoUrl,
       host:data.host,
       roomName:data.roomName,
+      roomPass:data.roomPass,
     }
   }
   return finalData;
@@ -283,36 +284,54 @@ export const trackVisitor = (id) => {
   };
 };
 
-export const getActiveVisitorsCount = (setActiveVisitors,id) => {
-  const visitorsRef = collection(doc(db, 'content/type/videosId',id),"activeVisitors");
+export const getActiveVisitorsCount = (setActiveVisitors, id) => {
+  if (!id) {
+    console.warn("getActiveVisitorsCount called with invalid id:", id);
+    return () => {}; // Trả về một hàm no-op để tránh lỗi
+  }
 
-  const unsubscribe = onSnapshot(visitorsRef, (snapshot) => {
-    const activeVisitorsCount = snapshot.size;  // Sử dụng snapshot.size để đếm số lượng tài liệu
-    console.log("Active visitors count updated:", activeVisitorsCount);
-    setActiveVisitors(activeVisitorsCount);
+  const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
 
-    setTimeout(()=>{
-      trackVisitor(id);
-    },1000)
-      // Gọi hàm trackVisitor để theo dõi mỗi khi có sự thay đổi trong số lượng người dùng
-  }, (error) => {
-    alert("Error getting active visitors count:", error);
-  });
+  const unsubscribe = onSnapshot(
+    visitorsRef,
+    (snapshot) => {
+      const activeVisitorsCount = snapshot.size;
+      console.log("Active visitors count updated:", activeVisitorsCount);
+      setActiveVisitors(activeVisitorsCount);
 
-  return unsubscribe;
-};
-export const getActiveVisitors = (id) => {
-  const visitorsRef = collection(doc(db, 'content/type/videosId',id),"activeVisitors");
-
-  const unsubscribe = onSnapshot(visitorsRef, (snapshot) => {
-    const activeVisitorsCount = snapshot.size;  // Sử dụng snapshot.size để đếm số lượng tài liệu
-    setTimeout(()=>{
-      trackVisitor(id);
-    },1000)
-      return activeVisitorsCount
-  }, (error) => {
-    alert("Error getting active visitors count:", error);
-  });
+      // Track visitor
+      setTimeout(() => {
+        trackVisitor(id);
+      }, 1000);
+    },
+    (error) => {
+      console.error("Error getting active visitors count:", error);
+    }
+  );
 
   return unsubscribe;
 };
+export const getActiveVisitors = (setActiveVisitors, id) => {
+  if (!id) {
+    console.warn("getActiveVisitorsCount called with invalid id:", id);
+    return () => {}; // Trả về một hàm no-op để tránh lỗi
+  }
+
+  const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
+
+  const unsubscribe = onSnapshot(
+    visitorsRef,
+    (snapshot) => {
+      const activeVisitorsCount = snapshot.size;
+      console.log("Active visitors count updated:", activeVisitorsCount);
+      setActiveVisitors(activeVisitorsCount);
+
+    },
+    (error) => {
+      console.error("Error getting active visitors count:", error);
+    }
+  );
+
+  return unsubscribe;
+};
+
