@@ -11,10 +11,11 @@ import {
   trackVisitor,
   getActiveVisitorsCount,
   resetActiveVisitors,
-  trackUpdateRoom
+  trackUpdateRoom,
+  getRoomVisitors,
 } from "/src/components/Video";
 import "../styles/Video.css";
-import {updateRoom} from '../components/Room'
+import { updateRoom } from "../components/Room";
 
 const Video = () => {
   const { showLoader, hideLoader } = useLoader(); // Use loader context
@@ -123,7 +124,7 @@ const Video = () => {
   const messageRef = useRef();
   const [messages, setMessages] = useState([]);
   const [isCloseLatestChat, setIsCloseLatestChat] = useState(true);
-  const [latestMessage, setLatestMessage] = useState(null);  
+  const [latestMessage, setLatestMessage] = useState(null);
   const chatContainerRef = useRef(null); // Tham chiếu đến container chứa tin nhắn
   const audioRef = useRef(null); // Tham chiếu đến âm thanh
 
@@ -157,20 +158,20 @@ const Video = () => {
   const handleCloseLatestChat = () => {
     setIsCloseLatestChat(true);
   };
-useEffect(() => {
-  if (messages.length > 0) {
-    setLatestMessage(messages[messages.length - 1]);
-    setIsCloseLatestChat(false); 
-  } else {
-    setLatestMessage(null); 
-    setIsCloseLatestChat(true);
-  }
-}, [messages]); 
-  useEffect(()=>{
-    if(isCloseLatestChat==true){
-      setLatestMessage(null); 
+  useEffect(() => {
+    if (messages.length > 0) {
+      setLatestMessage(messages[messages.length - 1]);
+      setIsCloseLatestChat(false);
+    } else {
+      setLatestMessage(null);
+      setIsCloseLatestChat(true);
     }
-},[isCloseLatestChat])
+  }, [messages]);
+  useEffect(() => {
+    if (isCloseLatestChat == true) {
+      setLatestMessage(null);
+    }
+  }, [isCloseLatestChat]);
   const chatStyle = !isCloseChat
     ? isCloseLatestChat
       ? { display: "none" }
@@ -179,22 +180,26 @@ useEffect(() => {
   // Hàm cập nhật tin nhắn
   const updateChats = (newChats) => {
     setMessages(newChats);
-
-    // Cuộn xuống cuối khi có tin nhắn mới
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
         behavior: "smooth", // Thêm tùy chọn cuộn mượt
       });
     }
-
     // Phát âm thanh khi có tin nhắn mới
     if (audioRef.current) {
       audioRef.current.volume = 0.5; // Điều chỉnh âm lượng (0.5 là 50% âm lượng)
       audioRef.current.play(); // Phát âm thanh
     }
   };
-
+  useEffect(() => {
+    if (isCloseChat) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth", // Thêm tùy chọn cuộn mượt
+      });
+    }
+  }, [isCloseChat]);
   useEffect(() => {
     // Gọi getChats với videoId và callback updateChats để cập nhật dữ liệu chat
     const unsubscribe = getChats(videoId, updateChats);
@@ -206,10 +211,10 @@ useEffect(() => {
   //
   //
   const [activeVisitors, setActiveVisitors] = useState(0);
-  useState(async()=>{
+  useState(async () => {
     await resetActiveVisitors(videoId);
-  },[]);
-  
+  }, []);
+
   useEffect(() => {
     // Bắt đầu theo dõi khi component được mount
     const stopTracking = trackVisitor(videoId);
@@ -227,10 +232,10 @@ useEffect(() => {
   const [roomPass, setRoomPass] = useState();
   const roomPassRef = useRef();
   const [isJoinRoom, setIsJoinRoom] = useState();
-  const [hostId,setHostId] = useState();
-  const [roomName,setRoomName] = useState();
-  const [selectVideo,setSelectVideo] = useState("");
-  const [isHost,setIsHost] = useState(false);
+  const [hostId, setHostId] = useState();
+  const [roomName, setRoomName] = useState();
+  const [selectHost, setSelectHost] = useState();
+  const [isHost, setIsHost] = useState(false);
   const videoTitleRef = useRef();
   const videoUrlRef = useRef();
   const [isRoomPass, setIsRoomPass] = useState();
@@ -253,6 +258,7 @@ useEffect(() => {
         setIsRoomPass(false);
       }
       setHostId(data.host);
+      setSelectHost(data.host);
       setRoomName(data.roomName);
       videoTitleRef.current.value = data.title;
       videoUrlRef.current.value = data.url;
@@ -260,7 +266,7 @@ useEffect(() => {
       alert(error);
     }
   };
-  
+
   const handleJoinRoom = () => {
     const pass = roomPassRef.current.value;
     if (pass == "") {
@@ -274,80 +280,105 @@ useEffect(() => {
       setIsPass(false);
     }
   };
-  const checkIsHost = ()=>{
-      let hostLocalId = localStorage.getItem('visitorId');
-  if (!hostLocalId) {
-    hostLocalId = Date.now();
-    localStorage.setItem('visitorId', hostLocalId); // Lưu vào localStorage
-  }
-    
-    if(hostId == hostLocalId){
+  const checkIsHost = () => {
+    let hostLocalId = localStorage.getItem("visitorId");
+    if (!hostLocalId) {
+      hostLocalId = Date.now();
+      localStorage.setItem("visitorId", hostLocalId); // Lưu vào localStorage
+    }
+
+    if (hostId == hostLocalId) {
       setIsHost(true);
       setIsPass(false);
       setIsJoinRoom(true);
-    }else{
-      setIsHost(false)
+    } else {
+      setIsHost(false);
     }
-  }
-  useEffect(()=>{
+  };
+  useEffect(() => {
     checkIsHost();
-  },[hostId]);
-  const [isCloseHost,setIsCloseHost] = useState(false);
-  const [isChangeSetting,setIsChangeSetting] = useState(false);
-  const handleCloseHost=()=>{
+  }, [hostId]);
+  const [isCloseHost, setIsCloseHost] = useState(false);
+  const [isChangeSetting, setIsChangeSetting] = useState(false);
+  const handleCloseHost = () => {
     setIsCloseHost(!isCloseHost);
-  }
-  const handleSetIsPass = ()=>{
+  };
+  const handleSetIsPass = () => {
     setIsRoomPass(!isRoomPass);
-  }
-  const handleChangeRoomSetting = async()=>{
-    const isConfirm = confirm("Xác nhận, thay đổi sẽ ảnh hưởng đến toàn bộ thành viên trong phòng...")
-      if(!isConfirm){
-        return
+  };
+  const handleChangeRoomSetting = async () => {
+    const isConfirm = confirm(
+      "Xác nhận, nếu thay đổi mật khẩu sẽ ảnh hưởng đến toàn bộ thành viên trong phòng..."
+    );
+    if (!isConfirm) {
+      return;
+    }
+    try {
+      showLoader("Đang cập nhật phòng");
+      const title = videoTitleRef.current.value;
+      const url = videoUrlRef.current.value;
+      let pass;
+      if (isRoomPass) {
+        pass = roomPassInputRef.current.value;
+      } else {
+        pass = false;
       }
-    try{
-      showLoader("Đang cập nhật phòng")
-    const title =videoTitleRef.current.value;
-    const url = videoUrlRef.current.value;
-    let pass 
-    if(isRoomPass){
-      pass = roomPassInputRef.current.value;
-    }else{
-      pass = false;
-    }
-    const responseUpdate = await updateRoom(roomName,pass,title,url);
-    if(responseUpdate == 'lỗi'){
-      showToast("Lỗi","error");
-    }else if(responseUpdate == "kimochi"){
-      showToast("Cập nhật thành công!","success");
-    }else{
-      showToast('Đặc cầu')
-    }
+      const responseUpdate = await updateRoom(
+        roomName,
+        selectHost,
+        pass,
+        title,
+        url
+      );
+      if (responseUpdate == "lỗi") {
+        showToast("Lỗi", "error");
+      } else if (responseUpdate == "kimochi") {
+        showToast("Cập nhật thành công!", "success");
+      } else {
+        showToast("Đặc cầu");
+      }
       setIsChangeSetting(true);
-    }catch(error){
-      alert("Lỗi changeRoomSetting: ",error)
-    }finally{
+    } catch (error) {
+      alert("Lỗi changeRoomSetting: ", error);
+    } finally {
       hideLoader();
     }
-  }
+  };
+  const [listUser, setListUser] = useState([]);
+  const loadVisitorIds = async () => {
+    try {
+      const roomateIds = await getRoomVisitors(videoId);
+      setListUser(roomateIds);
+    } catch (error) {
+      alert("loadVisitorsId" + error);
+    }
+  };
+  useEffect(() => {
+    loadVisitorIds();
+  }, [activeVisitors]);
   useEffect(() => {
     handleSetRoom();
     checkIsHost();
     videoInfo();
   }, []);
-  
-useEffect(() => {
-  if (!roomName) {
-    return;
-  }
-  const unsubscribe = trackUpdateRoom(roomName, handleSetRoom, checkIsHost, videoInfo);
-  return () => {
-    if (typeof unsubscribe === 'function') {
-      unsubscribe();
-    } else {
+
+  useEffect(() => {
+    if (!roomName) {
+      return;
     }
-  };
-}, [roomName]);
+    const unsubscribe = trackUpdateRoom(
+      roomName,
+      handleSetRoom,
+      checkIsHost,
+      videoInfo
+    );
+    return () => {
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      } else {
+      }
+    };
+  }, [roomName]);
 
   return (
     <div className="video-block">
@@ -360,7 +391,7 @@ useEffect(() => {
             src={videoUrl}
             className="video"
           ></iframe>
-          <div className="title animated2" value={videoTitle }>
+          <div className="title animated2" value={videoTitle}>
             {videoTitle}
           </div>
         </div>
@@ -423,7 +454,7 @@ useEffect(() => {
               placeholder="Nhập tin nhắn..."
               ref={messageRef}
               onKeyDown={handleKeyDown}
-              onFocus={(e)=>e.target.select()}
+              onFocus={(e) => e.target.select()}
             />
             <button
               type="button"
@@ -477,63 +508,118 @@ useEffect(() => {
       >
         <label>
           Nhập mật khẩu để vào phòng
-          <input className="password-input" type="password" ref={roomPassRef} 
-            onFocus={(e)=>e.target.select()}/>
+          <input
+            className="password-input"
+            type="password"
+            ref={roomPassRef}
+            onFocus={(e) => e.target.select()}
+          />
         </label>
         <button onClick={handleJoinRoom} className="join-button">
           Vào
         </button>
       </div>
-      <div className='host-container' style={{
-    display: (isJoinRoom && isHost && isCloseHost) ? "" : "none"
-  }}>
-        <button className="x-button" onClick={handleCloseHost}>x</button>
+      <div
+        className="host-container"
+        style={{
+          display: isJoinRoom && isHost && isCloseHost ? "" : "none",
+        }}
+      >
+        <button className="x-button" onClick={handleCloseHost}>
+          x
+        </button>
         <div className="room-profile">
           <div className="room-setting">
-            <label >Room name:
+            <label>
+              Room name:
               <p className="room-name">{roomName}</p>
             </label>
-            <label className="select-label">Host hiện tại
-              <select>
-                <option className="">Bạn đang là host</option>
+            <label className="select-label">
+              Host hiện tại
+              <select
+                value={selectHost}
+                onChange={(e) => setSelectHost(e.target.value)}
+              >
+                {listUser
+                  ? listUser
+                      .filter((user) => user.id == hostId)
+                      .map((user) => (
+                        <option className="" value={hostId} key={hostId}>
+                          Bạn: {user.userId}
+                        </option>
+                      ))
+                  : ""}
+                {listUser.length > 0
+                  ? listUser
+                      .filter((user) => user.id !== hostId)
+                      .map((user) => (
+                        <option key={user.id} value={user.id}>
+                          <p>{user.userId}</p>
+                          <p>/ Id: {user.id}</p>
+                        </option>
+                      ))
+                  : ""}
               </select>
             </label>
-            <p className="p-abc">Mật khẩu:<button onClick={handleSetIsPass} >{isRoomPass ? ("có") : ("Không") }</button></p>
-            <label style={isRoomPass ? {display:""} : {display:"none"} }>Mật khẩu:
-              <input type="password" className="room-pass" 
+            <p className="p-abc">
+              Mật khẩu:
+              <button onClick={handleSetIsPass}>
+                {isRoomPass ? "có" : "Không"}
+              </button>
+            </p>
+            <label style={isRoomPass ? { display: "" } : { display: "none" }}>
+              Mật khẩu:
+              <input
+                type="password"
+                className="room-pass"
                 placeholder="Mật khẩu phòng"
                 ref={roomPassInputRef}
-                onFocus={(e)=>e.target.select()}
-                />
-            </label>
-            <label>Tên video
-            <input type="text" placeholder="Nhập tên video"
-              ref={videoTitleRef}
-              onFocus={(e)=>e.target.select()}
+                onFocus={(e) => e.target.select()}
               />
             </label>
-            <label>link video
-              <input type="text" placeholder="nhập url video"
+            <label>
+              Tên video
+              <input
+                type="text"
+                placeholder="Nhập tên video"
+                ref={videoTitleRef}
+                onFocus={(e) => e.target.select()}
+              />
+            </label>
+            <label>
+              link video
+              <input
+                type="text"
+                placeholder="nhập url video"
                 ref={videoUrlRef}
-                onFocus={(e)=>e.target.select()}
-                onKeyDown={(e)=>{
-                  if(e.key==="Enter"){
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
                     handleChangeRoomSetting();
                   }
                 }}
-                /> 
+              />
             </label>
-            <button className="room-buttom" type="button" onClick={handleChangeRoomSetting}>Thay đổi</button>
+            <button
+              className="room-buttom"
+              type="button"
+              onClick={handleChangeRoomSetting}
+            >
+              Thay đổi
+            </button>
           </div>
           <div className="room-users">
-            <ul>
-            </ul>
+            <ul></ul>
           </div>
         </div>
       </div>
-      <button className="host-button"
-        style={{display: (isJoinRoom && isHost && !isCloseHost) ? "" : "none"}} 
-        onClick={handleCloseHost}>Host</button>
+      <button
+        className="host-button"
+        style={{ display: isJoinRoom && isHost && !isCloseHost ? "" : "none" }}
+        onClick={handleCloseHost}
+      >
+        Host
+      </button>
     </div>
   );
 };
