@@ -260,13 +260,12 @@ export const trackVisitor = (id) => {
   // Kiểm tra nếu visitorId đã tồn tại trong localStorage
   let visitorId = localStorage.getItem('visitorId');
   if (!visitorId) {
-    visitorId = Date.now().toString(); // Tạo ID mới nếu chưa tồn tại
+    visitorId = Date.now();
     localStorage.setItem('visitorId', visitorId); // Lưu vào localStorage
   }
 
   const visitorRef = doc(collection(doc(db, 'content/type/videosId',id),"activeVisitors"), visitorId);
   setDoc(visitorRef, { active: true })
-    .then(() => console.log("Visitor set as active in Firestore."))
     .catch((error) => console.log("Error setting visitor active status:", error));
 
   const handleBeforeUnload = () => {
@@ -296,7 +295,6 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
     visitorsRef,
     (snapshot) => {
       const activeVisitorsCount = snapshot.size;
-      console.log("Active visitors count updated:", activeVisitorsCount);
       setActiveVisitors(activeVisitorsCount);
 
       // Track visitor
@@ -323,7 +321,6 @@ export const getActiveVisitors = (setActiveVisitors, id) => {
     visitorsRef,
     (snapshot) => {
       const activeVisitorsCount = snapshot.size;
-      console.log("Active visitors count updated:", activeVisitorsCount);
       setActiveVisitors(activeVisitorsCount);
 
     },
@@ -334,7 +331,18 @@ export const getActiveVisitors = (setActiveVisitors, id) => {
 
   return unsubscribe;
 };
-export const resetActiveVisitors = async(id)=>{
-   const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
-  await deleteDoc(visitorsRef);
-}
+export const resetActiveVisitors = async (id) => {
+  try {
+    // Truy cập tập hợp activeVisitors bên trong tài liệu videosId
+    const visitorsRef = collection(doc(db, 'content/type/videosId', id), "activeVisitors");
+    
+    // Lấy tất cả tài liệu bên trong tập hợp activeVisitors
+    const snapshot = await getDocs(visitorsRef);
+
+    // Xóa từng tài liệu trong tập hợp
+    const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error("Error resetting active visitors:", error);
+  }
+};
