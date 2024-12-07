@@ -87,10 +87,10 @@ const Video = () => {
       let convertedUrl = convertToEmbedUrl(url);
       convertedUrl = convertPornhubToEmbedUrl(convertedUrl);
       const iframeUrl = `
-    <div style="width: calc(840px * 0.2875); height: calc(450px * 0.2875); overflow: hidden; position: relative; border-radius: 8px;">
+    <div style="width: calc(810px * 0.2875); height: calc(450px * 0.2875); overflow: hidden; position: relative; border-radius: 8px;">
       <iframe 
         src="${convertedUrl}" 
-        style="width: 840px; height: 450px; border: 0; transform: scale(0.2875); transform-origin: top left;" 
+        style="width: 810px; height: 450px; border: 0; transform: scale(0.2875); transform-origin: top left;" 
         allowfullscreen>
       </iframe>
     </div>
@@ -141,7 +141,7 @@ const Video = () => {
 
       const userId =
         localStorage.getItem("loggedInUserId") ||
-        "9njjU8JwUWeO0DqITxs3Q6Ldtvq1";
+        "anonymous";
       const time = await getTime();
       await sendChats(videoId, time, userId, message);
       messageRef.current.value = "";
@@ -214,7 +214,19 @@ const Video = () => {
   useState(async () => {
     await resetActiveVisitors(videoId);
   }, []);
-
+  
+  useEffect(()=>{
+    const intervalId = setInterval(async()=>{
+      try{
+        await resetActiveVisitors(videoId);
+        console.log('reset')
+      }catch(error){
+        alert(error);
+      }
+    },1800000)
+    return()=>clearInterval(intervalId);
+  },[])
+  
   useEffect(() => {
     // Bắt đầu theo dõi khi component được mount
     const stopTracking = trackVisitor(videoId);
@@ -243,6 +255,7 @@ const Video = () => {
   const handleSetRoom = async () => {
     try {
       if (!videoId.startsWith("r")) {
+        setIsJoinRoom(true);
         return;
       }
       const data = await getVideo(videoId);
@@ -307,11 +320,20 @@ const Video = () => {
     setIsRoomPass(!isRoomPass);
   };
   const handleChangeRoomSetting = async () => {
+    if(isRoomPass){
     const isConfirm = confirm(
-      "Xác nhận, nếu thay đổi mật khẩu sẽ ảnh hưởng đến toàn bộ thành viên trong phòng..."
+      "Đặt mật khẩu thì tất cả thành viên sẽ phải vào lại, xác nhận chứ ?"
     );
     if (!isConfirm) {
       return;
+    }
+    }if(selectHost !==hostId){
+       const isConfirm = confirm(
+      "Thay đổi host chứ ? Bạn sẽ mất quyền host"
+    );
+    if (!isConfirm) {
+    return;
+    }
     }
     try {
       showLoader("Đang cập nhật phòng");
@@ -347,15 +369,18 @@ const Video = () => {
   const [listUser, setListUser] = useState([]);
   const loadVisitorIds = async () => {
     try {
-      const roomateIds = await getRoomVisitors(videoId);
+      const roomateIds = await getRoomVisitors(videoId); // Lấy danh sách các visitor
       setListUser(roomateIds);
+
     } catch (error) {
-      alert("loadVisitorsId" + error);
+      alert("loadVisitorsId " + error); // Xử lý lỗi khi lấy danh sách visitors
     }
   };
+
   useEffect(() => {
-    loadVisitorIds();
-  }, [activeVisitors]);
+    loadVisitorIds(); 
+  }, [activeVisitors])
+  
   useEffect(() => {
     handleSetRoom();
     checkIsHost();
@@ -391,9 +416,10 @@ const Video = () => {
             src={videoUrl}
             className="video"
           ></iframe>
-          <div className="title animated2" value={videoTitle}>
-            {videoTitle}
+          <div className="title animated2">
+            {videoTitle + " " + "\u00A0"}
           </div>
+
         </div>
 
         <div
@@ -406,7 +432,7 @@ const Video = () => {
             preload="auto"
           />
           <div>
-            <h3>Số người đang xem: {activeVisitors}</h3>
+            <h6>Số người đang xem: {activeVisitors}</h6>
           </div>
           <button className="x-button" onClick={handleCloseChat}>
             x
@@ -469,6 +495,7 @@ const Video = () => {
         <div className="latest-chat" style={chatStyle}>
           <div className="latest-chat-header">
             <p className="latest-chat-text">Chat mới nhất</p>
+            <h6>Số người đang xem: {activeVisitors}</h6>
             <button className="x-button" onClick={handleCloseLatestChat}>
               x
             </button>
@@ -555,7 +582,7 @@ const Video = () => {
                       .map((user) => (
                         <option key={user.id} value={user.id}>
                           <p>{user.userId}</p>
-                          <p>/ Id: {user.id}</p>
+                          <p> Id: {user.id}</p>
                         </option>
                       ))
                   : ""}

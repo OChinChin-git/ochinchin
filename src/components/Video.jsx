@@ -16,17 +16,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
-  authDomain: "ochinchin-7b3d8.firebaseapp.com",
-  projectId: "ochinchin-7b3d8",
-  storageBucket: "ochinchin-7b3d8.firebasestorage.app",
-  messagingSenderId: "364411060998",
-  appId: "1:364411060998:web:b7f31215e5cb0d0fbf1487",
-  measurementId: "G-BFRZ15ZNEC",
+  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
+  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
+  databaseURL: "https://thanhchimbe-d29a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "thanhchimbe-d29a4",
+  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
+  messagingSenderId: "661307532795",
+  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
+  measurementId: "G-ZKJF0FJ44X"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
 const getDocValue = async (type, name) => {
@@ -259,42 +259,58 @@ export const sendChats = async (id, time, userId, message) => {
     alert(error);
   }
 };
-export const trackVisitor = (id) => {
-  // Kiểm tra nếu visitorId đã tồn tại trong localStorage
-  let visitorId = localStorage.getItem("visitorId");
-  if (!visitorId) {
-    visitorId = Date.now().toString();
-    localStorage.setItem("visitorId", visitorId); // Lưu vào localStorage
+export const trackVisitor = async (id) => {
+  try {
+    // Kiểm tra nếu visitorId đã tồn tại trong localStorage
+    let visitorId = localStorage.getItem("visitorId");
+    if (!visitorId) {
+      visitorId = Date.now().toString();
+      localStorage.setItem("visitorId", visitorId); // Lưu vào localStorage
+    }
+
+    const docRef = doc(db, "content/type/videosId", id);
+    const collRef = collection(docRef, "activeVisitors");
+    const visitorRef = doc(collRef, visitorId);
+
+    let userId = localStorage.getItem("loggedInUserId") || "anonymous";
+
+    // Dữ liệu cần ghi
+    const newData = {
+      userId: userId,
+      active: true,
+      timestamp: new Date(), // Thêm timestamp để sử dụng TTL
+    };
+
+    // Kiểm tra dữ liệu hiện tại để giảm ghi không cần thiết
+    const existingDoc = await getDoc(visitorRef);
+    if (!existingDoc.exists() || JSON.stringify(existingDoc.data()) !== JSON.stringify(newData)) {
+      await setDoc(visitorRef, newData);
+    }
+
+    // Hàm xử lý trước khi đóng trình duyệt
+    const handleBeforeUnload = async () => {
+      try {
+        await deleteDoc(visitorRef);
+      } catch (error) {
+        console.error("Error removing visitor on unload:", error);
+      }
+    };
+
+    // Gắn sự kiện `beforeunload`
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Trả về hàm cleanup để xóa sự kiện và tài liệu khi cần
+    return async () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      try {
+        await deleteDoc(visitorRef);
+      } catch (error) {
+        console.error("Error removing visitor during cleanup:", error);
+      }
+    };
+  } catch (error) {
+    console.error("Error in trackVisitor:", error);
   }
-  const docRef = doc(db, "content/type/videosId", id);
-  const collRef = collection(docRef, "activeVisitors");
-  const visitorRef = doc(collRef, visitorId);
-  let userId = localStorage.getItem("loggedInUserId");
-  if (userId == null) {
-    userId = "9njjU8JwUWeO0DqITxs3Q6Ldtvq1";
-  }
-  const data = {
-    userId: userId,
-    active: true,
-  };
-  setDoc(visitorRef, data).catch((error) =>
-    console.log("Error setting visitor active status:", error)
-  );
-
-  const handleBeforeUnload = () => {
-    deleteDoc(visitorRef).catch((error) =>
-      alert("Error removing visitor:", error)
-    );
-  };
-
-  window.addEventListener("beforeunload", handleBeforeUnload);
-
-  return () => {
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-    deleteDoc(visitorRef).catch((error) =>
-      alert("Error removing visitor during cleanup:", error)
-    );
-  };
 };
 
 export const getActiveVisitorsCount = (setActiveVisitors, id) => {
@@ -317,7 +333,7 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
       // Track visitor
       setTimeout(() => {
         trackVisitor(id);
-      }, 1000);
+      }, 100);
     },
     (error) => {
       console.error("Error getting active visitors count:", error);

@@ -2,6 +2,7 @@
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; 
+    min-height: 100vh;
     width:100%;
   height:100%;
   align-items:center;
@@ -35,7 +36,7 @@
 }
 .title {
   margin:3px 10px;
-  font-style:oblique;
+  font-style:italic;
   font-size:18px;
   white-space:nowrap;
   overflow:hidden;
@@ -45,13 +46,10 @@
   overflow-x: auto; /* Hiện thanh cuộn khi hover */
 }
 
-/* Thiết lập layout cho màn hình nhỏ */
-/* @media (max-width: 768px) {
 
-} */
 .latest-chat{
   position:fixed;
-  bottom:82px;
+  bottom:48px;
   right:12px;
   z-index:102;
   border:2px solid #39FF14;
@@ -89,7 +87,7 @@
   z-index: 101;
   max-height:calc(100% - 100px);
   background: rgba(0,0,0,0.7);
-  padding:10px 0px 0px 10px;
+  padding:2px 0px 0px 10px;
   border:2px solid #39FF14;
   border-radius:16px;
   width:300px;
@@ -105,14 +103,14 @@
   
 }
 .chat-toggle{
-  bottom:43px;
+  bottom:10px;
   right: 20px;
   position:fixed;
   z-index:101;
   padding: 6px 16px;
 }
 .chat-container{
-  max-height:300px;
+  max-height:calc(100vh - 170px);
   overflow:hidden;
 }
 .chat-container:hover{
@@ -125,8 +123,8 @@
   margin-right:5px;
 }
 .avatar{
-  width:28px;
-  height:28px;
+  width:22px;
+  height:22px;
   border-radius:50%;
 }
 .message{
@@ -146,19 +144,22 @@
   margin-left:5px;
   color:#39FF14;
   transform: skew(-10deg);
-  font-size:15px;
+  font-size:12px;
 }
 .kimochi .user-name{
   color:#00FFFF;
 }
-.message-text{
-  font-size:14px;
-  margin-bottom:3px;
-  color:white;
-  max-width:230px;
+.message-text {
+  font-size: 12px;
+  margin-bottom: 3px;
+  color: white;
+  max-width: 230px;
+  word-wrap: break-word; /* Ngắt từ dài */
+  overflow-wrap: break-word; /* Dành cho trình duyệt hiện đại */
+  user-select:text;
 }
 .message-time{
-  font-size:11px;
+  font-size:8.6px;
   color:white;
 }
 .input-container{
@@ -194,7 +195,7 @@
   position:fixed;
   width:240px;
   top:50px;
-  right:326px;
+  right:12px;
   z-index:102;
   background:#222222;
   padding:10px;
@@ -214,8 +215,8 @@
 }
 .host-button{
   position:fixed;
-  bottom:13px;
-  right:20px;
+  bottom:10px;
+  right:84px;
   z-index:102;
   
 }
@@ -225,4 +226,38 @@
 }
 .kimochi .p-abc{
   color:#229999;
+}
+.latest-chat-header{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:5px;
+}
+/* Thiết lập layout cho màn hình nhỏ */
+@media (max-width: 468px) {
+  .video-container{
+    max-height: 300px;
+  }
+  .chat-container{
+  height:calc(100vh - 500px);
+  overflow-y:auto;
+}
+    .host-container{
+    top:unset;
+    bottom:84px;
+    right:12px;
+    max-height:calc(100vh - 122px);
+    overflow-y:auto;
+  }
+}
+@media (max-height: 468px) {
+  .chat-container{
+  overflow-y:auto;
+}
+  .host-container{
+    right:12px;
+    max-height:calc(100vh - 122px);
+    width:auto;
+    overflow-y:auto;
+  }
 }

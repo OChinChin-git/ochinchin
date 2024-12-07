@@ -261,3 +261,20 @@ h3:hover {
     color: #006666; /* Màu chữ khi hover */
 
 }
+h6 {
+    font-size: 13px; /* Giảm kích thước chữ cho tiêu đề danh sách */
+    color: #39FF14; /* Màu chữ mặc định */
+    margin:2px 0;
+    font-weight:normal;
+}
+h6:hover {
+    color: #268A0A; /* Màu chữ khi hover */
+
+}
+.kimochi h6 {
+    color: #00FFFF; /* Màu chữ khi ở trong class .kimochi */
+}
+.kimochi h6:hover {
+    color: #006666; /* Màu chữ khi hover */
+
+}

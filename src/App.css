@@ -2,8 +2,6 @@
 body {
   font-family: "Roboto", sans-serif;
  user-select: none; /* Ngừng chọn chữ trên toàn bộ trang */
-}
-body{
   background-color: #000000;
 }
 /* Cho phép chọn chữ ở các trường nhập liệu như input, textarea */
@@ -77,37 +75,7 @@ input, textarea {
     display: block; /* Hiển thị thông báo khi màn hình dọc */
   }
 }
-#dropdownMenu {
-    position: absolute;
-    top: 41px; /* Đẩy dropdown xuống ngay bên dưới profile-container */
-    background-color: #000; /* Nền đen */
-  color: #fff; /* Chữ trắng */
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    min-width: 150px;
-    z-index: 1;
-    display: none; /* Ẩn dropdown theo mặc định */
-}
 
-#dropdownMenu div {
-    padding: 5px 0;
-}
-
-#dropdownMenu button {
-    width: 100%;
-    padding: 5px;
-    background-color: #c9d6ff;
-    border: none;
-    color: blueviolet;
-    font-weight: bold;
-    border-radius: 5px;
-}
-
-#dropdownMenu button:hover {
-    color: blue;
-    text-decoration: underline;
-}
 .button-container button {
     margin-bottom: 10px; /* Tạo khoảng cách dưới mỗi nút */
   }
