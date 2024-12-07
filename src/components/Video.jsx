@@ -264,7 +264,7 @@ export const trackVisitor = async (id) => {
     // Kiểm tra nếu visitorId đã tồn tại trong localStorage
     let visitorId = localStorage.getItem("visitorId");
     if (!visitorId) {
-      visitorId = Date.now().toString();
+      visitorId = Date.now().toString(); // Tạo một ID duy nhất cho người truy cập
       localStorage.setItem("visitorId", visitorId); // Lưu vào localStorage
     }
 
@@ -278,19 +278,19 @@ export const trackVisitor = async (id) => {
     const newData = {
       userId: userId,
       active: true,
-      timestamp: new Date(), // Thêm timestamp để sử dụng TTL
+      timestamp: new Date() // Cập nhật timestamp nếu có sự thay đổi
     };
 
-    // Kiểm tra dữ liệu hiện tại để giảm ghi không cần thiết
+    // Kiểm tra dữ liệu hiện tại và chỉ ghi nếu có thay đổi
     const existingDoc = await getDoc(visitorRef);
-    if (!existingDoc.exists() || JSON.stringify(existingDoc.data()) !== JSON.stringify(newData)) {
-      await setDoc(visitorRef, newData);
+    if (!existingDoc.exists() || existingDoc.data().userId !== userId || existingDoc.data().active !== newData.active) {
+      await setDoc(visitorRef, newData); // Chỉ ghi lại khi dữ liệu thay đổi
     }
 
     // Hàm xử lý trước khi đóng trình duyệt
     const handleBeforeUnload = async () => {
       try {
-        await deleteDoc(visitorRef);
+        await deleteDoc(visitorRef); // Xóa visitor khi đóng trình duyệt
       } catch (error) {
         console.error("Error removing visitor on unload:", error);
       }
@@ -301,9 +301,9 @@ export const trackVisitor = async (id) => {
 
     // Trả về hàm cleanup để xóa sự kiện và tài liệu khi cần
     return async () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload); // Hủy sự kiện khi cần
       try {
-        await deleteDoc(visitorRef);
+        await deleteDoc(visitorRef); // Xóa visitor khi cần cleanup
       } catch (error) {
         console.error("Error removing visitor during cleanup:", error);
       }
@@ -316,7 +316,7 @@ export const trackVisitor = async (id) => {
 export const getActiveVisitorsCount = (setActiveVisitors, id) => {
   if (!id) {
     console.warn("getActiveVisitorsCount called with invalid id:", id);
-    return () => {}; // Trả về một hàm no-op để tránh lỗi
+    return () => {}; // Trả về hàm no-op nếu id không hợp lệ
   }
 
   const visitorsRef = collection(
@@ -330,9 +330,9 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
       const activeVisitorsCount = snapshot.size;
       setActiveVisitors(activeVisitorsCount);
 
-      // Track visitor
+      // Track visitor sau một khoảng thời gian ngắn
       setTimeout(() => {
-        trackVisitor(id);
+        trackVisitor(id); // Cập nhật visitor sau một khoảng thời gian ngắn
       }, 100);
     },
     (error) => {
@@ -340,8 +340,9 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
     }
   );
 
-  return unsubscribe;
+  return unsubscribe; // Trả về hàm unsubscribe để dừng theo dõi
 };
+
 export const getActiveVisitors = (setActiveVisitors, id) => {
   if (!id) {
     console.warn("getActiveVisitorsCount called with invalid id:", id);
