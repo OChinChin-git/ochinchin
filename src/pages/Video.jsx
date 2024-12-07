@@ -223,7 +223,7 @@ const Video = () => {
       }catch(error){
         alert(error);
       }
-    },1800000)
+    },600000)
     return()=>clearInterval(intervalId);
   },[])
   
