@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
-import {getUserProfile,changeUserProfile} from './firebaseAuth.js'
+import {getUserProfile,changeUserProfile,loginAnonymous} from './firebaseAuth.js'
 import { useLoader } from "./LoaderContext"; 
 import { useToast } from './ToastContext';
 import {useDialog} from './DialogContext';
@@ -16,6 +16,7 @@ const Navbar = () => {
   const [name,setName]=useState("");
   const [email,setEmail]=useState("");
   const[isLoggedIn,setIsLoggedIn] = useState(false);
+  
   const [uid, setUid] = useState(localStorage.getItem("loggedInUserId"));
   const [avt,setAvt] = useState("");
   // Cập nhật activeItem khi đường dẫn thay đổi
@@ -101,20 +102,26 @@ if(uid == null){
 const userProfile = async()=>{
   try{
     const data = await getUserProfile(uid);
+    if(data == 'yamate'){
+      return
+    }
     setName(data.displayName);
-    setEmail(data.email );
+    setEmail(data.email || 'Ẩn danh');
     setAvt(data.avatar);
   }catch(error){
     alert(error);
   }
 }
+
   useEffect(() =>{
+    
   isLog();
         if(!isLoggedIn){
       return
     }
     userProfile();
   },[uid,isLoggedIn])
+  
   useEffect(()=>{
     isLog();
     if(!isLoggedIn){
@@ -149,6 +156,19 @@ const userProfile = async()=>{
         alert(error)
       }hideLoader();
     }
+    const handleLoginAnonymousButton = async()=>{
+      try{
+        showLoader('Đang đăng nhập ẩn danh')
+        await loginAnonymous();
+        setUid(localStorage.getItem("loggedInUserId"));
+        setIsLoggedIn(true);
+      }catch(error){
+        alert("handle login anonymous"+error)
+      }finally{
+        hideLoader();
+      }
+    }
+
   return (
     <div className="navbar">
       
@@ -192,6 +212,7 @@ const userProfile = async()=>{
         <div><span >Chưa đăng nhập </span></div>
       <div className="button-container">
         <button type="button" onClick={handleLoginButton}>Login</button>
+        <button type="button" onClick={handleLoginAnonymousButton}>Login Ẩn danh</button>
       </div>
       </div>
     </div>

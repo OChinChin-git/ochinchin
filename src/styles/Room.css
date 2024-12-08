@@ -1,0 +1,117 @@
+.room-list li {
+  cursor: pointer;
+  padding: 4px;
+  background-color: #2b2b2b; /* Nền mục */
+  margin: 5px 0;
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+  
+}
+
+/* Giao diện danh sách */
+.room-list ul {
+  list-style-type: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin:0px;
+  background-color: #000000;
+  color: white;
+ 
+}
+
+.room-list li.active {
+  background-color: #39ff14; /* Màu nền khi chọn */
+  color: #000000;
+  font-weight: bold;
+  transform: scale(1.05); /* Tăng kích thước một chút */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Thêm hiệu ứng chuyển tiếp */
+}
+.kimochi .room-list li.active {
+  background-color: #00ffff; /* Màu nền khi chọn */
+}
+/* Hiệu ứng hover */
+.room-list li:hover {
+  background-color: #268a0a; /* Nền khi hover */
+}
+.kimochi .room-list li:hover {
+  background-color: #006666; /* Nền khi hover */
+}
+.room-list {
+  margin-top: 20px;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #3e3e3e; /* Viền xám */
+  background-color: #1e1e1e; /* Nền danh sách tối */
+ overflow:hidden;
+  border-radius: 5px;
+}
+.room-list:hover{
+  overflow-y:auto;
+}
+.room-li{
+  display:flex;
+  flex-direction:row;
+  gap:10px;
+  align-items:center;
+  padding:4px 6px;
+}
+.roomate{
+  color:#39FF14;
+  font-size:14px;
+  margin-left:4px;
+}
+.room-name{
+  font-size:16px;
+}
+.selectLabel {
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: row; /* Sắp xếp theo chiều ngang */
+  align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
+  justify-content: flex-start; /* Căn trái các phần tử */
+  gap: 10px; /* Khoảng cách giữa các phần tử */
+  font-size: 18px; /* Kích thước chữ */
+  height: 100%; /* Chiều cao của container */
+  margin: 0;
+}
+
+.selectLabel label, .selectLabel button {
+  flex-shrink: 0; /* Không cho label và button co lại */
+}
+
+.selectLabel select {
+  flex-grow: 1; /* Để select chiếm hết không gian còn lại */
+  width: 0; /* Đặt chiều rộng ban đầu bằng 0 */
+  max-width: 100%; /* Đảm bảo select không vượt quá container */
+  min-width: 0; /* Đảm bảo select không có chiều rộng tối thiểu */
+}
+.room-container{
+  padding:20px 30px;
+}
+.room-background{
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
+    url("https://www.desktophut.com/images/1723027733.webp");
+  background-size: cover; 
+  min-height: 100vh;
+}
+.add-room{
+  margin:20px 0;
+}
+.add-room *{
+  margin-bottom:5px;
+}
+.join-room{
+  margin-top:20px;
+}
+.join-room *{
+  margin-bottom:10px;
+}
+.p-abc{
+  color:#229900;
+  font-size:15px;
+}
+.kimochi .p-abc{
+  color:#229999;
+}
+.room-button{
+  padding:4px 6px;
+}

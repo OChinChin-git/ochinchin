@@ -1,16 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
- import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
- import{getFirestore, setDoc, doc,getDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
+ import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+ import{getFirestore, setDoc, doc,getDoc,updateDoc, onSnapshot,getDocs, collection} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
  
  // Your web app's Firebase configuration
- const firebaseConfig = {
-  apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
-  authDomain: "ochinchin-7b3d8.firebaseapp.com",
-  projectId: "ochinchin-7b3d8",
-  storageBucket: "ochinchin-7b3d8.firebasestorage.app",
-  messagingSenderId: "364411060998",
-  appId: "1:364411060998:web:b7f31215e5cb0d0fbf1487",
-  measurementId: "G-BFRZ15ZNEC"
+const firebaseConfig = {
+  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
+  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
+  databaseURL: "https://thanhchimbe-d29a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "thanhchimbe-d29a4",
+  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
+  messagingSenderId: "661307532795",
+  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
+  measurementId: "G-ZKJF0FJ44X"
 };
 
  // Initialize Firebase
@@ -78,6 +79,28 @@ export async function signUp(name, email, password) {
     }
   }
 }
+export async function loginAnonymous(){
+  try{
+  const userCredential = await signInAnonymously(auth)
+  const user = userCredential.user;
+    const displayName = 'Ẩn danh 😎';
+    const photoUrl = "https://www.dropbox.com/scl/fi/o0nyh6atfock3fxrjcu8j/andanh.png?rlkey=bgbperz5j18dden4j4vll416q&dl=1";
+    const userData = {
+      displayName: displayName,
+      avatar: photoUrl,
+    };
+    const docRef = doc(db, "users", user.uid);
+    try {
+      await setDoc(docRef, userData);
+      localStorage.setItem('loggedInUserId', user.uid);
+      return "kimochi";
+    } catch (error) {
+      alert(`Error saving user data: ${error.message}`);  // Hiển thị thông báo lỗi khi lưu dữ liệu
+    }
+  }catch(error){
+    alert('login anonymous f' + error)
+  }
+}
 export async function login(email,password){
   try{
     const userCredential = await signInWithEmailAndPassword(auth,email,password);
@@ -95,6 +118,11 @@ export async function login(email,password){
 export async function getUserProfile(uid){
   try{
     const ref = doc(db,"users",uid)
+    const docSnap = await getDoc(ref)
+    if(!docSnap.exists()){
+      localStorage.removeItem('loggedInUserId');
+      return 'yamate'
+    }
     const data = await getDoc(ref);
     return data.data();
   }catch(error){
@@ -111,3 +139,4 @@ export async function changeUserProfile(uid,name,avt){
   }catch(error){
     alert(error)}
 };
+
