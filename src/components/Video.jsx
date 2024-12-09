@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
 import {
   getFirestore,
   setDoc,
@@ -12,21 +11,9 @@ import {
   Timestamp,
   deleteDoc,
   FieldValue,
-  serverTimestamp,
+  serverTimestamp,query,where,orderBy,startAfter,limit
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
-  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
-  databaseURL: "https://thanhchimbe-d29a4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "thanhchimbe-d29a4",
-  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
-  messagingSenderId: "661307532795",
-  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
-  measurementId: "G-ZKJF0FJ44X"
-};
-
-// Initialize Firebase
 const db = getFirestore();
 
 const getDocValue = async (type, name) => {
@@ -86,7 +73,7 @@ export const getVideo = async (id) => {
 };
 
 export const getTime = async () => {
-  const userDoc = doc(db, "users", "user_id"); // Thay "user_id" bằng ID cụ thể
+  const userDoc = doc(db, "content", "serverTime"); // Thay "user_id" bằng ID cụ thể
   try {
     await setDoc(userDoc, { createdAt: serverTimestamp() }, { merge: true });
   } catch (error) {
@@ -124,49 +111,7 @@ export const getTime = async () => {
     return null;
   }
 };
-const getUserData = async (id) => {
-  const docRef = doc(db, "users", id);
-  try {
-    const docSnapshot = await getDoc(docRef);
-    if (docSnapshot.exists()) {
-      const userData = docSnapshot.data();
-      const { displayName, avatar } = userData;
-      return { displayName, avatar }; // Trả về thông tin người dùng
-    }
-    return null;
-  } catch (error) {
-    console.error("Error getting user data:", error);
-    return null;
-  }
-};
-
-const getChatsValue = (id, callback) => {
-  try {
-    // Tạo tham chiếu tới document của videoId
-    const idDocRef = doc(db, "content/type/videosId", id);
-
-    // Tạo tham chiếu tới collection con "chats" trong document
-    const chatColRef = collection(idDocRef, "chats");
-
-    // Lắng nghe các thay đổi trong collection chats
-    const unsubscribe = onSnapshot(chatColRef, (chatSnapshot) => {
-      const chatList = chatSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // Gọi callback để cập nhật dữ liệu mới
-      callback(chatList);
-    });
-
-    // Trả về unsubscribe để bạn có thể hủy đăng ký khi không cần lắng nghe nữa
-    return unsubscribe;
-  } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu chats:", error);
-    return [];
-  }
-};
-const formatTime = (chatTime) => {
+export const formatTime = (chatTime) => {
   // Lấy 13 ký tự đầu (timestamp chính)
   const chatTimeMillis = Date.parse(
     `${chatTime.slice(0, 4)}-${chatTime.slice(4, 6)}-${chatTime.slice(6, 8)}T` +
@@ -215,35 +160,6 @@ const formatTime = (chatTime) => {
 
   return formattedTime;
 };
-
-export const getChats = (id, callback) => {
-  try {
-    // Lắng nghe dữ liệu chat thay vì chỉ lấy một lần
-    const unsubscribe = getChatsValue(id, async (chatList) => {
-      const chatsWithUserData = await Promise.all(
-        chatList.map(async (chat) => {
-          const userData = await getUserData(chat.userId);
-          const time = formatTime(chat.time);
-          return {
-            message: chat.message,
-            time: time,
-            displayName: userData ? userData.displayName : "",
-            avatar: userData ? userData.avatar : "",
-          };
-        })
-      );
-
-      // Cập nhật dữ liệu chat với thông tin người dùng
-      callback(chatsWithUserData);
-    });
-
-    // Trả về unsubscribe nếu cần dừng lắng nghe thay đổi sau này
-    return unsubscribe;
-  } catch (error) {
-    alert(error);
-  }
-};
-
 export const sendChats = async (id, time, userId, message) => {
   try {
     const chatDoc = doc(db, "content/type/videosId", id);
@@ -259,59 +175,128 @@ export const sendChats = async (id, time, userId, message) => {
     alert(error);
   }
 };
-export const trackVisitor = async (id) => {
-  try {
-    // Kiểm tra nếu visitorId đã tồn tại trong localStorage
-    let visitorId = localStorage.getItem("visitorId");
-    if (!visitorId) {
-      visitorId = Date.now().toString(); // Tạo một ID duy nhất cho người truy cập
-      localStorage.setItem("visitorId", visitorId); // Lưu vào localStorage
-    }
+export const getUsersData = (callback) => {
+  const userRef = collection(db, 'users');
+  const unsubscribe = onSnapshot(userRef, (snapshot) => {
+    const newData = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
-    const docRef = doc(db, "content/type/videosId", id);
-    const collRef = collection(docRef, "activeVisitors");
-    const visitorRef = doc(collRef, visitorId);
-
-    let userId = localStorage.getItem("loggedInUserId") || "anonymous";
-
-    // Dữ liệu cần ghi
-    const newData = {
-      userId: userId,
-      active: true,
-      timestamp: new Date() // Cập nhật timestamp nếu có sự thay đổi
-    };
-
-    // Kiểm tra dữ liệu hiện tại và chỉ ghi nếu có thay đổi
-    const existingDoc = await getDoc(visitorRef);
-    if (!existingDoc.exists() || existingDoc.data().userId !== userId || existingDoc.data().active !== newData.active) {
-      await setDoc(visitorRef, newData); // Chỉ ghi lại khi dữ liệu thay đổi
-    }
-
-    // Hàm xử lý trước khi đóng trình duyệt
-    const handleBeforeUnload = async () => {
-      try {
-        await deleteDoc(visitorRef); // Xóa visitor khi đóng trình duyệt
-      } catch (error) {
-        console.error("Error removing visitor on unload:", error);
+    // So sánh dữ liệu trước và sau khi nhận được mới
+    callback((prevData) => {
+      if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
+        return newData;
       }
-    };
-
-    // Gắn sự kiện `beforeunload`
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Trả về hàm cleanup để xóa sự kiện và tài liệu khi cần
-    return async () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload); // Hủy sự kiện khi cần
-      try {
-        await deleteDoc(visitorRef); // Xóa visitor khi cần cleanup
-      } catch (error) {
-        console.error("Error removing visitor during cleanup:", error);
-      }
-    };
-  } catch (error) {
-    console.error("Error in trackVisitor:", error);
-  }
+      return prevData;
+    });
+  });
+  return unsubscribe;
 };
+function subtractOneHour(serverTime) {
+  // Chuyển serverTime thành đối tượng Date
+  const year = parseInt(serverTime.slice(0, 4), 10);
+  const month = parseInt(serverTime.slice(4, 6), 10) - 1; // Tháng bắt đầu từ 0
+  const day = parseInt(serverTime.slice(6, 8), 10);
+  const hour = parseInt(serverTime.slice(8, 10), 10);
+  const minute = parseInt(serverTime.slice(10, 12), 10);
+  const second = parseInt(serverTime.slice(12, 14), 10);
+
+  // Tạo đối tượng Date
+  const date = new Date(year, month, day, hour, minute, second);
+
+  // Trừ đi 1 giờ
+  date.setHours(date.getHours() - 2);
+
+  // Chuyển lại thành chuỗi theo định dạng "YYYYMMDDHHmmssSSS"
+  const newTime = date.getFullYear().toString() +
+                  ('0' + (date.getMonth() + 1)).slice(-2) + // Tháng (1-12)
+                  ('0' + date.getDate()).slice(-2) +          // Ngày
+                  ('0' + date.getHours()).slice(-2) +         // Giờ
+                  ('0' + date.getMinutes()).slice(-2) +       // Phút
+                  ('0' + date.getSeconds()).slice(-2) +       // Giây
+                  '000';                                      // Mili giây (đã mặc định là 000)
+
+  return newTime;
+}
+export const getChats = async(id)=>{
+  const chatColRef = collection(doc(db,'content/type/videosId',id),'chats');
+  const serverTime = await getTime();
+
+  const timeValue = subtractOneHour(serverTime);
+  const chatQuery= query(
+  chatColRef,
+    orderBy('__name__'),
+    startAfter(timeValue)
+  )
+  const data = await getDocs(chatQuery)
+  if (data.size == 0) {
+    const chatsData = await getDocs(chatColRef);
+
+    // Tạo mảng các promise từ các thao tác delete
+    const deletePromises = chatsData.docs.map((chat) => {
+      return deleteDoc(doc(chatColRef, chat.id));  // Mỗi deleteDoc sẽ trả về một promise
+    });
+
+    // Đợi tất cả các promise hoàn thành (xóa tất cả các document cùng lúc)
+    await Promise.all(deletePromises);
+  }
+
+  const final = data.docs.map((chat)=>({
+    ...chat.data(),
+    id:chat.id
+  }))
+  return final
+}
+export const getAllChats = async(id)=>{
+  const chatColRef = collection(doc(db,'content/type/videosId',id),'chats');
+  const data = await getDocs(chatColRef)
+  const final = data.docs.map((chat)=>({
+    ...chat.data(),
+    id:chat.id
+  }))
+  return final
+}
+export const getNewChats = (id, latest, callback) => {
+  const chatColRef = collection(doc(db, 'content/type/videosId', id), 'chats');
+  if(latest == 0){
+
+    const unsubscribe = onSnapshot(chatColRef, (snapshot) => {
+    // Kiểm tra nếu có dữ liệu trả về từ Firebase
+    if (!snapshot.empty) {
+      const data = snapshot.docs.map((chat) => ({
+        ...chat.data(),
+        id: chat.id
+      }));
+
+      // Gọi callback để cập nhật state với dữ liệu mới
+      callback(prevMessages => [...prevMessages, ...data]);
+    }
+  });
+
+  return unsubscribe;
+  }
+  const chatQuery = query(
+    chatColRef,
+    orderBy('__name__'), // order by __name__ (id doc)
+    startAfter(latest.id)
+  );
+
+  const unsubscribe = onSnapshot(chatQuery, (snapshot) => {
+    // Kiểm tra nếu có dữ liệu trả về từ Firebase
+    if (!snapshot.empty) {
+      const data = snapshot.docs.map((chat) => ({
+        ...chat.data(),
+        id: chat.id
+      }));
+
+      // Gọi callback để cập nhật state với dữ liệu mới
+      callback(prevMessages => [...prevMessages, ...data]);
+    }
+  });
+
+  return unsubscribe;
+}
 
 export const getActiveVisitorsCount = (setActiveVisitors, id) => {
   if (!id) {
@@ -329,11 +314,6 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
     (snapshot) => {
       const activeVisitorsCount = snapshot.size;
       setActiveVisitors(activeVisitorsCount);
-
-      // Track visitor sau một khoảng thời gian ngắn
-      setTimeout(() => {
-        trackVisitor(id); // Cập nhật visitor sau một khoảng thời gian ngắn
-      }, 100);
     },
     (error) => {
       console.error("Error getting active visitors count:", error);
@@ -343,30 +323,6 @@ export const getActiveVisitorsCount = (setActiveVisitors, id) => {
   return unsubscribe; // Trả về hàm unsubscribe để dừng theo dõi
 };
 
-export const getActiveVisitors = (setActiveVisitors, id) => {
-  if (!id) {
-    console.warn("getActiveVisitorsCount called with invalid id:", id);
-    return () => {}; // Trả về một hàm no-op để tránh lỗi
-  }
-
-  const visitorsRef = collection(
-    doc(db, "content/type/videosId", id),
-    "activeVisitors"
-  );
-
-  const unsubscribe = onSnapshot(
-    visitorsRef,
-    (snapshot) => {
-      const activeVisitorsCount = snapshot.size;
-      setActiveVisitors(activeVisitorsCount);
-    },
-    (error) => {
-      console.error("Error getting active visitors count:", error);
-    }
-  );
-
-  return unsubscribe;
-};
 export const resetActiveVisitors = async (id) => {
   try {
     // Truy cập tập hợp activeVisitors bên trong tài liệu videosId
@@ -407,6 +363,7 @@ export const trackUpdateRoom = (
     handleSetRoom();
     checkIsHost();
     videoInfo();
+    
   });
   return unsubscribe;
 };
@@ -418,14 +375,38 @@ export const getRoomVisitors = async (id) => {
   // Sử dụng Promise.all để xử lý các hàm async
   const visitorIds = await Promise.all(
     allVisitor.docs.map(async (doc) => {
-      const userId = doc.data().userId; // Lấy userId từ doc
-      const userData = await getUserData(userId); // Chờ lấy dữ liệu người dùng
+
       return {
         id: doc.id,
-        userId: userData ? userData.displayName : "Unknown", // Hiển thị "Unknown" nếu không tìm thấy dữ liệu
+        ...doc.data(),
       };
     })
   );
-
+  console.log(visitorIds);
   return visitorIds;
 };
+export const addVisitor = async(id)=>{
+  try{
+    const visitor = localStorage.getItem('visitorId') ||Date.now().toString();
+    const userId = localStorage.getItem('loggedInUserId'||'anonymous')
+    const visitorsRef = doc(collection(doc(db,'content/type/videosId',id),'activeVisitors'),visitor);
+    const data={
+      userId:userId,
+    }
+    await setDoc(visitorsRef,data);
+  }catch(error){
+    alert('add visitor' +error)
+  }
+}
+export const removeVisitor = async(id)=>{
+  try{
+    const visitor = localStorage.getItem('visitorId') ;
+    if(!visitor){
+      return
+    }
+    const visitorsRef = doc(collection(doc(db,'content/type/videosId',id),'activeVisitors'),visitor);
+    await deleteDoc(visitorsRef);
+  }catch(error){
+    alert('remove'+error)
+  }
+}

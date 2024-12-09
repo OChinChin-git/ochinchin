@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
 import {
   getFirestore,
   setDoc,
@@ -15,18 +14,7 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
-  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
-  databaseURL: "https://thanhchimbe-d29a4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "thanhchimbe-d29a4",
-  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
-  messagingSenderId: "661307532795",
-  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
-  measurementId: "G-ZKJF0FJ44X"
-};
 
-// Initialize Firebase
 const db = getFirestore();
 
 const roomCol = collection(db, "content/type/rooms");

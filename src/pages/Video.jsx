@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { getVideo } from "../components/Video";
 import { useLoader } from "../components/LoaderContext";
@@ -7,12 +7,12 @@ import { useDialog } from "../components/DialogContext";
 import {
   sendChats,
   getTime,
-  getChats,
-  trackVisitor,
   getActiveVisitorsCount,
   resetActiveVisitors,
   trackUpdateRoom,
-  getRoomVisitors,
+  formatTime,
+  getUsersData,getChats,getNewChats,getAllChats
+  ,getRoomVisitors,addVisitor,removeVisitor
 } from "/src/components/Video";
 import "../styles/Video.css";
 import { updateRoom } from "../components/Room";
@@ -60,7 +60,7 @@ const Video = () => {
       convertedUrl = convertPornhubToEmbedUrl(convertedUrl); // Convert to Pornhub embed URL if applicable
       return convertedUrl;
     } catch (error) {
-      alert(error);
+      alert('convert'+ error);
     }
   };
   const isValidUrl = (url) => {
@@ -97,7 +97,7 @@ const Video = () => {
     `;
       return iframeUrl;
     } catch (error) {
-      alert(error);
+      alert('chatiframe' +error);
     }
   };
   const videoInfo = async () => {
@@ -110,7 +110,7 @@ const Video = () => {
       setVideoUrl(embedUrl);
       setVideoTitle(title);
     } catch (error) {
-      alert(error);
+      alert('videoinfo'+ error);
     } finally {
       hideLoader();
     }
@@ -127,16 +127,27 @@ const Video = () => {
   const [latestMessage, setLatestMessage] = useState(null);
   const chatContainerRef = useRef(null); // Tham chiếu đến container chứa tin nhắn
   const audioRef = useRef(null); // Tham chiếu đến âm thanh
+  const [userData,setUserData]=useState([]);
 
   const handleCloseChat = () => {
     setIsCloseChat(!isCloseChat);
   };
+  const [lastSendChatTime,setLastSendTime] = useState(0);
   const handleSendMessage = async () => {
+  if(lastSendChatTime == null){
+    lastSendChatTime = 0
+  }
     try {
-      if (messageRef.current.value.length == "") {
+      if (messageRef.current.value.trim() == "") {
         messageRef.current.focus();
         return;
       }
+      const now = Date.now();
+      if(now - lastSendChatTime <300){
+        showToast('Chat chậm thôi','error');
+        return
+      }
+      setLastSendTime(now);
       const message = await convertIframe(messageRef.current.value);
 
       const userId =
@@ -146,7 +157,7 @@ const Video = () => {
       await sendChats(videoId, time, userId, message);
       messageRef.current.value = "";
     } catch (error) {
-      alert(error);
+      alert('send'+ error);
     }
   };
   const handleKeyDown = (e) => {
@@ -162,6 +173,7 @@ const Video = () => {
     if (messages.length > 0) {
       setLatestMessage(messages[messages.length - 1]);
       setIsCloseLatestChat(false);
+      updateChats();
     } else {
       setLatestMessage(null);
       setIsCloseLatestChat(true);
@@ -178,8 +190,7 @@ const Video = () => {
       : { display: "" }
     : { display: "none" };
   // Hàm cập nhật tin nhắn
-  const updateChats = (newChats) => {
-    setMessages(newChats);
+  const updateChats = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
@@ -200,36 +211,113 @@ const Video = () => {
       });
     }
   }, [isCloseChat]);
-  useEffect(() => {
-    // Gọi getChats với videoId và callback updateChats để cập nhật dữ liệu chat
-    const unsubscribe = getChats(videoId, updateChats);
-    // Hủy đăng ký khi component unmount để tránh memory leaks
-    return () => unsubscribe();
-  }, [videoId]);
+const userMap = useMemo(() => {
+  return new Map(userData.map((user) => [user.id, user]));
+}, [userData]);
+
+useEffect(() => {
+  const unsubscribe = getUsersData(setUserData);
+  return () => {
+    unsubscribe();
+  };
+}, []);
+
+const loadChat = (data) => {
+  if (!userMap.size) {
+    console.warn("userMap chưa sẵn sàng");
+    return;
+  }
+
+  const chatData = data.map((chat) => {
+    const user = userMap.get(chat.userId);
+    const time = formatTime(chat.time);
+    return {
+      time: time,
+      displayName: user ? user.displayName : "anonymous",
+      avatar: user ? user.avatar : "https://www.dropbox.com/scl/fi/o0nyh6atfock3fxrjcu8j/andanh.png?rlkey=bgbperz5j18dden4j4vll416q&dl=1",
+      message: chat.message,
+    };
+  });
+  setMessages(chatData);
+};
+  const [messagesData,setMessagesData] = useState([])
+useEffect(() => {
+    const functionGetChats = async()=> {
+      const data = await getChats(videoId);
+    setMessagesData(data);
+    }
+    functionGetChats();
+}, []);
+  useEffect(()=>{
+    if (userMap.size) {
+    loadChat(messagesData);
+    }
+  },[userMap,messagesData])
+useEffect(() => {
+  let latestMessagesData
+  if (messagesData.length === 0) {
+    latestMessagesData = 0
+  }else{
+    latestMessagesData = messagesData[messagesData.length - 1]; // Lấy tin nhắn mới nhất
+  }
+  const unsubscribe = getNewChats(videoId, latestMessagesData, setMessagesData);
+  // Cleanup function to unsubscribe when the component unmounts
+  return () => unsubscribe();
+}, [messagesData]); // Thêm dependency để re-run khi messagesData thay đổi
+
+  
   //
   //
   //
   //
   const [activeVisitors, setActiveVisitors] = useState(0);
-  useState(async () => {
-    await resetActiveVisitors(videoId);
-  }, []);
-  
-  useEffect(()=>{
-    const intervalId = setInterval(async()=>{
-      try{
-        await resetActiveVisitors(videoId);
-        console.log('reset')
-      }catch(error){
-        alert(error);
+  const [isClosePage,setIsClosePage] =  useState(false);
+  const [isReset,setIsReset] = useState(false);
+  useEffect(() => {
+    if(!isClosePage){
+      const addVst = async()=>{
+        if(!isReset){
+          await resetActiveVisitors(videoId);
+        }
+        await addVisitor(videoId)
       }
-    },600000)
-    return()=>clearInterval(intervalId);
-  },[])
+      addVst();
+      return
+    }
+    if(isClosePage){
+      const removeVst = async()=>{
+        await removeVisitor(videoId);
+      }
+      removeVst();
+      return
+    }
+  }, [isClosePage]);
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsClosePage(true);
+      } else {
+        setIsReset(true);
+        setIsClosePage(false);
+      }
+    };
+    const handleBeforeUnload =()=> {
+      setIsClosePage(true);
+    }
+    // Thêm event listener cho sự kiện visibilitychange
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload',handleBeforeUnload);
+    window.addEventListener('popstate',handleBeforeUnload);
+    // Cleanup: xóa event listener khi component bị unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload',handleBeforeUnload);
+      window.removeEventListener('popstate',handleBeforeUnload);
+    };
+  }, []);
+
   
   useEffect(() => {
-    // Bắt đầu theo dõi khi component được mount
-    const stopTracking = trackVisitor(videoId);
 
     // Lắng nghe số lượng người truy cập từ Firestore và cập nhật thông qua callback
     const unsubscribe = getActiveVisitorsCount(setActiveVisitors, videoId); // setActiveVisitors là callback
@@ -237,7 +325,6 @@ const Video = () => {
     // Cleanup khi component unmount
     return () => {
       unsubscribe(); // Dừng lắng nghe số lượng người truy cập
-      stopTracking(); // Dừng theo dõi người truy cập
     };
   }, []);
   const [isPass, setIsPass] = useState(false);
@@ -248,10 +335,10 @@ const Video = () => {
   const [roomName, setRoomName] = useState();
   const [selectHost, setSelectHost] = useState();
   const [isHost, setIsHost] = useState(false);
-  const videoTitleRef = useRef();
-  const videoUrlRef = useRef();
+  const videoTitleRef = useRef(null);
+  const videoUrlRef = useRef(null);
   const [isRoomPass, setIsRoomPass] = useState();
-  const roomPassInputRef = useRef();
+  const roomPassInputRef = useRef(null);
   const handleSetRoom = async () => {
     try {
       if (!videoId.startsWith("r")) {
@@ -276,7 +363,7 @@ const Video = () => {
       videoTitleRef.current.value = data.title;
       videoUrlRef.current.value = data.url;
     } catch (error) {
-      alert(error);
+      alert('setRoom' +error);
     }
   };
 
@@ -367,20 +454,7 @@ const Video = () => {
     }
   };
   const [listUser, setListUser] = useState([]);
-  const loadVisitorIds = async () => {
-    try {
-      const roomateIds = await getRoomVisitors(videoId); // Lấy danh sách các visitor
-      setListUser(roomateIds);
 
-    } catch (error) {
-      alert("loadVisitorsId " + error); // Xử lý lỗi khi lấy danh sách visitors
-    }
-  };
-
-  useEffect(() => {
-    loadVisitorIds(); 
-  }, [activeVisitors])
-  
   useEffect(() => {
     handleSetRoom();
     checkIsHost();
@@ -404,7 +478,31 @@ const Video = () => {
       }
     };
   }, [roomName]);
-
+  const [roomVisitorsList,setRoomVisitorsList] = useState([])
+  const roomVisitors = async()=>{
+    const data = await getRoomVisitors(videoId);
+    setRoomVisitorsList(data);
+  }
+  const updateRoomVisitorsList = ()=>{
+    const data = roomVisitorsList.map((visitor)=>{
+      const user = userMap.get(visitor.userId)
+      return{
+        id:visitor.id,
+        displayName: user ? user.displayName : 'anonymous'
+      }
+    })
+    setListUser(data);
+  }
+  useEffect(()=>{
+    console.log(roomVisitorsList);
+    updateRoomVisitorsList();
+  },[roomVisitorsList])
+  useEffect(()=>{
+    console.log(listUser)
+  },[listUser])
+  useEffect(()=>{
+    roomVisitors();
+  },[activeVisitors])
   return (
     <div className="video-block">
       <div style={isJoinRoom ? { display: "" } : { display: "none" }}>
@@ -558,8 +656,9 @@ const Video = () => {
         <div className="room-profile">
           <div className="room-setting">
             <label>
-              Room name:
+              Room :
               <p className="room-name">{roomName}</p>
+              <h6>Số người: {activeVisitors}</h6>
             </label>
             <label className="select-label">
               Host hiện tại
@@ -572,7 +671,7 @@ const Video = () => {
                       .filter((user) => user.id == hostId)
                       .map((user) => (
                         <option className="" value={hostId} key={hostId}>
-                          Bạn: {user.userId}
+                          Bạn: {user.displayName}
                         </option>
                       ))
                   : ""}
@@ -581,7 +680,7 @@ const Video = () => {
                       .filter((user) => user.id !== hostId)
                       .map((user) => (
                         <option key={user.id} value={user.id}>
-                          <p>{user.userId}</p>
+                          <p>{user.displayName}</p>
                           <p> Id: {user.id}</p>
                         </option>
                       ))
