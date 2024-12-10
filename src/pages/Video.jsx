@@ -327,6 +327,16 @@ useEffect(() => {
       unsubscribe(); // Dừng lắng nghe số lượng người truy cập
     };
   }, []);
+  useEffect(()=>{
+    if(!isClosePage){
+      const addVst = async()=>{
+        await addVisitor(videoId)
+      }
+      addVst();
+      return
+    }
+  },[activeVisitors]);
+  
   const [isPass, setIsPass] = useState(false);
   const [roomPass, setRoomPass] = useState();
   const roomPassRef = useRef();
@@ -494,11 +504,9 @@ useEffect(() => {
     setListUser(data);
   }
   useEffect(()=>{
-    console.log(roomVisitorsList);
     updateRoomVisitorsList();
   },[roomVisitorsList])
   useEffect(()=>{
-    console.log(listUser)
   },[listUser])
   useEffect(()=>{
     roomVisitors();

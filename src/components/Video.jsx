@@ -206,7 +206,7 @@ function subtractOneHour(serverTime) {
   const date = new Date(year, month, day, hour, minute, second);
 
   // Trừ đi 1 giờ
-  date.setHours(date.getHours() - 2);
+  date.setHours(date.getHours() - 1);
 
   // Chuyển lại thành chuỗi theo định dạng "YYYYMMDDHHmmssSSS"
   const newTime = date.getFullYear().toString() +
