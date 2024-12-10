@@ -1,78 +1,74 @@
-import * as React from "react";
-import { animated } from "react-spring";
-import { useWiggle } from "../hooks/wiggle";
-import { Link } from "wouter";
+import React, { useEffect, useRef, useState } from "react";
 
-// Our language strings for the header
-const strings = [
-  "Hello React",
-  "Salut React",
-  "Hola React",
-  "안녕 React",
-  "Hej React"
-];
+const YouTubePlayer = ({ videoId }) => {
+  const iframeRef = useRef(null);
+  const [player, setPlayer] = useState(null);
+  const [playbackState, setPlaybackState] = useState("");
+  const [currentTime, setCurrentTime] = useState(0);
 
-// Utility function to choose a random value from the language array
-function randomLanguage() {
-  return strings[Math.floor(Math.random() * strings.length)];
-}
+  useEffect(() => {
+    // Tải YouTube IFrame API
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-/**
-* The Home function defines the content that makes up the main content of the Home page
-*
-* This component is attached to the /about path in router.jsx
-* The function in app.jsx defines the page wrapper that this appears in along with the footer
-*/
+    // Khởi tạo player khi API sẵn sàng
+    window.onYouTubeIframeAPIReady = () => {
+      const videoId = 'WvesPq96rTY'
+      const playerInstance = new window.YT.Player(iframeRef.current, {
+        videoId: videoId,
+        events: {
+          onStateChange: onPlayerStateChange,
+        },
+      });
+      setPlayer(playerInstance);
+    };
+  }, [videoId]);
 
-export default function Home() {
-  /* We use state to set the hello string from the array https://reactjs.org/docs/hooks-state.html
-     - We'll call setHello when the user clicks to change the string
-  */
-  const [hello, setHello] = React.useState(strings[0]);
-  
-  /* The wiggle function defined in /hooks/wiggle.jsx returns the style effect and trigger function
-     - We can attach this to events on elements in the page and apply the resulting style
-  */
-  const [style, trigger] = useWiggle({ x: 5, y: 5, scale: 1 });
-
-  // When the user clicks we change the header language
-  const handleChangeHello = () => {
-    
-    // Choose a new Hello from our languages
-    const newHello = randomLanguage();
-    
-    // Call the function to set the state string in our component
-    setHello(newHello);
+  // Xử lý sự kiện trạng thái của player
+  const onPlayerStateChange = (event) => {
+    switch (event.data) {
+      case window.YT.PlayerState.PLAYING:
+        setPlaybackState("Playing");
+        break;
+      case window.YT.PlayerState.PAUSED:
+        setPlaybackState("Paused");
+        break;
+      case window.YT.PlayerState.ENDED:
+        setPlaybackState("Ended");
+        break;
+      default:
+        setPlaybackState("Idle");
+    }
   };
+useEffect(() => {
+  if (player) {
+    const onSeekChange = (event) => {
+      if (event.data === window.YT.PlayerState.PAUSED) {
+        const time = player.getCurrentTime();
+        setCurrentTime(time);
+      }
+    };
+
+    // Gán sự kiện lắng nghe trên player
+    player.addEventListener('onStateChange', onSeekChange);
+
+    // Dọn dẹp khi component unmount
+    return () => {
+      player.removeEventListener('onStateChange', onSeekChange);
+    };
+  }
+}, [player]);
+
+
   return (
-    <>
-      <h1 className="title">{hello}!</h1>
-      {/* When the user hovers over the image we apply the wiggle style to it */}
-      <animated.div onMouseEnter={trigger} style={style}>
-        <img
-          src="https://cdn.glitch.com/2f80c958-3bc4-4f47-8e97-6a5c8684ac2c%2Fillustration.svg?v=1618196579405"
-          className="illustration"
-          onClick={handleChangeHello}
-          alt="Illustration click to change language"
-        />
-      </animated.div>
-      <div className="navigation">
-        {/* When the user hovers over this text, we apply the wiggle function to the image style */}
-        <animated.div onMouseEnter={trigger}>
-          <a className="btn--click-me" onClick={handleChangeHello}>
-            Psst, click me
-          </a>
-        </animated.div>
-      </div>
-      <div className="instructions">
-        <h2>Using this project</h2>
-        <p>
-          This is the Glitch <strong>Hello React</strong> project. You can use
-          it to build your own app. See more info in the{" "}
-          <Link href="/about">About</Link> page, and check out README.md in the
-          editor for additional detail plus next steps you can take!
-        </p>
-      </div>
-    </>
+    <div>
+      <div ref={iframeRef}  style={{ width: "100%", height: "360px" }}></div>
+      <p>State: {playbackState}</p>
+      <p>Current Time: {currentTime.toFixed()} seconds</p>
+    </div>
   );
-}
+};
+
+export default YouTubePlayer;
