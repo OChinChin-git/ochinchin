@@ -137,7 +137,7 @@ useEffect(() => {
 }, [selectedRoom]);
 
   return (
-    <div >
+    <div className='room-container'>
       <label className="selectLabel">
         Chọn phòng:
         <select

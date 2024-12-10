@@ -45,7 +45,7 @@ const YouTubePlayer = ({ videoId }) => {
 useEffect(() => {
   if (player) {
     const onSeekChange = (event) => {
-      if (event.data === window.YT.PlayerState.PAUSED) {
+      if (event.data === window.YT.PlayerState.PLAYING) {
         const time = player.getCurrentTime();
         setCurrentTime(time);
       }

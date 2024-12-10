@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   padding-top: 60px;
-  z-index: 1000;
+  z-index: 6;
 }
 
 .left-menu-icon {
@@ -50,7 +50,7 @@
   white-space: nowrap;
   font-size: 12px;
   margin-top: 5px; /* Thêm khoảng cách nếu cần */
-  z-index: 10;
+  z-index: 6;
   opacity: 0.9;
 }
 .kimochi [data-tooltip]:hover::after {

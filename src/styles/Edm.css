@@ -3,7 +3,7 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; 
-    min-height: 100vh;
+    min-height: calc(100vh - 50px);
 position: relative;
   display: flex;
   justify-content: center;
@@ -218,7 +218,7 @@ background-position: -60px center;
   color: white;
   padding: 15px 25px;
   border-radius: 5px;
-  z-index: 1000;
+  z-index: 5;
   transition: opacity 0.5s;
   opacity: 1;
 }

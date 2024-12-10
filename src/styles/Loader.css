@@ -8,7 +8,7 @@
   display: none; /* Ẩn mặc định */
   justify-content: center;
   align-items: center;
-  z-index: 999999999;
+  z-index: 11;
 }
 .loader-container.visible {
   display: flex; /* Hiển thị loader khi có class 'visible' */

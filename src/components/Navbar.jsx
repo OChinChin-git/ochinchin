@@ -5,6 +5,7 @@ import {getUserProfile,changeUserProfile,loginAnonymous} from './firebaseAuth.js
 import { useLoader } from "./LoaderContext"; 
 import { useToast } from './ToastContext';
 import {useDialog} from './DialogContext';
+import {Login} from '../pages/Login'
 const Navbar = () => {
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
@@ -36,9 +37,28 @@ const Navbar = () => {
       setActiveItem("");
     }
   }, [location]);
+  useEffect(() => {
+    // Kiểm tra thay đổi trong localStorage mỗi 1000ms (1 giây)
+    const intervalId = setInterval(() => {
+      const newUid = localStorage.getItem("loggedInUserId");
+      if (newUid !== uid) {
+        setUid(newUid); // Cập nhật lại state nếu có sự thay đổi
+      }
+    }, 4000);
 
+    // Dọn dẹp khi component unmount
+    return () => clearInterval(intervalId);
+  }, [uid]); 
   // Hàm chuyển hướng khi menu item được click
   const handleMenuItemClick = (item) => {
+    if(item == 'Kimochi'){
+      const isConfirm = confirm('Bạn chắc chứ 🤤')
+    if(!isConfirm){
+      return
+    }
+    window.location.href = 'https://ihentai.li/'
+      return
+    }
     setActiveItem(item);
     const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
     navigate(path);
@@ -84,12 +104,9 @@ const Navbar = () => {
   const handleProfileOpen=()=>{
     setIsOpen(!isOpen);
   }
+  const [isPopUp,setIsPopUp]=useState(false);
   const handleLoginButton = ()=>{
-    const isConfirm = confirm("Chuyển đến trang đăng nhập ?")
-    if(!isConfirm){
-      return
-    }
-    navigate('/login');
+    setIsPopUp(true);
   }
 
   const isLog=()=>{
@@ -101,6 +118,12 @@ if(uid == null){
 }  
 const userProfile = async()=>{
   try{
+    if(!uid){
+      setName("");
+      setEmail('');
+      setAvt('');
+      return
+    }
     const data = await getUserProfile(uid);
     if(data == 'yamate'){
       return
@@ -109,15 +132,15 @@ const userProfile = async()=>{
     setEmail(data.email || 'Ẩn danh');
     setAvt(data.avatar);
   }catch(error){
-    alert(error);
+    alert('user profile'+error);
   }
 }
 
   useEffect(() =>{
     
   isLog();
-        if(!isLoggedIn){
-      return
+    if(uid){
+      setIsPopUp(false);
     }
     userProfile();
   },[uid,isLoggedIn])
@@ -135,14 +158,6 @@ const userProfile = async()=>{
         return
       }
       localStorage.removeItem("loggedInUserId");
-      setIsLoggedIn(false);
-      setUid(null);
-      setAvt("")
-    const isConfirm = confirm("Chuyển đến trang đăng nhập ?")
-    if(!isConfirm){
-      return
-    }
-   navigate('/login');
   }
     const changeProfile = async()=>{
       const nameChange = await showPrompt("Nhập tên mới 😎",name);
@@ -153,7 +168,7 @@ const userProfile = async()=>{
         userProfile();
         showToast("Thay đổi thành công","success")
       }catch(error){
-        alert(error)
+        alert('change profile'+error)
       }hideLoader();
     }
     const handleLoginAnonymousButton = async()=>{
@@ -161,7 +176,6 @@ const userProfile = async()=>{
         showLoader('Đang đăng nhập ẩn danh')
         await loginAnonymous();
         setUid(localStorage.getItem("loggedInUserId"));
-        setIsLoggedIn(true);
       }catch(error){
         alert("handle login anonymous"+error)
       }finally{
@@ -223,6 +237,12 @@ const userProfile = async()=>{
           <i className="fas fa-sun toggle-icon"></i>
           <div className="toggle-ball"></div>
         </div>
+      </div>
+      <div className='loginPopUp'
+        style={isPopUp ?{display:''}:{display:'none'}}
+        >
+        <button className='x-button' onClick={()=>setIsPopUp(false)}>x</button>
+        <Login/>
       </div>
     </div>
   );

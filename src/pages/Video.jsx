@@ -28,7 +28,8 @@ const Video = () => {
   const [videoTitle, setVideoTitle] = useState("");
 
   const videoId = query.substring(1); // Lấy giá trị sau `?v`
-
+  const iframeRef = useRef('');
+  const [isIframeYoutube,setIframeYoutube] = useState(false);
   const convertToEmbedUrl = (url) => {
     // Sửa biểu thức chính quy để bao gồm các URL YouTube live
     const youtubeRegEx =
@@ -522,7 +523,9 @@ useEffect(() => {
             allowtransparency="true"
             src={videoUrl}
             className="video"
+            style={!isIframeYoutube ? {display:''}:{display:'none'}}
           ></iframe>
+          <div ref={iframeRef} className="video" style={isIframeYoutube ? {display:''}:{display:'none'}}></div>
           <div className="title animated2">
             {videoTitle + " " + "\u00A0"}
           </div>

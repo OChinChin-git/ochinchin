@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate và useLocation
 import '../styles/Sidebar.css'; // Import CSS cho Sidebar
-
+import {useDialog} from './DialogContext'
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(''); // Lưu trữ mục đang được chọn
   const navigate = useNavigate(); // Hook dùng để điều hướng
   const location = useLocation(); // Hook dùng để lấy đường dẫn hiện tại
+  const {showPrompt} = useDialog();
 
   // Cập nhật activeItem khi đường dẫn thay đổi
   useEffect(() => {
@@ -30,14 +31,21 @@ const Sidebar = () => {
     setActiveItem(item); // Cập nhật mục đang chọn
     navigate(path); // Điều hướng đến path tương ứng khi click
   };
-
+  const handleSearch =async()=>{
+    const promptInput = await showPrompt('Tìm gì đó...','Cẩn thận nhé 🤤');
+    const isConfirm = confirm('Bạn chắc chứ 🤤')
+    if(!isConfirm){
+      return
+    }
+    window.location.href = 'https://ihentai.li/search?s=' +promptInput
+  }
   return (
     <div className="sidebar">
       {/* Các biểu tượng sẽ giữ nguyên CSS, chỉ thêm sự kiện onClick */}
       <i
         className={`left-menu-icon fas fa-search ${activeItem === 'search' ? 'active' : ''}`}
         data-tooltip="Search"
-        onClick={() => handleMenuClick('/search', 'search')} // Điều hướng đến /search
+        onClick={handleSearch} // Điều hướng đến /search
       ></i>
       <i
         className={`left-menu-icon fas fa-home ${activeItem === 'home' ? 'active' : ''}`}
