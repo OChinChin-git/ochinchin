@@ -43,7 +43,7 @@ const Video = () => {
   const [isHost, setIsHost] = useState(false);
   const [firestorePlayback, setFirestorePlayback] = useState();
   const [iframeIsReady, setIframeIsReady] = useState(false);
-  const [firestoreCurrentTime, setFirestoreCurrentTime] = useState(0);
+  const [firestoreCurrentTime, setFirestoreCurrentTime] = useState();
   const convertToEmbedUrl = (url) => {
     // Sửa biểu thức chính quy để bao gồm các URL YouTube live
     const youtubeRegEx =
@@ -145,30 +145,19 @@ const Video = () => {
     };
   }, []);
 
-  // Đồng bộ trạng thái phát lại
-  useEffect(() => {
-    if (!isIframeYoutube || !youtubePlayer || firestorePlayback === undefined)
-      return;
-    if (!isHost && playbackState !== firestorePlayback) {
-      if (
-        firestorePlayback === "Playing" &&
-        typeof youtubePlayer.playVideo === "function"
-      ) {
-        youtubePlayer.playVideo();
-      } else if (
-        firestorePlayback === "Paused" &&
-        typeof youtubePlayer.pauseVideo === "function"
-      ) {
-        youtubePlayer.pauseVideo();
-      }
+useEffect(() => {
+  if (!youtubePlayer || firestorePlayback === undefined) return;
+  if(!iframeIsReady){
+    return
+  }
+  if (!isHost && playbackState !== firestorePlayback) {
+    if (firestorePlayback === 'Playing' && typeof youtubePlayer.playVideo === 'function') {
+      youtubePlayer.playVideo();
+    } else if (firestorePlayback === 'Paused' && typeof youtubePlayer.pauseVideo === 'function') {
+      youtubePlayer.pauseVideo();
     }
-  }, [
-    isIframeYoutube,
-    playbackState,
-    youtubePlayer,
-    isHost,
-    firestorePlayback,
-  ]);
+  }
+}, [playbackState, youtubePlayer, isHost,firestorePlayback]); 
 
   // Tạo Player khi `youtubeVideoId` thay đổi
   useEffect(() => {
@@ -196,21 +185,38 @@ const Video = () => {
     }
   }, [isIframeYoutube, youtubeVideoId]);
 
-  // Đồng bộ thời gian phát lại
-  useEffect(() => {
-    if (isIframeYoutube && !isHost && iframeIsReady && youtubePlayer) {
+useEffect(()=>{
       const syncYoutubeVideoFromFirebase = async () => {
-        if (
-          firestoreCurrentTime !== undefined &&
-          typeof youtubePlayer.seekTo === "function"
-        ) {
-          youtubePlayer.seekTo(firestoreCurrentTime);
-        }
-      };
-      syncYoutubeVideoFromFirebase();
+      if (firestoreCurrentTime !== undefined && typeof youtubePlayer.seekTo === 'function') {
+        youtubePlayer.seekTo(firestoreCurrentTime);
+        console.log('abc')
+        console.log(firestoreCurrentTime)
+      }
+    };
+  if (!isHost && iframeIsReady && youtubePlayer && playbackState!==firestorePlayback) {
+    try{
+          syncYoutubeVideoFromFirebase();
+    }catch(error){
+      alert(error)
     }
-  }, [isIframeYoutube, youtubePlayer, firestoreCurrentTime]);
 
+  }
+},[youtubePlayer,firestorePlayback,playbackState])
+  useEffect(() => {
+    if(firestoreCurrentTime == null){
+      console.log(firestoreCurrentTime)
+      return
+    }
+    // Khởi tạo intervalTime là 1000ms
+    const intervalId = setInterval(() => {
+      // Tăng firestoreCurrentTime lên 1 mỗi 1000ms
+      setFirestoreCurrentTime(prevTime => Number(prevTime) + 1);
+      console.log(firestoreCurrentTime)
+    }, 1000); // Thực hiện mỗi giây (1000ms)
+
+    // Dọn dẹp interval khi component bị unmount hoặc khi useEffect chạy lại
+    return () => clearInterval(intervalId);
+  }, [firestoreCurrentTime]); // Chạy chỉ một lần khi component mount
   // Thêm và gỡ sự kiện lắng nghe
   useEffect(() => {
     if (
