@@ -156,7 +156,7 @@ useEffect(() => {
       youtubePlayer.pauseVideo();
     }
   }
-}, [playbackState, youtubePlayer, isHost,firestorePlayback]); 
+}, [playbackState, youtubePlayer,firestorePlayback]); 
 
   // Tạo Player khi `youtubeVideoId` thay đổi
   useEffect(() => {
@@ -262,6 +262,7 @@ useEffect(()=>{
         setVideoTitle(title);
         setFirestorePlayback(data.playbackState);
         setFirestoreCurrentTime(data.currentTime);
+        setVideoUrl('');
         return;
       }
       setIsIframeYoutube(false);
