@@ -241,7 +241,7 @@ const userProfile = async()=>{
       <div className='loginPopUp'
         style={isPopUp ?{display:''}:{display:'none'}}
         >
-        <button className='x-button' onClick={()=>setIsPopUp(false)}>x</button>
+        <button className='x-button-login' onClick={()=>setIsPopUp(false)}>x</button>
         <Login/>
       </div>
     </div>
