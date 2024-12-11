@@ -15,6 +15,7 @@ const YouTubePlayer = ({ videoId }) => {
 
     // Khởi tạo player khi API sẵn sàng
     window.onYouTubeIframeAPIReady = () => {
+      console.log("YouTube Iframe API is ready.");
       const videoId = 'WvesPq96rTY'
       const playerInstance = new window.YT.Player(iframeRef.current, {
         videoId: videoId,

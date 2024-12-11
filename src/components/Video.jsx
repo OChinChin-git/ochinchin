@@ -47,6 +47,8 @@ const getTypeValue = async (type, data) => {
       host: data.host,
       roomName: data.roomName,
       roomPass: data.roomPass,
+      currentTime: data.currentTime || 0,
+      playbackState: data.playbackState || 'Paused',
     };
   }
   return finalData;
@@ -409,4 +411,12 @@ export const removeVisitor = async(id)=>{
   }catch(error){
     alert('remove'+error)
   }
+}
+export const syncYoutubeIframe =async(id,playbackState,currentTime)=>{
+  const roomDoc = doc(db,'content/type/rooms',id)
+  const data={
+    playbackState:playbackState,
+    currentTime:currentTime,
+  }
+  await updateDoc(roomDoc,data);
 }
