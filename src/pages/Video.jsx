@@ -140,7 +140,6 @@ const Video = () => {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     window.onYouTubeIframeAPIReady = () => {
-      console.log("YouTube Iframe API is ready.");
       setIframeIsReady(true);
     };
   }, []);
@@ -162,7 +161,6 @@ useEffect(() => {
   // Tạo Player khi `youtubeVideoId` thay đổi
   useEffect(() => {
     if (youtubePlayer) {
-      console.log("dâccu");
       setIsIframeYoutube(false);
       videoInfo();
       return;
@@ -189,8 +187,6 @@ useEffect(()=>{
       const syncYoutubeVideoFromFirebase = async () => {
       if (firestoreCurrentTime !== undefined && typeof youtubePlayer.seekTo === 'function') {
         youtubePlayer.seekTo(firestoreCurrentTime);
-        console.log('abc')
-        console.log(firestoreCurrentTime)
       }
     };
   if (!isHost && iframeIsReady && youtubePlayer && playbackState!==firestorePlayback) {
@@ -204,14 +200,12 @@ useEffect(()=>{
 },[youtubePlayer,firestorePlayback,playbackState])
   useEffect(() => {
     if(firestoreCurrentTime == null){
-      console.log(firestoreCurrentTime)
       return
     }
     // Khởi tạo intervalTime là 1000ms
     const intervalId = setInterval(() => {
       // Tăng firestoreCurrentTime lên 1 mỗi 1000ms
       setFirestoreCurrentTime(prevTime => Number(prevTime) + 1);
-      console.log(firestoreCurrentTime)
     }, 1000); // Thực hiện mỗi giây (1000ms)
 
     // Dọn dẹp interval khi component bị unmount hoặc khi useEffect chạy lại
@@ -250,7 +244,6 @@ useEffect(()=>{
         youtubePlayer.destroy(); // Hủy Player
         setYoutubePlayer(null); // Đặt lại trạng thái Player
       } catch (error) {
-        console.error("Lỗi khi hủy YouTube Player:", error);
       }
     }
   }, [isIframeYoutube]);
@@ -280,18 +273,7 @@ useEffect(()=>{
       hideLoader();
     }
   };
-  useEffect(() => {
-    console.log(youtubeVideoId);
-  }, [youtubeVideoId]);
-  useEffect(() => {
-    console.log(currentTime);
-  }, [currentTime]);
-  useEffect(() => {
-    console.log(playbackState);
-  }, [playbackState]);
-  useEffect(() => {
-    console.log(isIframeYoutube);
-  }, [isIframeYoutube]);
+
   useEffect(() => {
     if (
       !isIframeYoutube ||
@@ -303,7 +285,6 @@ useEffect(()=>{
     }
     const syncYoutubeVideo = async () => {
       await syncYoutubeIframe(roomName, playbackState, currentTime);
-      console.log("async");
     };
     syncYoutubeVideo();
   }, [playbackState, currentTime]);
@@ -413,7 +394,6 @@ useEffect(()=>{
 
   const loadChat = (data) => {
     if (!userMap.size) {
-      console.warn("userMap chưa sẵn sàng");
       return;
     }
 
