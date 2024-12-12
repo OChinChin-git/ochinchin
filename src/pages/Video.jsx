@@ -40,7 +40,7 @@ const Video = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [youtubeVideoId, setYoutubeVideoId] = useState("");
   const [roomName, setRoomName] = useState();
-  const [isHost, setIsHost] = useState(false);
+  const [isHost, setIsHost] = useState();
   const [firestorePlayback, setFirestorePlayback] = useState();
   const [iframeIsReady, setIframeIsReady] = useState(false);
   const [firestoreCurrentTime, setFirestoreCurrentTime] = useState();
@@ -579,6 +579,13 @@ useEffect(()=>{
   useEffect(() => {
     checkIsHost();
   }, [hostId]);
+  useEffect(()=>{
+    console.log(isHost);
+  },[isHost])
+  useEffect(()=>{
+    console.log(hostId);
+  },[hostId])
+
   const [isCloseHost, setIsCloseHost] = useState(false);
   const [isChangeSetting, setIsChangeSetting] = useState(false);
   const handleCloseHost = () => {
@@ -603,6 +610,9 @@ useEffect(()=>{
       }
     }
     try {
+      if(!isHost){
+        return
+      }
       showLoader("Đang cập nhật phòng");
       const title = videoTitleRef.current.value;
       const url = videoUrlRef.current.value;
@@ -648,7 +658,6 @@ useEffect(()=>{
     const unsubscribe = trackUpdateRoom(
       roomName,
       handleSetRoom,
-      checkIsHost,
       videoInfo
     );
     return () => {
@@ -676,7 +685,6 @@ useEffect(()=>{
   useEffect(() => {
     updateRoomVisitorsList();
   }, [roomVisitorsList]);
-  useEffect(() => {}, [listUser]);
   useEffect(() => {
     roomVisitors();
   }, [activeVisitors]);

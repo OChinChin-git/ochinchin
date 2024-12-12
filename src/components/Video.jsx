@@ -353,7 +353,6 @@ export const resetActiveVisitors = async (id) => {
 export const trackUpdateRoom = (
   roomId,
   handleSetRoom,
-  checkIsHost,
   videoInfo
 ) => {
   if (!roomId) {
@@ -363,7 +362,6 @@ export const trackUpdateRoom = (
   const unsubscribe = onSnapshot(roomRef, (docSnapshot) => {
     const data = docSnapshot.data();
     handleSetRoom();
-    checkIsHost();
     videoInfo();
     
   });
