@@ -5,7 +5,7 @@ import Loader from './Loader'; // Import component Loader của bạn
 
 const Edm = lazy(() => import('../pages/Edm'));
 const Content = lazy(() => import('../pages/AddContent'));
-const Data = lazy(() => import('../pages/Data'));
+const ShortenLink = lazy(() => import('../pages/ShortenLink'));
 const Kimochi = lazy(() => import('../pages/Kimochi'));
 const Home = lazy(() => import('../pages/Home'));
 const Login = lazy(() => import('../pages/Login'));
@@ -34,7 +34,7 @@ const MainContent = () => {
               onEnter={handleRouteChange}  // Lấy sự kiện để kích hoạt loader khi vào route này
             />
             <Route path="/content" element={<Content />} />
-            <Route path="/data" element={<Data />} />
+            <Route path="/link" element={<ShortenLink />} />
             <Route path="/kimochi" element={<Kimochi />} />
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />

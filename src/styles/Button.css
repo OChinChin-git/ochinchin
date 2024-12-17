@@ -2,7 +2,6 @@ button {
     padding: 6px;
     font-size: 14px;
     cursor: pointer;
-    margin: 5px 5px;
     background-color: #111111;
     color: #39FF14;
     border: 1.2px solid #268A0A;
@@ -39,6 +38,7 @@ button:hover {
 input[type="number"],
 input[type="text"],
 input[type="email"],
+input[type="url"],
 select{
     padding: 6px;
     border: 1.2px solid #268A0A; /* Viền xanh lá */
@@ -50,6 +50,7 @@ select{
 input[type="number"]:focus,
 input[type="text"]:focus,
 input[type="email"]:focus,
+input[type="url"]:focus,
  select:focus{
     border: 2px solid #66FF33; /* Viền sáng khi focus */
   outline:none;
@@ -57,6 +58,8 @@ input[type="email"]:focus,
 }
 input[type="number"]:hover,
 input[type="text"]:hover,
+input[type="url"]:hover,
+input[type="email"]:hover,
 select:hover{
     background-color: #000000; /* Màu nền khi hover */
     color: #268A0A; /* Màu chữ khi hover */
@@ -66,6 +69,7 @@ select:hover{
 .kimochi input[type="number"] ,
 .kimochi input[type="text"],
 .kimochi input[type="email"],
+.kimochi input[type="url"],
 .kimochi select{
     border: 1.2px solid #006666;
     color: #00FFFF;
@@ -73,6 +77,7 @@ select:hover{
 .kimochi input[type="number"]:focus,
 .kimochi input[type="text"]:focus,
 .kimochi input[type="email"]:focus,
+.kimochi input[type="url"]:focus,
 .kimochi select:focus{
     border: 2px solid #00FFFF;
   outline:none;
@@ -82,6 +87,7 @@ select:hover{
 .kimochi input[type="number"]:hover,
 .kimochi input[type="text"]:hover,
 .kimochi input[type="email"]:hover,
+.kimochi input[type="url"]:hover,
 .kimochi select:hover{
     background-color: #000000; /* Nền khi hover */
     color: #006666; /* Màu chữ khi hover */

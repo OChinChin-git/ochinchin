@@ -29,8 +29,8 @@ const Navbar = () => {
       setActiveItem("Edm");
     } else if (path === "/content") {
       setActiveItem("Content");
-    } else if (path === "/data") {
-      setActiveItem("Data");
+    } else if (path === "/link") {
+      setActiveItem("ShortenLink");
     } else if (path === "/kimochi") {
       setActiveItem("Kimochi");
     } else {
@@ -57,6 +57,10 @@ const Navbar = () => {
       return
     }
     window.location.href = 'https://ihentai.li/'
+      return
+    }
+    if(item=='ShortenLink'){
+      navigate('/link');
       return
     }
     setActiveItem(item);
@@ -192,7 +196,7 @@ const userProfile = async()=>{
         </div>
         <div className="menu-container">
           <ul className="menu-list">
-            {["Home", "Edm", "Content", "Data", "Kimochi"].map((item) => (
+            {["Home", "Edm", "Content", "ShortenLink", "Kimochi"].map((item) => (
               <li
                 key={item}
                 className={`menu-list-item ${

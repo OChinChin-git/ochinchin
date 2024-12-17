@@ -418,3 +418,9 @@ export const syncYoutubeIframe =async(id,playbackState,currentTime)=>{
   }
   await updateDoc(roomDoc,data);
 }
+export const deleteRoom = async(id,id2)=>{
+  const roomRef = doc(db,'content/type/rooms',id);
+  const videosRef = doc(db,'content/type/videosId',id2)
+  await deleteDoc(roomRef);
+  await deleteDoc(videosRef);
+}

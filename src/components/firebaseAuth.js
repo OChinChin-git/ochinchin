@@ -138,4 +138,29 @@ export async function changeUserProfile(uid,name,avt){
   }catch(error){
     alert(error)}
 };
-
+export const shortenLinkConst = async(name,link)=>{
+  try{
+  const linkRef = doc(collection(db,'link'),name);
+  const docSnap = await getDoc(linkRef)
+  if(docSnap.exists()){
+    return('exist');
+  }
+  const data={
+    name:name,
+    link:link
+  }
+  await setDoc(linkRef,data);
+    return 'kimochi'
+  }catch(error){
+    return('fsdb',error);
+  }
+}
+export const getLink = async(name)=>{
+  try{
+  const linkRef = doc(collection(db,'link'),name);
+  const docSnap = await getDoc(linkRef)
+  return docSnap.data()
+  }catch(error){
+    return('fsdb',error);
+  }
+}

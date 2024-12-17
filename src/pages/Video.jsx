@@ -19,6 +19,7 @@ import {
   addVisitor,
   removeVisitor,
   syncYoutubeIframe,
+  deleteRoom,
 } from "/src/components/Video";
 import "../styles/Video.css";
 import { updateRoom } from "../components/Room";
@@ -153,6 +154,8 @@ useEffect(() => {
     if (firestorePlayback === 'Playing' && typeof youtubePlayer.playVideo === 'function') {
       youtubePlayer.playVideo();
     } else if (firestorePlayback === 'Paused' && typeof youtubePlayer.pauseVideo === 'function') {
+      youtubePlayer.pauseVideo();
+    } else if (firestorePlayback === 'Ended' && typeof youtubePlayer.pauseVideo === 'function') {
       youtubePlayer.pauseVideo();
     }
   }
@@ -688,7 +691,18 @@ useEffect(()=>{
   useEffect(() => {
     roomVisitors();
   }, [activeVisitors]);
-
+  const handleDeleteRoom = async()=>{
+    try{
+      const isConfirm = confirm('Chắc chắn xóa phòng này chứ?');
+      if(!isConfirm){
+        showToast('Đã hủy')
+        return
+      }
+      await deleteRoom(roomName,videoId);
+    }catch(error){
+      alert('deleteRoom' + error)
+    }
+  }
   return (
     <div className="video-block">
       <div style={isJoinRoom ? { display: "" } : { display: "none" }}>
@@ -845,7 +859,7 @@ useEffect(()=>{
         <div className="room-profile">
           <div className="room-setting">
             <label>
-              Room :<p className="room-name">{roomName}</p>
+              <div className="room-name">{'Room: '+roomName}</div>
               <h6>Số người: {activeVisitors}</h6>
             </label>
             <label className="select-label">
@@ -920,6 +934,7 @@ useEffect(()=>{
             >
               Thay đổi
             </button>
+            <button onClick={handleDeleteRoom}>Xóa phòng</button>
           </div>
           <div className="room-users">
             <ul></ul>
@@ -933,6 +948,7 @@ useEffect(()=>{
       >
         Host
       </button>
+      
     </div>
   );
 };
