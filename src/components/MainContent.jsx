@@ -4,6 +4,7 @@ import { useLoader } from './LoaderContext'; // Import useLoader từ context
 import Loader from './Loader'; // Import component Loader của bạn
 
 const Edm = lazy(() => import('../pages/Edm'));
+const EdmTest = lazy(() => import('../pages/EdmTest'));
 const Content = lazy(() => import('../pages/AddContent'));
 const ShortenLink = lazy(() => import('../pages/ShortenLink'));
 const Kimochi = lazy(() => import('../pages/Kimochi'));
@@ -31,6 +32,11 @@ const MainContent = () => {
             <Route
               path="/edm"
               element={<Edm />}
+              onEnter={handleRouteChange}  // Lấy sự kiện để kích hoạt loader khi vào route này
+            />
+            <Route
+              path="/edmtest"
+              element={<EdmTest />}
               onEnter={handleRouteChange}  // Lấy sự kiện để kích hoạt loader khi vào route này
             />
             <Route path="/content" element={<Content />} />

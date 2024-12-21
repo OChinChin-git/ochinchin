@@ -1,455 +1,491 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/Edm.css"
+import "../styles/Edm.css";
 import { useLoader } from "../components/LoaderContext";
-import {useToast} from "../components/ToastContext";
-const Edm = () => {
-  // States để quản lý các thông tin
-  const [currentSongIndex, setCurrentSongIndex] = useState(() =>{
-    const savedIndex = localStorage.getItem("currentSongIndex");
-    return savedIndex !== null ? parseInt(savedIndex,10) : 0;
-  })
-  const [songs, setSongs] = useState([]);
-  const [isShuffled, setIsShuffled] = useState(() => {
-    const savedShuffled = localStorage.getItem("isShuffled");
-    return savedShuffled !== null ? JSON.parse(savedShuffled) : false;
+import { useToast } from "../components/ToastContext";
+import { useDialog } from "../components/DialogContext";
+import {
+  getFirestore,
+  setDoc,
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  Timestamp,
+  deleteDoc,
+  FieldValue,
+  serverTimestamp,
+  query,
+  where,
+  orderBy,
+  startAfter,
+  limit,
+} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+const db = getFirestore();
+const edmRef = collection(db, "edm");
+
+const getEdmList = async () => {
+  const data = await getDocs(edmRef);
+  const finalData = data.docs.map((edm) => {
+    return {
+      id: edm.id,
+      ...edm.data(),
+    };
   });
-  const [playbackRate, setPlaybackRate] = useState(1.0);
-  const [activeButton, setActiveButton] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdateTime, setLastUpdateTime] = useState(0); // Thời gian cập nhật cuối cùng
-  const [hideList, setHideList] = useState(false);
-  const [volume, setVolume] = useState(() => {
-    // Lấy giá trị volume từ localStorage, nếu không có thì đặt mặc định là 100
-    const savedVolume = localStorage.getItem("volume");
-    return savedVolume !== null ? parseInt(savedVolume, 10) : 100;
-  });
+  return finalData;
+};
+const saveEdm = async (name, url, showToast) => {
+  const embedUrl = convertToEmbedUrl(url);
+  if(embedUrl == 'yamate'){
+    showToast('Nhập url youtube...')
+    return
+  }
+  const data = {
+    name: name,
+    url: embedUrl,
+  };
+  const edmDocRef = doc(edmRef, name);
+  const edmDocSnap = await getDoc(edmDocRef);
+  if (edmDocSnap.exists()) {
+    const isConfirm = confirm("Tên đã tồn tại, thay thế chứ?");
+    if (!isConfirm) {
+      showToast("Đã hủy");
+      return;
+    }
+  }
+  await setDoc(edmDocRef, data);
+  showToast('Thêm thành công')
+};
+  const convertToEmbedUrl = (url) => {
+    // Sửa biểu thức chính quy để bao gồm các URL YouTube live
+    const youtubeRegEx =
+      /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[&?][^#]*)?/;
+
+    const match = url.match(youtubeRegEx);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`; // Trả về URL nhúng
+    }
+
+    return 'yamate'; // Nếu không phải URL YouTube hợp lệ, trả về URL gốc
+  };
+const EdmTest = () => {
   const [wave, setWave] = useState(false);
-  const [idListInput, setIdListInput] = useState(() => {
-    const savedIdList = localStorage.getItem("idListInput");
-    return savedIdList !== null ? JSON.parse(savedIdList) : "";
-  });
-  // Sử dụng Ref để tham chiếu đến các phần tử DOM
-  const audioRef = useRef(null);
-  const songListRef = useRef(null);
-  const currentTimeRef = useRef(null);
-  const durationTimeRef = useRef(null);
-  const seekBarRef = useRef(null);
-  const volumeSliderRef = useRef(null);
+  const [activeButton, setActiveButton] = useState(false);
+  const [hideList, setHideList] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const iframeRef = useRef();
   const { showLoader, hideLoader } = useLoader(); // Use loader context
-  // Ref để tham chiếu đến từng phần tử trong danh sách
-  const songRefs = useRef([]);
-  const {showToast} = useToast();
-  const [validIds,setValidIds] = useState([]);
-  // Fetch dữ liệu từ Google Sheets
+  const { showToast } = useToast();
+  const { showPrompt } = useDialog();
+  const [edmList, setEdmList] = useState([]);
+  const [currentEdm, setCurrentEdm] = useState(null);
+  const [isYoutubeAPIReady,setIsYoutubeAPIReady] = useState(false);
+  const [youtubePlayer,setYoutubePlayer] = useState(null);
+  const [isPlayerReady,setIsPlayerReady] = useState(false);
+  const [youtubeVideoId,setYoutubeVideoId] = useState(null);
+  const [playbackState,setPlaybackState]=useState();
+  const [durationTime,setDurationTime] = useState();
+  const [currentTime,setCurrentTime] = useState();
+  const [edmVolume,setEdmVolume] = useState(100);
+  const [edmPlaybackRate,setEdmPlaybackRate] = useState(1);
+  const [edmFakeVolume,setEdmFakeVolume] = useState(100);
+  const [tempCurrentTime,setTempCurrentTime] = useState(null);
+  const fetchEdmList = async () => {
+    const data = await getEdmList();
+    setEdmList(data);
+  };
   useEffect(() => {
-    showLoader("Đang tải...");
-    async function fetchSongs() {
-      const response = await fetch(
-        "https://docs.google.com/spreadsheets/d/1JC22TNfLkxrzuAROvc8-gZe9gp70qOhEvtTkTIo4WUk/gviz/tq?tqx=out:json"
-      );
-      const data = await response.text();
-      const json = JSON.parse(data.substr(47).slice(0, -2));
-      const rows = json.table.rows;
-      const headers = rows[0].c.map((cell) => cell?.v);
-      const linkIndex = headers.indexOf("Link mp3");
-const fetchedSongs = rows.slice(1).map((row) => {
-  const songName = row.c[0]?.v;
-  const songLink = row.c[linkIndex]?.v;
-
-  if (idListInput === "") {
-    return { songName, songLink };
-  } else {
-    // Nếu có idListInput, lọc theo ID
-    const ids = headers.slice(1, linkIndex).map((header, index) => {
-      return { id: header, marked: row.c[index + 1]?.v === 'x' };
-    }).filter(entry => entry.marked);
-
-    // Kiểm tra xem idListInput có khớp với bất kỳ ID nào trong ids không
-    const matchingId = ids.find(entry => entry.id.toLowerCase() === idListInput);
-
-    // Nếu tìm thấy ID khớp, trả về songName và songLink
-    if (matchingId) {
-      return { songName, songLink };
-    } else {
-      return null; // Nếu không có ID khớp, trả về null hoặc có thể bỏ qua
+    fetchEdmList();
+    const storedVolume = localStorage.getItem("edmVolume");
+    if (storedVolume !== null) {
+      // Nếu có giá trị trong localStorage, chuyển thành số và cập nhật state
+      setEdmVolume(Number(storedVolume));
     }
-  }
-}).filter(song => song !== null);  // Loại bỏ các phần tử null nếu không có songLink khớp
-
-      setSongs(fetchedSongs);
-      const ids = headers.slice(1, linkIndex);
-      setValidIds(ids);
+  }, []);
+  const handleNextEdm = () => {
+    if (edmList.length == 0) {
+      return;
     }
-    hideLoader("Chúc bạn nghe nhạc vui vẻ!", 1000);
-    fetchSongs();
-  }, [idListInput]);
-  useEffect(() => {
-  if (validIds.length > 0) {
-    console.log("Valid IDs đã được cập nhật:", validIds);
-    // Xử lý với validIds sau khi đã cập nhật
-  }
-}, [validIds]);  // Theo dõi sự thay đổi của validIds
-
-useEffect(() => {
-  if (songs.length > 0) {
     
-    // Phát bài hát hiện tại
-    playSong(currentSongIndex).then(() => {
-      audioRef.current.pause();  // Dừng bài hát ngay lập tức
-    });
-  }
-}, [songs]);
-useEffect(() => {
-  if (songs.length > 0) {
-    // Kiểm tra xem currentSongIndex có hợp lệ không
-    if (currentSongIndex >= songs.length || currentSongIndex < 0) {
-      setCurrentSongIndex(0);  
-      playSong(currentSongIndex);
-    }
-  }
-}, [currentSongIndex, songs]);
-  
-useEffect(() => {
-  localStorage.setItem("currentSongIndex", currentSongIndex);
-  localStorage.setItem("isShuffled", JSON.stringify(isShuffled));
-    localStorage.setItem("volume", volume);
-  localStorage.setItem("idListInput", JSON.stringify(idListInput));
-}, [currentSongIndex, volume, isShuffled,idListInput]);
-  
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-  const playSong = async (songIndex) => {
-    const song = songs[songIndex];
-
-    // Hiển thị loader với tên bài hát
-    showLoader("Đang tải: " + song.songName);
-
-    // Cập nhật nguồn cho audio
-    audioRef.current.src = song.songLink;
-
-    // Đảm bảo rằng bài hát đã tải xong
-    audioRef.current.load(); // Tải lại audio nguồn
-    await new Promise((resolve, reject) => {
-      audioRef.current.oncanplaythrough = () => resolve(); // Bài hát đã tải xong
-      audioRef.current.onerror = () => reject("Lỗi tải bài hát");
-    });
-
-    // Cập nhật thời lượng bài hát vào ref
-    const durationInSeconds = audioRef.current.duration; // Thời lượng bài hát (giây)
-    if (!isNaN(durationInSeconds)) {
-      const formattedDuration = formatTime(durationInSeconds);
-      if (durationTimeRef.current) {
-        durationTimeRef.current.textContent = formattedDuration;
-      }
-    }
-
-    // Phát bài hát sau khi đã tải xong
-    audioRef.current.play();
-    updateActiveClass(songIndex);
-    scrollToCurrentSong(songRefs.current[songIndex]);
-    setCurrentSongIndex(songIndex);
-
-    // Ẩn loader sau khi bài hát đã được tải và bắt đầu phát
-    hideLoader("Đang tải: " + song.songName, 1000);
-  };
-  // Hàm để cập nhật lớp active cho bài hát
-  const updateActiveClass = (activeItemIndex) => {
-    const songItems = document.querySelectorAll(".song-item"); // Các phần tử li của danh sách bài hát
-    songItems.forEach((item, index) => {
-      // Loại bỏ lớp active khỏi tất cả các bài hát
-      item.classList.remove("active");
-
-      // Thêm lớp active vào bài hát đang phát
-      if (index === activeItemIndex) {
-        item.classList.add("active");
-      }
-    });
-  };
-  // Xử lý sự kiện play/pause
-  const togglePlayPause = () => {
-    if (audioRef.current.paused) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-  };
-  // Định dạng thời gian
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  // Xử lý thay đổi tốc độ phát
-  const handleSpeedChange = () => {
-    const speedValue = parseFloat(document.getElementById("speedInput").value);
-    if (speedValue >= 0.25 && speedValue <= 10) {
-      setPlaybackRate(speedValue);
-      audioRef.current.playbackRate = speedValue;
-      if(speedValue > 3|| speedValue < 0.7){
-        showToast("Speed: " + speedValue,"error");
+    let nextIndex = null;
+    
+    if(currentEdm == null){
+      if(!isShuffled){
+        setCurrentEdm(edmList[0])
       }else{
-      showToast("Speed: " + speedValue);
+        nextIndex = Math.floor(Math.random() * edmList.length);
+        setCurrentEdm(edmList[nextIndex]);
       }
-    }else{
-      showToast("Vui lòng nhập speed từ 0.25 đến 10")
-    }
-  };
-
-  // Cập nhật bài hát tiếp theo
-  const nextSong = () => {
-    let nextIndex = currentSongIndex + 1;
-    if (isShuffled) {
-      nextIndex = Math.floor(Math.random() * songs.length);
-    }
-    if (nextIndex >= songs.length) {
-      nextIndex = 0;
-    }
-    playSong(nextIndex);
-  };
-  // Dùng useEffect để tự động cập nhật trạng thái khi audio play/pause
-  useEffect(() => {
-    // Cập nhật trạng thái nút khi bài hát thay đổi trạng thái play/pause
-    const updateButtonState = () => {
-      setWave(!audioRef.current.paused);
-      setActiveButton(!audioRef.current.paused);
-    };
-
-    // Lắng nghe sự kiện "play" và "pause" của audio
-    const audioElement = audioRef.current;
-    audioElement.addEventListener("play", updateButtonState);
-    audioElement.addEventListener("pause", updateButtonState);
-
-    // Cleanup event listeners khi component unmount
-    return () => {
-      audioElement.removeEventListener("play", updateButtonState);
-      audioElement.removeEventListener("pause", updateButtonState);
-    };
-  }, []); // Chỉ chạy một lần khi component mount
-  useEffect(() => {
-    const checkIfSongIsLoading = () => {
-      const current = audioRef.current.currentTime; // Lấy currentTime của audio
-      const duration = audioRef.current.duration; // Thời lượng bài hát
-
-      // Kiểm tra xem currentTime có thay đổi không trong 0.5 giây và bài hát không bị tạm dừng
-      if (
-        Math.abs(current - lastUpdateTime) < 0.1 &&
-        audioRef.current.paused === false
-      ) {
-        setWave(false);
-        setIsLoading(true); // Đánh dấu đang tải
-        showLoader("Đang tải, chờ chút..."); // Hiển thị loader
-      } else {
-        setIsLoading(false); // Đã phát, không còn tải nữa
-        hideLoader(); // Ẩn loader
-        setWave(!audioRef.current.paused);
-      }
-
-      setLastUpdateTime(current); // Cập nhật lastUpdateTime để so sánh lần sau
-    };
-
-    // Chạy kiểm tra mỗi 0.5 giây
-    const intervalId = setInterval(checkIfSongIsLoading, 500);
-
-    // Cleanup khi component unmount
-    return () => clearInterval(intervalId);
-  }, [lastUpdateTime, audioRef.current, wave]);
-
-  // Xử lý thay đổi thanh volume
-  const handleVolumeChange = (e) => {
-    const newVolume = e.target.value;
-    setVolume(newVolume); // Cập nhật giá trị volume
-    audioRef.current.volume = newVolume / 100; // Áp dụng volume cho audio
-  };
-
-  // Cập nhật thanh tiến độ
-  const updateProgress = () => {
-    const currentTime = audioRef.current.currentTime;
-    const durationTime = audioRef.current.duration;
-    currentTimeRef.current.textContent = formatTime(currentTime);
-    seekBarRef.current.value = currentTime;
-    seekBarRef.current.max = durationTime;
-  };
-  // Đăng ký sự kiện keydown khi component mount
-  useEffect(() => {
-    const handleSpaceKey = (event) => {
-      if (event.code === "Space") {
-        event.preventDefault(); // Ngăn không cho trình duyệt xử lý mặc định
-        togglePlayPause(); // Gọi hàm toggle play/pause
-      }
-    };
-
-    // Đăng ký sự kiện keydown
-    document.addEventListener("keydown", handleSpaceKey);
-
-    // Cleanup sự kiện khi component unmount
-    return () => {
-      document.removeEventListener("keydown", handleSpaceKey);
-    };
-  }, []); // Dùng mảng phụ thuộc rỗng để chỉ chạy 1 lần khi component mount
-  // Hàm cuộn đến bài hát hiện tại trong danh sách
-  const scrollToCurrentSong = (item) => {
-    if (item) {
-      item.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
-  
-  const idListRef = useRef();
-  const handleIdListClick = () =>{
-    const id = idListRef.current.value;
-    if(id === ""){
-      const isConfirm = confirm("Chưa nhập id, reset list")
-      if(!isConfirm){
-        showToast("Đã hủy");
-        return
-      }
-      setIdListInput(id);
-      showToast("Đang phát list mặc định","success")
       return
     }
-if (!validIds.map(id => id.toLowerCase()).includes(id.toLowerCase())) {
-  showToast("Id không tồn tại, id có sẵn: " + validIds.join(", "));
-  idListRef.current.value = "";
-  return;
-}
     
-    setIdListInput(id);
-    idListRef.current.value = "";
-    showToast("Đang phát: " + id);
+    const currentIndex = edmList.findIndex((edm) => edm.id === currentEdm.id);
+    if (currentIndex === -1) {
+      return;
+    }
+    
+    if (!isShuffled) {
+      nextIndex = (currentIndex + 1) % edmList.length;
+    } else {
+      do {
+        nextIndex = Math.floor(Math.random() * edmList.length);
+      } while (nextIndex === currentIndex);
+    }
+    setCurrentEdm(edmList[nextIndex]);
   };
+useEffect(() => {
+  const tag = document.createElement('script');
+  tag.src = '//www.youtube.com/iframe_api';
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   
+  window.onYouTubeIframeAPIReady = () => {
+    setIsYoutubeAPIReady(true);
+  };
+}, []);
+
+useEffect(() => {
+  if (!isYoutubeAPIReady) return;
+
+  const newPlayer = new window.YT.Player(iframeRef.current, {
+    height: "0", // Chiều cao 0 để chỉ phát âm thanh
+    width: "0",  // Chiều rộng 0
+    playerVars: {
+      controls: 0,           // Ẩn điều khiển video
+      modestbranding: 1,     // Loại bỏ logo YouTube
+      rel: 0,                // Không hiển thị video liên quan
+      showinfo: 0,           // Ẩn thông tin video
+      autoplay: 1,           // Tự động phát
+      origin: window.location.origin, // Đảm bảo hoạt động trên các tên miền cụ thể
+    },
+    events: {
+      onReady: () => {
+        setIsPlayerReady(true); // Đảm bảo player sẵn sàng trước khi gọi loadVideoByUrl
+      },
+      onStateChange: onPlayerStateChange
+    },
+  });
+  setYoutubePlayer(newPlayer);
+}, [isYoutubeAPIReady]);
+  
+  const onPlayerStateChange = async (event) => {
+    switch (event.data) {
+      case window.YT.PlayerState.PLAYING:
+        setPlaybackState("Playing");
+        break;
+      case window.YT.PlayerState.PAUSED:
+        setPlaybackState("Paused");
+        break;
+      case window.YT.PlayerState.ENDED:
+        setPlaybackState("Ended");
+        break;
+      case window.YT.PlayerState.UNSTARTED:
+        setPlaybackState('Loading');
+        break;
+      default:
+        setPlaybackState("Idle");
+    }
+  };
+  useEffect(()=>{
+    if(playbackState === "Idle" || playbackState === "Loading") {
+      showLoader('Đang tải...')
+      setActiveButton(false);
+      setWave(false);
+    }else{
+      hideLoader();
+    if(playbackState == 'Paused' ){
+      setActiveButton(false);
+      setWave(false)
+    }else if(playbackState == 'Playing'){
+      setActiveButton(true);
+      setWave(true)
+    }else if(playbackState == 'Ended'){
+      handleNextEdm();
+    }
+    }
+  },[playbackState])
+  const formatTime = (time)=>{
+    const hours = Math.floor(time / 3600 % 24)
+    const minutes = Math.floor(time / 60 %60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+    let formatedTime;
+    if(hours!==0){
+      formatedTime = (`${hours}:${minutes}:${seconds}`);
+    }else{
+      formatedTime =(`${minutes}:${seconds}`);
+    }
+    return formatedTime;
+  }
+  useEffect(() => {
+    if (youtubePlayer && isPlayerReady && youtubeVideoId) {
+      youtubePlayer.loadVideoById(youtubeVideoId);
+      // Lắng nghe sự kiện để đợi video tải xong metadata
+      const handleMetadataLoaded = () => {
+        const videoDuration = youtubePlayer.getDuration();
+        if (videoDuration > 0) {
+          setDurationTime(parseFloat(videoDuration.toFixed(2)))
+        } else {
+        }
+      };
+
+      youtubePlayer.addEventListener("onStateChange", (event) => {
+        if (event.data === window.YT.PlayerState.UNSTARTED || event.data === window.YT.PlayerState.CUED) {
+          handleMetadataLoaded();
+        }
+      });
+
+      // Xóa listener khi component unmount
+      return () => {
+        youtubePlayer.removeEventListener("onStateChange", handleMetadataLoaded);
+      };
+    }
+  }, [youtubeVideoId, youtubePlayer, isPlayerReady]);
+  
+useEffect(() => {
+  if (!activeButton || !youtubePlayer) return;
+
+  const interval = setInterval(() => {
+    const videoCurrentTime = youtubePlayer.getCurrentTime(); // Lấy thời gian hiện tại của video
+    if(videoCurrentTime >0){
+    setCurrentTime(parseFloat(videoCurrentTime.toFixed(2))) // Cập nhật thời gian
+    }
+  }, 500);
+
+  return () => clearInterval(interval); // Dọn dẹp interval khi unmount hoặc khi activeButton thay đổi
+}, [activeButton, youtubePlayer]);
+
+  const handlePlayPause = () => {
+    if (!isYoutubeAPIReady || !isPlayerReady || !youtubePlayer ||edmList.length == 0) {
+      return;
+    }
+    if(currentEdm == null){
+      if(!isShuffled){
+        setCurrentEdm(edmList[0]);
+      }else{
+        const nextIndex = Math.floor(Math.random()*edmList.length);
+        setCurrentEdm(edmList[nextIndex]);
+      };
+    }
+    const playerState = youtubePlayer.getPlayerState();
+    if (playerState === window.YT.PlayerState.PLAYING) {
+      youtubePlayer.pauseVideo();
+    }
+    if (playerState === window.YT.PlayerState.PAUSED || playerState === window.YT.PlayerState.CUED) {
+      youtubePlayer.playVideo();
+    }
+  };
+    const getVideoId = ()=>{
+      const embedUrl = currentEdm.url
+      const youtubeId = embedUrl.split("/embed/")[1];
+      return youtubeId;
+    }
+  useEffect(()=>{
+    if(currentEdm == null || !isPlayerReady) return;
+    const youtubeId = getVideoId();
+    setYoutubeVideoId(youtubeId);
+    const edmElement = document.getElementById(formatId(currentEdm.name))
+    edmElement.scrollIntoView({behavior:'smooth',block:'center'})
+  },[currentEdm,isPlayerReady])
+  useEffect(()=>{
+    if(youtubePlayer == null || currentEdm == null || !isPlayerReady)return;
+    const youtubeVolume = youtubePlayer.getVolume();
+    if(edmVolume !== youtubeVolume){
+      youtubePlayer.setVolume(edmVolume)
+    }
+  },[edmVolume,youtubePlayer,currentEdm])
+  useEffect(()=>{
+    if(edmVolume !== edmFakeVolume){
+      setEdmFakeVolume(edmVolume);
+    }
+    localStorage.setItem('edmVolume',edmVolume);
+  },[edmVolume])
+  const onEdmVolumeChange = (e)=>{
+  if(currentEdm == null)return
+  setEdmVolume(e.target.value)
+  }
+  const [onInputCurrentTime,setOnInputCurrentTime] = useState(false)
+  useEffect(()=>{
+    if(currentTime==tempCurrentTime || onInputCurrentTime) return;
+    setTempCurrentTime(currentTime)
+  },[currentTime])
+  const formatId = (str) => {
+  return str
+    .replace(/\s+/g, '_')  // Thay thế khoảng trắng bằng dấu gạch dưới
+    .replace(/[^a-zA-Z0-9_-]/g, '')  // Loại bỏ các ký tự không hợp lệ
+    .toLowerCase();  // Chuyển thành chữ thường để đảm bảo tính nhất quán
+};
   return (
     <div className="edm-container">
-    <div className="edmphiphai">
-      <h1 className="animated2">Phi phai</h1>
-      <div>
-        <input type="text"
-          placeholder="Nhập ID"  ref ={idListRef}/>
-       
-        <button onClick={handleIdListClick}>Tải list</button>
-      </div>
+      <div className="edmphiphai">
+        <h1 className="animated2">Phi phai</h1>
+        <div className="input-id-and-button">
+          <input type="text" placeholder="Nhập ID" />
 
-      <div className="current-song-info">
-        <div
-          className="circle"
-          style={{
-            animation: wave ? "" : "none",
-          }}
-        >
-          <p id="currentSongTitle" className="animated3">
-            Bài hiện tại:{" "}
-            <span>
-              {songs[currentSongIndex]?.songName || "Không có bài hát nào"}
-            </span>
-          </p>
-          <p id="currentSongIndex">
-            Thứ tự: <span id="currentIndex">{currentSongIndex + 1}</span> /{" "}
-            <span id="totalSongs">{songs.length}</span>
-          </p>
-          <p>
-            Thời gian đã phát:
-            <br />
-            <span id="currentTime" ref={currentTimeRef}>
-              0:00
-            </span>{" "}
-            /
-            <span id="durationTime" ref={durationTimeRef}>
-              0:00
-            </span>
-          </p>
-          <input
-            type="range"
-            ref={seekBarRef}
-            id="seekBar"
-            step="1"
-            min="0"
-            onChange={(e) => {
-              const newTime = e.target.value;
-              if (audioRef.current) {
-                audioRef.current.currentTime = newTime; // Cập nhật thời gian phát
-              }
+          <button>Tải list</button>
+          <button
+            onClick={async () => {
+              const edmInputName = await showPrompt("Nhập tên cho bài hát");
+              const edmInputUrl = await showPrompt("Nhập url youtube ");
+              await saveEdm(edmInputName, edmInputUrl,showToast);
+              fetchEdmList();
             }}
-          />
+          >
+            Thêm edm
+          </button>
         </div>
-      </div>
 
-      <div className="controls">
-        <button id="playPauseBtn" onClick={togglePlayPause}>
-          {activeButton ? "Tạm dừng" : "Phát"}
-        </button>
-        <button id="nextBtn" onClick={nextSong}>
-          Bài tiếp theo
-        </button>
-        <div className="speed-control">
-          <label className="speed-input-button">Tốc độ:
-          <input
-            type="number"
-            id="speedInput"
-            value={playbackRate}
-            step="0.05"
-            min="0.1"
-            max="10"
-            onChange={(e) => setPlaybackRate(parseFloat(e.target.value))}
-          />
-          <button id="setSpeedBtn" onClick={handleSpeedChange}>
+        <div className="current-song-info">
+          <div
+            className="circle"
+            style={{
+              animation: wave ? "" : "none",
+            }}
+          >
+            <p id="currentSongTitle" className="animated3">
+              <span>{currentEdm ? 'Bài hiện tại: '+currentEdm.name : "Chọn 1 bài..."}</span>
+            </p>
+            <p id="currentSongIndex">
+              Thứ tự:{" "}
+              <span id="currentIndex">
+                {currentEdm
+                  ? edmList.findIndex((edm) => edm.id === currentEdm.id) + 1
+                  : "__"}
+              </span>{" "}
+              / <span id="totalSongs">{edmList ? edmList.length : "__"}</span>
+            </p>
+            <p>
+              Thời gian đã phát:
+              <br />
+              <span id="currentTime">{currentTime != null ? formatTime(tempCurrentTime) : '__'}</span> /
+              <span id="durationTime">{durationTime != null ? formatTime(durationTime) : '__'}</span>
+            </p>
+            <input type="range" id="seekBar" step="1" min="0" 
+              max={Math.floor(durationTime) || 0}
+              value = {Math.floor(tempCurrentTime)|| 0}
+              onMouseUp={(e)=>{
+                if(!youtubePlayer || currentTime == null)return;
+                const seekTime = Number(e.target.value);
+                youtubePlayer.seekTo(seekTime,true)
+                setTempCurrentTime(seekTime);
+                setOnInputCurrentTime(false);
+              }}
+              onTouchEnd={(e)=>{
+                if(!youtubePlayer || currentTime == null)return;
+                const seekTime = Number(e.target.value);
+                youtubePlayer.seekTo(seekTime,true)
+                setTempCurrentTime(seekTime);
+                setOnInputCurrentTime(false);
+              }}
+              onInput={(e)=>{
+                setTempCurrentTime(Number(e.target.value))
+                setOnInputCurrentTime(true);
+              }}
+              />
+          </div>
+        </div>
+
+        <div className="controls">
+          <button id="playPauseBtn" onClick={handlePlayPause}>
+            {activeButton ? "Tạm dừng" : "Phát"}
+          </button>
+          <button id="nextBtn" onClick={handleNextEdm}>
+            Bài tiếp theo
+          </button>
+          <div className="speed-control">
+            <label className="speed-input-button">
+              Tốc độ:
+              <input
+                onChange={(e)=>{
+                  const value =parseFloat(e.target.value);
+                  if(isNaN(value)){
+                    setEdmPlaybackRate('');
+                  }
+                  else
+                  setEdmPlaybackRate(value);
+                }}
+                type="number"
+                id="speedInput"
+                step="0.05"
+                min="0.25"
+                max="2"
+                value={edmPlaybackRate}
+                onKeyDown={(e)=>{
+                  if(e.key !=='Enter')return;
+                  if(edmPlaybackRate<0.25|| edmPlaybackRate>2){
+                    showToast('Từ 0.25 - 2')
+                    return
+                  }
+                  if(youtubePlayer == null || currentEdm == null) return;
+                  youtubePlayer.setPlaybackRate(Number(edmPlaybackRate));
+                  showToast('Tốc độ hiện tại: ' + edmPlaybackRate)
+                }}
+              />
+              <button id="setSpeedBtn" onClick={()=>{
+                  if(edmPlaybackRate<0.25|| edmPlaybackRate>2){
+                    showToast('Từ 0.25 - 2')
+                    return
+                  }
+                  if(youtubePlayer == null || currentEdm == null) return;
+                  youtubePlayer.setPlaybackRate(Number(edmPlaybackRate));
+                  showToast('Tốc độ hiện tại: ' + edmPlaybackRate)
+                }}>
             Đặt tốc độ
-          </button></label>
+          </button>
+            </label>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <input
-          type="range"
-          ref={volumeSliderRef}
-          id="volume-slider"
-          min="0"
-          max="100"
-          value={volume} // Liên kết giá trị volume với state
-          onChange={handleVolumeChange}
-        />
-        <span id="volume-percentage">{volume}%</span>{" "}
-      </div>
+        <div>
+          <input type="range" id="volume-slider" min="0" max="100"
+            onInput={(e)=>{
+              if(currentEdm == null)return;
+              setEdmFakeVolume(e.target.value);
+            }}
+            onMouseUp={onEdmVolumeChange}
+            onTouchEnd={onEdmVolumeChange}
+            value={edmFakeVolume}/>
+          <span id="volume-percentage">{edmFakeVolume}%</span>{" "}
+        </div>
 
-      <h3>
-        Danh sách
-        <button id="toggleListBtn" onClick={() => setHideList(!hideList)}>
-          {hideList ? " + " : " - "}
-        </button>
-        <button id="shuffleBtn" onClick={() => setIsShuffled(!isShuffled)}>
-          {isShuffled ? "Hủy Random" : "Random"}
-        </button>
-      </h3>
+        <h3>
+          Danh sách
+          <button id="toggleListBtn" onClick={() => setHideList(!hideList)}>
+            {hideList ? " + " : " - "}
+          </button>
+          <button id="shuffleBtn" onClick={() => setIsShuffled(!isShuffled)}>
+            {isShuffled ? "Hủy Random" : "Random"}
+          </button>
+        </h3>
 
-      <div
-        className="list-edm"
-        style={{ display: hideList ? "none" : "block" }}
-      >
-        <ul id="songList">
-          {songs.map((song, index) => (
-            <li
-              key={index}
-              ref={(el) => (songRefs.current[index] = el)}
-              className={`song-item ${
-                currentSongIndex === index ? "active" : ""
-              }`} // Thêm lớp active nếu bài hát này đang phát
-              onClick={() => playSong(index)} // Khi nhấn vào bài hát sẽ gọi playSong
-            >
-              {song.songName}
-            </li>
-          ))}
-        </ul>
+        <div
+          className="list-edm"
+          style={{ display: hideList ? "none" : "block" }}
+        >
+          <ul id="songList">
+            {edmList.length > 0 ? (
+              edmList.map((edm) => (
+                <li
+                  key={edm.name}
+                  id={formatId(edm.name)}
+                  className={`song-item 
+                ${currentEdm == edm ? "active" : ""} `}
+                  onClick={() => {
+                    setCurrentEdm(edm);
+                  }}
+                >
+                  {edm.name}
+                </li>
+              ))
+            ) : (
+              <li className="song-item">Không có bài nào</li>
+            )}
+          </ul>
+        </div>
+        <div ref={iframeRef} style={{display:'none'}}></div>
       </div>
-      <audio
-        ref={audioRef}
-        onTimeUpdate={updateProgress}
-        onEnded={nextSong}
-      ></audio>
     </div>
-      </div>
   );
 };
-
-export default Edm;
+export default EdmTest;

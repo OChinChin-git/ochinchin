@@ -10,7 +10,7 @@ const ShortenLink= ()=>{
   const inputNameRef = useRef('');
   const location = useLocation();
   const queryParam = new URLSearchParams(location.search);
-  const name = queryParam.get('name');
+  const name = queryParam.get('n');
   const [isName,setIsName]= useState(false);
   const [link,setLink] = useState();
   const [isSubmit,setIsSubmit] =useState(false);
@@ -113,7 +113,7 @@ const ShortenLink= ()=>{
         <a className='shorten-link-text'>Thành công, bạn có thể truy cập link tại: 
           <br/>https://chillsite-test.glitch.me/link?name={submitName}</a>
         <button className='link=button' onClick={()=>{
-            navigator.clipboard.writeText('https://chillsite-test.glitch.me/link?name=' + submitName)
+            navigator.clipboard.writeText('https://chillsite-test.glitch.me/link?n=' + submitName)
             showToast('copy thành công!')
           }}
           style={{fontSize:'14px'}}

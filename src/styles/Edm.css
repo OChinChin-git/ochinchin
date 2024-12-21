@@ -258,3 +258,6 @@ canvas {
 }
 
 }
+.input-id-and-button *{
+  margin-left:3px;
+}
