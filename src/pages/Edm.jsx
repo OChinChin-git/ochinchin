@@ -92,9 +92,12 @@ const EdmTest = () => {
   const [edmPlaybackRate,setEdmPlaybackRate] = useState(1);
   const [edmFakeVolume,setEdmFakeVolume] = useState(100);
   const [tempCurrentTime,setTempCurrentTime] = useState(null);
+  const [hideManagerList,setHideManagerList] = useState(true);
+  const [edmCustomList,setEdmCustomList] =useState([]);
   const fetchEdmList = async () => {
     const data = await getEdmList();
     setEdmList(data);
+    setEdmCustomList(data);
   };
   useEffect(() => {
     fetchEdmList();
@@ -316,14 +319,28 @@ useEffect(() => {
     .replace(/[^a-zA-Z0-9_-]/g, '')  // Loại bỏ các ký tự không hợp lệ
     .toLowerCase();  // Chuyển thành chữ thường để đảm bảo tính nhất quán
 };
+  const managerListRef = useRef();
+  const handleClickOutSide=(e)=>{
+    if(managerListRef.current && !managerListRef.current.contains(e.target)){
+      setHideManagerList(true);
+    }
+  };
+  useEffect(()=>{
+    document.addEventListener('mousedown',handleClickOutSide)
+    return()=>{
+      document.removeEventListener('mousedown',handleClickOutSide)
+    }
+  },[])
   return (
     <div className="edm-container">
       <div className="edmphiphai">
         <h1 className="animated2">Phi phai</h1>
         <div className="input-id-and-button">
-          <input type="text" placeholder="Nhập ID" />
+          <input type="text" placeholder="Nhập ID" style={{display:'none'}}/>
 
-          <button>Tải list</button>
+          <button onClick={(e)=>{
+              setHideManagerList(!hideManagerList);
+            }}>Quản lí List</button>
           <button
             onClick={async () => {
               const edmInputName = await showPrompt("Nhập tên cho bài hát");
@@ -334,8 +351,29 @@ useEffect(() => {
           >
             Thêm edm
           </button>
+        <div className={'manager-edm-list'}
+          ref={managerListRef}
+          style={hideManagerList?{display:'none'}:{}}>
+          <ul className='manager-ul'>
+            {edmCustomList.length >0 ? edmCustomList.map((edm)=>(
+            <li key={edm.name}
+              className='manager-li'>{edm.name}
+                <input type="checkbox" className="manager-checkbox" 
+                  defaultChecked={edmList.includes(edm)? true:false}
+                  onChange={(e)=>{
+                    if(e.target.checked){
+                      setEdmList((prev)=>[...prev,edm])
+                    }
+                    else{
+                      setEdmList((prev)=>prev.filter((item)=>item !== edm))
+                    }
+                  }}
+                  />
+              </li>
+            )):(<li className='manager-li'>Không có edm nào...</li>)}
+          </ul>
         </div>
-
+        </div>
         <div className="current-song-info">
           <div
             className="circle"
@@ -350,7 +388,10 @@ useEffect(() => {
               Thứ tự:{" "}
               <span id="currentIndex">
                 {currentEdm
-                  ? edmList.findIndex((edm) => edm.id === currentEdm.id) + 1
+                  ? (()=>{ 
+                  const findedIndex = edmList.findIndex((edm) => edm.id === currentEdm.id)
+                  return findedIndex == -1 ? 'Bị xóa': findedIndex +1;
+                })()
                   : "__"}
               </span>{" "}
               / <span id="totalSongs">{edmList ? edmList.length : "__"}</span>

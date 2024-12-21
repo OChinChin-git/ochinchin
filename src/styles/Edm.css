@@ -3,13 +3,8 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; 
-    min-height: calc(100vh - 50px);
-position: relative;
-  display: flex;
-  justify-content: center;
 }
 .edmphiphai{
-    position: relative;
   padding: 0px 0px 30px;
     text-align: center;
   width:100%;
@@ -125,7 +120,6 @@ position: relative;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  position: relative; /* Để quản lý vị trí của pseudo-element */
 }
 
 .circle {
@@ -147,7 +141,6 @@ position: relative;
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover;
   background-position: -100px center;
-  position: relative;
 }
 .kimochi .circle {
   border: 5px solid transparent;
@@ -158,7 +151,7 @@ position: relative;
     url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
  background-size: cover;
 background-position: -60px center;
-  position: relative;
+
 }
 
 /* Căn giữa các phần tử trong hình tròn */
@@ -254,10 +247,47 @@ canvas {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.95)),
     url("https://i.pinimg.com/736x/03/82/94/038294aa97a514c28aaafeecf315829a.jpg");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
-  position: relative;
 }
 
 }
 .input-id-and-button *{
   margin-left:3px;
+}
+.manager-edm-list{
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  left:calc(50% - 125px);
+  top:80px;
+  border-radius: 10px;
+  box-shadow: 0 20px 35px rgba(57, 255, 20, 0.2);
+  background: rgba(0, 0, 0, 0.7);
+  max-width: 400px;
+  padding: 10px 5px;
+  padding-left:0;
+  z-index:4;
+}
+.manager-ul{
+  list-style-type:none;
+  overflow-y:hidden;
+  max-height: 300px;
+  padding:0 5px 0 5px;
+}
+.manager-ul:hover{
+  overflow-y:auto;
+}
+.manager-li{
+  display:flex;
+  font-size:14px;
+  position:relative;
+  border: 1px solid #39FF14;
+  padding:4px;
+  margin-bottom:4px;
+  border-radius:12px;
+  gap:4px;
+}
+.manager-checkbox{
+  position:static;
+  margin-left:auto;
+  right:10px;
 }

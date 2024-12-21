@@ -257,9 +257,6 @@ export const Login = () => {
           </div>
         </div>
       </div>
-      <div style={isLogin ? { display: "" } : { display: "none" }}>
-        <p>Đã đăng nhập rồi yamate</p>
-      </div>
     </>
   );
 };
