@@ -96,6 +96,7 @@ const EdmTest = () => {
   const [edmCustomList,setEdmCustomList] =useState([]);
   const fetchEdmList = async () => {
     const data = await getEdmList();
+    if(edmList.length == 0)
     setEdmList(data);
     setEdmCustomList(data);
   };
@@ -347,6 +348,7 @@ useEffect(() => {
               const edmInputUrl = await showPrompt("Nhập url youtube ");
               await saveEdm(edmInputName, edmInputUrl,showToast);
               fetchEdmList();
+              setHideManagerList(false);
             }}
           >
             Thêm edm
@@ -359,13 +361,14 @@ useEffect(() => {
             <li key={edm.name}
               className='manager-li'>{edm.name}
                 <input type="checkbox" className="manager-checkbox" 
-                  defaultChecked={edmList.includes(edm)? true:false}
+                  defaultChecked={edmList.some(item=>item.id == edm.id)? true:false}
                   onChange={(e)=>{
-                    if(e.target.checked){
+                    if(e.target.checked ){
+                      if(edmList.some(item => item.id == edm.id)) return;
                       setEdmList((prev)=>[...prev,edm])
                     }
                     else{
-                      setEdmList((prev)=>prev.filter((item)=>item !== edm))
+                      setEdmList((prev)=>prev.filter((item)=>item.id !== edm.id))
                     }
                   }}
                   />
@@ -511,7 +514,7 @@ useEffect(() => {
                   key={edm.name}
                   id={formatId(edm.name)}
                   className={`song-item 
-                ${currentEdm == edm ? "active" : ""} `}
+                ${currentEdm && currentEdm.id == edm.id ? "active" : ""} `}
                   onClick={() => {
                     setCurrentEdm(edm);
                   }}
