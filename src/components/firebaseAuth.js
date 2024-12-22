@@ -128,13 +128,18 @@ export async function getUserProfile(uid){
     alert(error);
   }
 }
-export async function changeUserProfile(uid,name,avt){
+export async function changeUserProfile(uid,profile,type){
   try{
     const ref = doc(db,"users",uid);
+    if(type=='displayName'){
     await updateDoc(ref, {
-      displayName:name,
-      avatar:avt,
+      displayName:profile,
     });
+    }else if(type == 'avatar'){
+          await updateDoc(ref, {
+      avatar:profile,
+    });
+    }
   }catch(error){
     alert(error)}
 };

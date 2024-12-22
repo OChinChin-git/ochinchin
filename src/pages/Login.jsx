@@ -18,17 +18,6 @@ export const Login = () => {
   const handleSignUp = () => {
     setIsSignUp(!isSignUp);
   };
-  const [isLogin, setIsLogin] = useState(false);
-  const checkIsLogin = () => {
-    const check = localStorage.getItem("loggedInUserId");
-    if (check == null) {
-      return;
-    }
-    setIsLogin(true);
-  };
-  useEffect(() => {
-    checkIsLogin();
-  }, []);
 
   const handleSignInWithGoogle = async () => {
     try {
@@ -116,7 +105,6 @@ export const Login = () => {
     <>
       <div
         className="login-background"
-        style={!isLogin ? { display: "" } : { display: "none" }}
       >
         
         <div

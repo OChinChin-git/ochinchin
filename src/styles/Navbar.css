@@ -129,12 +129,15 @@
   color:#229999;
 }
 .profile-picture {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border:1.6px solid #39FF14;
 }
-
+.kimochi .profile-picture{
+  border:1.6px solid #00FFFF;
+}
 .toggle {
   width: 40px;
   height: 20px;
@@ -170,15 +173,17 @@
 }
 .dropdownMenu {
     position: absolute;
-    top: 41px; 
+    top: 45px; 
     border:1px solid #39FF14;
-    padding: 10px;
+    padding: 0px 10px;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 6;
     display: none;
     right:0px;
   background: rgba(0, 0, 0, 0.7);
   border-radius:10px ;
+  font-size:14px;
+  
 }
 .kimochi .dropdownMenu{
   border:1px solid #00FFFF;
@@ -191,12 +196,9 @@
     width: 100%;
     padding: 5px;
     margin:0px;
-    border: none;
+    border: 0.1px solid ;
     font-weight: bold;
     border-radius: 5px;
-}
-.kimochi .dropdownMenu button {
-  border:none;
 }
 .dropdownMenu button:hover {
     
@@ -214,4 +216,22 @@
   top:30px;
   right:-220px;
   z-index:5;
+}
+.profile-picture-dropdown{
+  height:60px;
+  border-radius:50%;
+}
+.profile-value-container{
+
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:flex-start;
+  gap:8px;
+}
+.profile-dropdown-picture{
+  color:#39FF14;
+}
+.kimochi .profile-dropdown-picture{
+  color:#00FFFF;
 }
