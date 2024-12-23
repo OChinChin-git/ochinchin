@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef  } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import {
@@ -10,7 +10,7 @@ import { useLoader } from "./LoaderContext";
 import { useToast } from "./ToastContext";
 import { useDialog } from "./DialogContext";
 import { Login } from "../pages/Login";
-const Navbar = () => {
+const Navbar = forwardRef((props, ref) => {
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
   const { showPrompt } = useDialog();
@@ -38,6 +38,8 @@ const Navbar = () => {
       setActiveItem("ShortenLink");
     } else if (path === "/kimochi") {
       setActiveItem("Kimochi");
+    } else if (path === "/quest") {
+      setActiveItem("Quest");
     } else {
       setActiveItem("");
     }
@@ -131,6 +133,7 @@ const Navbar = () => {
         setName("");
         setEmail("");
         setAvt("");
+        setUserCoin(null);
         return;
       }
       const data = await getUserProfile(uid);
@@ -140,7 +143,7 @@ const Navbar = () => {
       setName(data.displayName);
       setEmail(data.email || "Ẩn danh");
       setAvt(data.avatar);
-      setUserCoin(data.coin) || 0;
+      data.coin ? setUserCoin(data.coin) : 0;
     } catch (error) {
       alert("user profile" + error);
     }
@@ -191,7 +194,9 @@ const Navbar = () => {
       hideLoader();
     }
   };
-
+  useImperativeHandle(ref, () => ({
+    userProfile,
+  }));
   return (
     <div className="navbar">
       <div className="navbar-container">
@@ -200,7 +205,7 @@ const Navbar = () => {
         </div>
         <div className="menu-container">
           <ul className="menu-list">
-            {["Home", "Edm", "Content", "ShortenLink", "Kimochi"].map(
+            {["Home", "Edm", "Content", "ShortenLink", "Kimochi",'Quest'].map(
               (item) => (
                 <li
                   key={item}
@@ -221,9 +226,9 @@ const Navbar = () => {
             style={{ position: "relative", display: "inline-block" }}
             className="profile-dropdown-picture"
           >
-            <img className="profile-picture" alt="Profile" src={avt} />
+            <img className="profile-picture" alt=".." src={avt} />
             <i
-              class={!isOpen ? "fas fa-chevron-up" : "fas fa-chevron-down"}
+              className={!isOpen ? "fas fa-chevron-up" : "fas fa-chevron-down"}
               style={{
                 position: "absolute",
                 transform: "translateY(-50%)",
@@ -260,7 +265,7 @@ const Navbar = () => {
                       src={avt}
                     />
                     <i
-                      class="fas fa-edit"
+                      className="fas fa-edit"
                       style={{
                         position: "absolute",
                         bottom: "0px",
@@ -283,7 +288,7 @@ const Navbar = () => {
                     >
                       {name}
                       <i
-                        class="fas fa-edit"
+                        className="fas fa-edit"
                         style={{ marginLeft: "4px", fontSize: "9px" }}
                         onClick={() =>
                           changeProfile(name, "Nhập tên mới", "displayName")
@@ -313,7 +318,7 @@ const Navbar = () => {
                       }}
                     >
                       <i
-                        class="fab fa-bitcoin"
+                        className="fab fa-bitcoin"
                         style={{ marginRight: "4px" }}
                       ></i>
                       {userCoin}
@@ -360,6 +365,6 @@ const Navbar = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Navbar;

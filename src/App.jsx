@@ -1,5 +1,5 @@
 // src/App.jsx
-import React from "react";
+import React, { useRef } from "react";
 import { BrowserRouter as Router } from "react-router-dom"; // Import Router
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -11,15 +11,16 @@ import { LoaderProvider } from "/src/components/LoaderContext";
 import { ToastProvider } from "/src/components/ToastContext";
 import { DialogProvider } from "/src/components/DialogContext";
 const App = () => {
+   const navbarRef = useRef();
   return (
     <Router>
       <DialogProvider>
         <ToastProvider>
           <LoaderProvider>
             <div className="app-container">
-              <Navbar />
+              <Navbar ref={navbarRef}/>
               <Sidebar />
-              <MainContent />
+              <MainContent navbarRef={navbarRef}/>
             </div>
           </LoaderProvider>
         </ToastProvider>
