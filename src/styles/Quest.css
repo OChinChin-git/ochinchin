@@ -1,0 +1,43 @@
+.quest-page-container{
+  border: 1.6px solid #39FF14;
+  border-radius: 4px;
+  padding: 8px;
+  max-width:300px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.page-icon{
+  color:#39ff14;
+  background:#555555;
+  border-radius: 50%;
+  padding:10px;
+   width: 24px; /* Chiều rộng cố định */
+  height: 24px;
+}
+.kimochi .page-icon{
+  color:#00FFFF;
+}
+.kimochi .quest-page-container{
+  border: 1.6px solid #00ffff;
+}
+.quest-page-button{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  font-size:12px;
+  border:1px solid #39ff14;
+  border-radius:6px;
+  padding:6px 10px;
+  width: fit-content;
+  margin-top:auto;
+}
+.kimochi .quest-page-button{
+  border:1px solid #00ffff;
+}
+.quest-page-button:hover{
+  background:rgba(57, 255, 20, 0.3);
+}
+.kimochi .quest-page-button:hover{
+  background:rgba(0,255,255, 0.3);
+}

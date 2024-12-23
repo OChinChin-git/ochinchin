@@ -4,7 +4,7 @@ import {getVideo} from '../components/Video'
 import { useLoader } from "../components/LoaderContext"; 
 import { useToast } from '../components/ToastContext';
 import {useDialog} from '../components/DialogContext';
-import {sendChats,getTime,getChats,trackVisitor, getActiveVisitorsCount,getActiveVisitors} from '/src/components/Video';
+import {sendChats,getTime, getActiveVisitorsCount} from '/src/components/Video';
 import "../styles/Room.css"
 import {loadOption,loadDoc} from '../components/AddContent.js'
 import {addRoom,getRoomsId} from '../components/Room'
@@ -49,9 +49,12 @@ const Room = ()=>{
   useEffect(()=>{
   loadDataVideo();
   },[selectVideo]);
-  useEffect(async()=>{
-    const videos = await loadOption("videos");
+  useEffect(()=>{
+    const loadVideosOption = async()=>{
+      const videos = await loadOption("videos");
     setVideoOptions(videos);
+    }
+    loadVideosOption();
   },[])
 
   const handleAddRoom = async()=>{
@@ -113,7 +116,7 @@ useEffect(() => {
   if (rId === "") {
     return;
   }
-  const unsubscribe = getActiveVisitors(setRoomCount, rId);
+  const unsubscribe = getActiveVisitorsCount(setRoomCount, rId);
   return () => {
     unsubscribe && unsubscribe(); // Kiểm tra nếu unsubscribe tồn tại
   };
@@ -134,7 +137,7 @@ useEffect(() => {
 }, [selectedRoom]);
 
   return (
-    <div >
+    <div className='room-container'>
       <label className="selectLabel">
         Chọn phòng:
         <select

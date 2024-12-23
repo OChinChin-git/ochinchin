@@ -1,17 +1,9 @@
 
 .login-background{
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95)),
-    url("https://www.desktophut.com/images/1723027733.webp");
-  background-size: cover; 
-  min-height: 100vh;
 position: relative;
   display: flex;
   justify-content: center;
-}
-.kimochi .login-background{
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95)),
-    url("https://motionbgs.com//i/c/960x540/media/6009/tanjiro-water-dragon.jpg");
-background-size: cover;
+  padding-left:50px;
 }
 .form-title {
   font-size: 1.5rem;
@@ -48,34 +40,36 @@ background-size: cover;
 .kimochi .login-container{
   box-shadow: 0 20px 35px rgba(0, 255, 255, 0.2);
 }
-.input-group {
-  display: flex;
-  flex-direction: row; /* Các phần tử nằm ngang */
-  align-items: center ; /* Căn giữa theo chiều dọc */
-  position: relative; /* Cần thiết để định vị icon bên trong input */
-
+.input-label{
+  display:flex;
+  flex-direction:row;
+  gap:4px;
+  justify-content:flex-start;
+  align-items:center;
+  position:relative;
 }
-
-.input-group i {
-  position: absolute; /* Đặt icon bên trong input */
-  left: 10px; /* Khoảng cách từ bên trái */
-  top:30px;
-  pointer-events: none; /* Ngăn icon nhận sự kiện chuột */
+.input-label i{
+  z-index:2;
+  position:fixed;
+  padding-left:5px;
 }
-
-
-.input-group input {
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid #757575;
-  padding: 6px;
-  padding-left: 2.5rem; /* Đảm bảo có đủ không gian cho icon */
+.login-input {
+  background-color: transparent !important;
+  border: 0 !important;
+  border-bottom: 2px solid #39FF14 !important;
   font-size: 15px;
-  min-width: calc(150% - 50px); /* Đảm bảo input chiếm hết chiều rộng của .input-group */
-  box-sizing: border-box; /* Bao gồm padding và border vào kích thước */
+  padding-left:25px !important;
+  width:100%;
+  z-index:1;
 }
-
-.input-group input::placeholder {
+.kimochi .login-input {
+  background-color: transparent !important;
+  border: 0 !important;
+  border-bottom: 2px solid #00FFFF !important;
+  font-size: 15px;
+  width:100%;
+}
+.input-label input::placeholder {
   color: transparent;
 }
 
@@ -84,15 +78,6 @@ background-size: cover;
   transition: 0.3s ease all;
 }
 
-.kimochi .input-group input {
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid #757575;
-  padding:6px;
-  padding-left: 2.5rem; 
-  font-size: 15px;
- 
-}
 .links{
   display:flex;
   flex-direction:row;

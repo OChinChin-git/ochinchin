@@ -2,16 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/fireba
  import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
  import{getFirestore, setDoc, doc,getDoc,updateDoc, onSnapshot,getDocs, collection} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
  
- // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC3-atWTI6-LsEWb4N3uTlPQEP2ewgoh7Y",
-  authDomain: "thanhchimbe-d29a4.firebaseapp.com",
-  databaseURL: "https://thanhchimbe-d29a4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "thanhchimbe-d29a4",
-  storageBucket: "thanhchimbe-d29a4.firebasestorage.app",
-  messagingSenderId: "661307532795",
-  appId: "1:661307532795:web:4a211686f935f6d1a2175e",
-  measurementId: "G-ZKJF0FJ44X"
+  apiKey: "AIzaSyAqvFTdSubEm_vWeevlvUhkLgPBxdBasL0",
+  authDomain: "ochinchin-7b3d8.firebaseapp.com",
+  databaseURL: "https://ochinchin-7b3d8-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ochinchin-7b3d8",
+  storageBucket: "ochinchin-7b3d8.firebasestorage.app",
+  messagingSenderId: "364411060998",
+  appId: "1:364411060998:web:b7f31215e5cb0d0fbf1487",
+  measurementId: "G-BFRZ15ZNEC"
 };
 
  // Initialize Firebase
@@ -129,14 +128,44 @@ export async function getUserProfile(uid){
     alert(error);
   }
 }
-export async function changeUserProfile(uid,name,avt){
+export async function changeUserProfile(uid,profile,type){
   try{
     const ref = doc(db,"users",uid);
+    if(type=='displayName'){
     await updateDoc(ref, {
-      displayName:name,
-      avatar:avt,
+      displayName:profile,
     });
+    }else if(type == 'avatar'){
+          await updateDoc(ref, {
+      avatar:profile,
+    });
+    }
   }catch(error){
     alert(error)}
 };
-
+export const shortenLinkConst = async(name,link)=>{
+  try{
+  const linkRef = doc(collection(db,'link'),name);
+  const docSnap = await getDoc(linkRef)
+  if(docSnap.exists()){
+    return('exist');
+  }
+  const data={
+    name:name,
+    link:link
+  }
+  await setDoc(linkRef,data);
+    return 'kimochi'
+  }catch(error){
+    return('fsdb',error);
+  }
+}
+export const getLink = async(name)=>{
+  try{
+  const linkRef = doc(collection(db,'link'),name);
+  const docSnap = await getDoc(linkRef)
+  return docSnap.data()
+  }catch(error){
+    return('fsdb',error);
+  }
+}

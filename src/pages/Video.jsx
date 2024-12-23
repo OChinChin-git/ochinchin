@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { getVideo } from "../components/Video";
 import { useLoader } from "../components/LoaderContext";
@@ -7,12 +7,19 @@ import { useDialog } from "../components/DialogContext";
 import {
   sendChats,
   getTime,
-  getChats,
-  trackVisitor,
   getActiveVisitorsCount,
   resetActiveVisitors,
   trackUpdateRoom,
+  formatTime,
+  getUsersData,
+  getChats,
+  getNewChats,
+  getAllChats,
   getRoomVisitors,
+  addVisitor,
+  removeVisitor,
+  syncYoutubeIframe,
+  deleteRoom,
 } from "/src/components/Video";
 import "../styles/Video.css";
 import { updateRoom } from "../components/Room";
@@ -26,9 +33,18 @@ const Video = () => {
   const query = location.search;
   const [videoUrl, setVideoUrl] = useState("");
   const [videoTitle, setVideoTitle] = useState("");
-
   const videoId = query.substring(1); // Lấy giá trị sau `?v`
-
+  const iframeRef = useRef("");
+  const [isIframeYoutube, setIsIframeYoutube] = useState(false);
+  const [playbackState, setPlaybackState] = useState();
+  const [youtubePlayer, setYoutubePlayer] = useState();
+  const [currentTime, setCurrentTime] = useState(0);
+  const [youtubeVideoId, setYoutubeVideoId] = useState("");
+  const [roomName, setRoomName] = useState();
+  const [isHost, setIsHost] = useState();
+  const [firestorePlayback, setFirestorePlayback] = useState();
+  const [iframeIsReady, setIframeIsReady] = useState(false);
+  const [firestoreCurrentTime, setFirestoreCurrentTime] = useState();
   const convertToEmbedUrl = (url) => {
     // Sửa biểu thức chính quy để bao gồm các URL YouTube live
     const youtubeRegEx =
@@ -60,7 +76,7 @@ const Video = () => {
       convertedUrl = convertPornhubToEmbedUrl(convertedUrl); // Convert to Pornhub embed URL if applicable
       return convertedUrl;
     } catch (error) {
-      alert(error);
+      alert("convert" + error);
     }
   };
   const isValidUrl = (url) => {
@@ -97,9 +113,144 @@ const Video = () => {
     `;
       return iframeUrl;
     } catch (error) {
-      alert(error);
+      alert("chatiframe" + error);
     }
   };
+
+  const onPlayerStateChange = async (event) => {
+    switch (event.data) {
+      case window.YT.PlayerState.PLAYING:
+        setPlaybackState("Playing");
+        break;
+      case window.YT.PlayerState.PAUSED:
+        setPlaybackState("Paused");
+        break;
+      case window.YT.PlayerState.ENDED:
+        setPlaybackState("Ended");
+        break;
+      default:
+        setPlaybackState("Idle");
+    }
+  };
+
+  // Chỉ tải API một lần
+  useEffect(() => {
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = () => {
+      setIframeIsReady(true);
+    };
+  }, []);
+
+useEffect(() => {
+  if (!youtubePlayer || firestorePlayback === undefined) return;
+  if(!iframeIsReady){
+    return
+  }
+  if (!isHost && playbackState !== firestorePlayback) {
+    if (firestorePlayback === 'Playing' && typeof youtubePlayer.playVideo === 'function') {
+      youtubePlayer.playVideo();
+    } else if (firestorePlayback === 'Paused' && typeof youtubePlayer.pauseVideo === 'function') {
+      youtubePlayer.pauseVideo();
+    } else if (firestorePlayback === 'Ended' && typeof youtubePlayer.pauseVideo === 'function') {
+      youtubePlayer.pauseVideo();
+    }
+  }
+}, [playbackState, youtubePlayer,firestorePlayback]); 
+
+  // Tạo Player khi `youtubeVideoId` thay đổi
+  useEffect(() => {
+    if (youtubePlayer) {
+      setIsIframeYoutube(false);
+      videoInfo();
+      return;
+    }
+    if (
+      isIframeYoutube &&
+      window.YT &&
+      window.YT.Player &&
+      youtubeVideoId &&
+      !youtubePlayer &&
+      iframeIsReady
+    ) {
+      const playerInstance = new window.YT.Player(iframeRef.current, {
+        videoId: youtubeVideoId,
+        events: {
+          onStateChange: onPlayerStateChange,
+        },
+      });
+      setYoutubePlayer(playerInstance);
+    }
+  }, [isIframeYoutube, youtubeVideoId]);
+
+useEffect(()=>{
+      const syncYoutubeVideoFromFirebase = async () => {
+      if (firestoreCurrentTime !== undefined && typeof youtubePlayer.seekTo === 'function') {
+        youtubePlayer.seekTo(firestoreCurrentTime);
+      }
+    };
+  if (!isHost && iframeIsReady && youtubePlayer && playbackState!==firestorePlayback) {
+    try{
+          syncYoutubeVideoFromFirebase();
+    }catch(error){
+      alert(error)
+    }
+
+  }
+},[youtubePlayer,firestorePlayback,playbackState])
+  useEffect(() => {
+    if(firestoreCurrentTime == null){
+      return
+    }
+    // Khởi tạo intervalTime là 1000ms
+    const intervalId = setInterval(() => {
+      // Tăng firestoreCurrentTime lên 1 mỗi 1000ms
+      setFirestoreCurrentTime(prevTime => Number(prevTime) + 1);
+    }, 1000); // Thực hiện mỗi giây (1000ms)
+
+    // Dọn dẹp interval khi component bị unmount hoặc khi useEffect chạy lại
+    return () => clearInterval(intervalId);
+  }, [firestoreCurrentTime]); // Chạy chỉ một lần khi component mount
+  // Thêm và gỡ sự kiện lắng nghe
+  useEffect(() => {
+    if (
+      !isIframeYoutube ||
+      !isHost ||
+      !youtubePlayer ||
+      !iframeIsReady ||
+      typeof youtubePlayer.addEventListener !== "function"
+    ) {
+      return;
+    }
+
+    const onSeekChange = (event) => {
+      if (event.data === window.YT.PlayerState.PLAYING) {
+        const time = youtubePlayer.getCurrentTime();
+        setCurrentTime(time.toFixed());
+      }
+    };
+
+    youtubePlayer.addEventListener("onStateChange", onSeekChange);
+
+    return () => {
+      youtubePlayer.removeEventListener("onStateChange", onSeekChange);
+    };
+  }, [isIframeYoutube, youtubePlayer]);
+
+  // Hủy Player khi `isIframeYoutube` thay đổi
+  useEffect(() => {
+    if (!isIframeYoutube && youtubePlayer) {
+      try {
+        youtubePlayer.destroy(); // Hủy Player
+        setYoutubePlayer(null); // Đặt lại trạng thái Player
+      } catch (error) {
+      }
+    }
+  }, [isIframeYoutube]);
+
   const videoInfo = async () => {
     try {
       showLoader("Đang tải video");
@@ -107,15 +258,40 @@ const Video = () => {
       const url = data.url;
       const title = data.title;
       const embedUrl = await convertUrl(url);
+      if (embedUrl.startsWith("https://www.youtube.com/embed/")) {
+        setIsIframeYoutube(true);
+        const youtubeId = embedUrl.split("/embed/")[1];
+        setYoutubeVideoId(youtubeId);
+        setVideoTitle(title);
+        setFirestorePlayback(data.playbackState);
+        setFirestoreCurrentTime(data.currentTime);
+        setVideoUrl('');
+        return;
+      }
+      setIsIframeYoutube(false);
       setVideoUrl(embedUrl);
       setVideoTitle(title);
     } catch (error) {
-      alert(error);
+      alert("videoinfo" + error);
     } finally {
       hideLoader();
     }
   };
 
+  useEffect(() => {
+    if (
+      !isIframeYoutube ||
+      playbackState == "Idle" ||
+      !isHost ||
+      !iframeIsReady
+    ) {
+      return;
+    }
+    const syncYoutubeVideo = async () => {
+      await syncYoutubeIframe(roomName, playbackState, currentTime);
+    };
+    syncYoutubeVideo();
+  }, [playbackState, currentTime]);
   //
   //
   //
@@ -127,26 +303,35 @@ const Video = () => {
   const [latestMessage, setLatestMessage] = useState(null);
   const chatContainerRef = useRef(null); // Tham chiếu đến container chứa tin nhắn
   const audioRef = useRef(null); // Tham chiếu đến âm thanh
+  const [userData, setUserData] = useState([]);
 
   const handleCloseChat = () => {
     setIsCloseChat(!isCloseChat);
   };
+  const [lastSendChatTime, setLastSendTime] = useState(0);
   const handleSendMessage = async () => {
+    if (lastSendChatTime == null) {
+      lastSendChatTime = 0;
+    }
     try {
-      if (messageRef.current.value.length == "") {
+      if (messageRef.current.value.trim() == "") {
         messageRef.current.focus();
         return;
       }
+      const now = Date.now();
+      if (now - lastSendChatTime < 300) {
+        showToast("Chat chậm thôi", "error");
+        return;
+      }
+      setLastSendTime(now);
       const message = await convertIframe(messageRef.current.value);
 
-      const userId =
-        localStorage.getItem("loggedInUserId") ||
-        "anonymous";
+      const userId = localStorage.getItem("loggedInUserId") || "anonymous";
       const time = await getTime();
       await sendChats(videoId, time, userId, message);
       messageRef.current.value = "";
     } catch (error) {
-      alert(error);
+      alert("send" + error);
     }
   };
   const handleKeyDown = (e) => {
@@ -162,6 +347,7 @@ const Video = () => {
     if (messages.length > 0) {
       setLatestMessage(messages[messages.length - 1]);
       setIsCloseLatestChat(false);
+      updateChats();
     } else {
       setLatestMessage(null);
       setIsCloseLatestChat(true);
@@ -178,8 +364,7 @@ const Video = () => {
       : { display: "" }
     : { display: "none" };
   // Hàm cập nhật tin nhắn
-  const updateChats = (newChats) => {
-    setMessages(newChats);
+  const updateChats = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
@@ -200,58 +385,144 @@ const Video = () => {
       });
     }
   }, [isCloseChat]);
+  const userMap = useMemo(() => {
+    return new Map(userData.map((user) => [user.id, user]));
+  }, [userData]);
+
   useEffect(() => {
-    // Gọi getChats với videoId và callback updateChats để cập nhật dữ liệu chat
-    const unsubscribe = getChats(videoId, updateChats);
-    // Hủy đăng ký khi component unmount để tránh memory leaks
+    const unsubscribe = getUsersData(setUserData);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const loadChat = (data) => {
+    if (!userMap.size) {
+      return;
+    }
+
+    const chatData = data.map((chat) => {
+      const user = userMap.get(chat.userId);
+      const time = formatTime(chat.time);
+      return {
+        time: time,
+        displayName: user ? user.displayName : "anonymous",
+        avatar: user
+          ? user.avatar
+          : "https://www.dropbox.com/scl/fi/o0nyh6atfock3fxrjcu8j/andanh.png?rlkey=bgbperz5j18dden4j4vll416q&dl=1",
+        message: chat.message,
+      };
+    });
+    setMessages(chatData);
+  };
+  const [messagesData, setMessagesData] = useState([]);
+  useEffect(() => {
+    const functionGetChats = async () => {
+      const data = await getChats(videoId);
+      setMessagesData(data);
+    };
+    functionGetChats();
+  }, []);
+  useEffect(() => {
+    if (userMap.size) {
+      loadChat(messagesData);
+    }
+  }, [userMap, messagesData]);
+  useEffect(() => {
+    let latestMessagesData;
+    if (messagesData.length === 0) {
+      latestMessagesData = 0;
+    } else {
+      latestMessagesData = messagesData[messagesData.length - 1]; // Lấy tin nhắn mới nhất
+    }
+    const unsubscribe = getNewChats(
+      videoId,
+      latestMessagesData,
+      setMessagesData
+    );
+    // Cleanup function to unsubscribe when the component unmounts
     return () => unsubscribe();
-  }, [videoId]);
+  }, [messagesData]); // Thêm dependency để re-run khi messagesData thay đổi
+
   //
   //
   //
   //
   const [activeVisitors, setActiveVisitors] = useState(0);
-  useState(async () => {
-    await resetActiveVisitors(videoId);
-  }, []);
-  
-  useEffect(()=>{
-    const intervalId = setInterval(async()=>{
-      try{
-        await resetActiveVisitors(videoId);
-        console.log('reset')
-      }catch(error){
-        alert(error);
-      }
-    },600000)
-    return()=>clearInterval(intervalId);
-  },[])
-  
+  const [isClosePage, setIsClosePage] = useState(false);
+  const [isReset, setIsReset] = useState(false);
   useEffect(() => {
-    // Bắt đầu theo dõi khi component được mount
-    const stopTracking = trackVisitor(videoId);
+    if (!isClosePage) {
+      const addVst = async () => {
+        if (!isReset) {
+          await resetActiveVisitors(videoId);
+        }
+        await addVisitor(videoId);
+      };
+      addVst();
+      return;
+    }
+    if (isClosePage) {
+      const removeVst = async () => {
+        await removeVisitor(videoId);
+      };
+      removeVst();
+      return;
+    }
+  }, [isClosePage]);
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsClosePage(true);
+      } else {
+        setIsReset(true);
+        setIsClosePage(false);
+      }
+    };
+    const handleBeforeUnload = () => {
+      setIsClosePage(true);
+    };
+    // Thêm event listener cho sự kiện visibilitychange
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handleBeforeUnload);
+    // Cleanup: xóa event listener khi component bị unmount
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handleBeforeUnload);
+    };
+  }, []);
 
+  useEffect(() => {
     // Lắng nghe số lượng người truy cập từ Firestore và cập nhật thông qua callback
     const unsubscribe = getActiveVisitorsCount(setActiveVisitors, videoId); // setActiveVisitors là callback
 
     // Cleanup khi component unmount
     return () => {
       unsubscribe(); // Dừng lắng nghe số lượng người truy cập
-      stopTracking(); // Dừng theo dõi người truy cập
     };
   }, []);
+  useEffect(() => {
+    if (!isClosePage) {
+      const addVst = async () => {
+        await addVisitor(videoId);
+      };
+      addVst();
+      return;
+    }
+  }, [activeVisitors]);
+
   const [isPass, setIsPass] = useState(false);
   const [roomPass, setRoomPass] = useState();
   const roomPassRef = useRef();
   const [isJoinRoom, setIsJoinRoom] = useState();
   const [hostId, setHostId] = useState();
-  const [roomName, setRoomName] = useState();
   const [selectHost, setSelectHost] = useState();
-  const [isHost, setIsHost] = useState(false);
-  const videoTitleRef = useRef();
-  const videoUrlRef = useRef();
+  const videoTitleRef = useRef(null);
+  const videoUrlRef = useRef(null);
   const [isRoomPass, setIsRoomPass] = useState();
-  const roomPassInputRef = useRef();
+  const roomPassInputRef = useRef(null);
   const handleSetRoom = async () => {
     try {
       if (!videoId.startsWith("r")) {
@@ -276,7 +547,7 @@ const Video = () => {
       videoTitleRef.current.value = data.title;
       videoUrlRef.current.value = data.url;
     } catch (error) {
-      alert(error);
+      alert("setRoom" + error);
     }
   };
 
@@ -311,6 +582,13 @@ const Video = () => {
   useEffect(() => {
     checkIsHost();
   }, [hostId]);
+  useEffect(()=>{
+    console.log(isHost);
+  },[isHost])
+  useEffect(()=>{
+    console.log(hostId);
+  },[hostId])
+
   const [isCloseHost, setIsCloseHost] = useState(false);
   const [isChangeSetting, setIsChangeSetting] = useState(false);
   const handleCloseHost = () => {
@@ -320,22 +598,24 @@ const Video = () => {
     setIsRoomPass(!isRoomPass);
   };
   const handleChangeRoomSetting = async () => {
-    if(isRoomPass){
-    const isConfirm = confirm(
-      "Đặt mật khẩu thì tất cả thành viên sẽ phải vào lại, xác nhận chứ ?"
-    );
-    if (!isConfirm) {
-      return;
+    if (isRoomPass) {
+      const isConfirm = confirm(
+        "Đặt mật khẩu thì tất cả thành viên sẽ phải vào lại, xác nhận chứ ?"
+      );
+      if (!isConfirm) {
+        return;
+      }
     }
-    }if(selectHost !==hostId){
-       const isConfirm = confirm(
-      "Thay đổi host chứ ? Bạn sẽ mất quyền host"
-    );
-    if (!isConfirm) {
-    return;
-    }
+    if (selectHost !== hostId) {
+      const isConfirm = confirm("Thay đổi host chứ ? Bạn sẽ mất quyền host");
+      if (!isConfirm) {
+        return;
+      }
     }
     try {
+      if(!isHost){
+        return
+      }
       showLoader("Đang cập nhật phòng");
       const title = videoTitleRef.current.value;
       const url = videoUrlRef.current.value;
@@ -367,20 +647,7 @@ const Video = () => {
     }
   };
   const [listUser, setListUser] = useState([]);
-  const loadVisitorIds = async () => {
-    try {
-      const roomateIds = await getRoomVisitors(videoId); // Lấy danh sách các visitor
-      setListUser(roomateIds);
 
-    } catch (error) {
-      alert("loadVisitorsId " + error); // Xử lý lỗi khi lấy danh sách visitors
-    }
-  };
-
-  useEffect(() => {
-    loadVisitorIds(); 
-  }, [activeVisitors])
-  
   useEffect(() => {
     handleSetRoom();
     checkIsHost();
@@ -394,7 +661,6 @@ const Video = () => {
     const unsubscribe = trackUpdateRoom(
       roomName,
       handleSetRoom,
-      checkIsHost,
       videoInfo
     );
     return () => {
@@ -404,7 +670,39 @@ const Video = () => {
       }
     };
   }, [roomName]);
-
+  const [roomVisitorsList, setRoomVisitorsList] = useState([]);
+  const roomVisitors = async () => {
+    const data = await getRoomVisitors(videoId);
+    setRoomVisitorsList(data);
+  };
+  const updateRoomVisitorsList = () => {
+    const data = roomVisitorsList.map((visitor) => {
+      const user = userMap.get(visitor.userId);
+      return {
+        id: visitor.id,
+        displayName: user ? user.displayName : "anonymous",
+      };
+    });
+    setListUser(data);
+  };
+  useEffect(() => {
+    updateRoomVisitorsList();
+  }, [roomVisitorsList]);
+  useEffect(() => {
+    roomVisitors();
+  }, [activeVisitors]);
+  const handleDeleteRoom = async()=>{
+    try{
+      const isConfirm = confirm('Chắc chắn xóa phòng này chứ?');
+      if(!isConfirm){
+        showToast('Đã hủy')
+        return
+      }
+      await deleteRoom(roomName,videoId);
+    }catch(error){
+      alert('deleteRoom' + error)
+    }
+  }
   return (
     <div className="video-block">
       <div style={isJoinRoom ? { display: "" } : { display: "none" }}>
@@ -415,11 +713,14 @@ const Video = () => {
             allowtransparency="true"
             src={videoUrl}
             className="video"
+            style={!isIframeYoutube ? { display: "" } : { display: "none" }}
           ></iframe>
-          <div className="title animated2">
-            {videoTitle + " " + "\u00A0"}
-          </div>
-
+          <div
+            ref={iframeRef}
+            className="video"
+            style={isIframeYoutube ? { display: "" } : { display: "none" }}
+          ></div>
+          <div className="title animated2">{videoTitle + " " + "\u00A0"}</div>
         </div>
 
         <div
@@ -558,8 +859,8 @@ const Video = () => {
         <div className="room-profile">
           <div className="room-setting">
             <label>
-              Room name:
-              <p className="room-name">{roomName}</p>
+              <div className="room-name">{'Room: '+roomName}</div>
+              <h6>Số người: {activeVisitors}</h6>
             </label>
             <label className="select-label">
               Host hiện tại
@@ -572,7 +873,7 @@ const Video = () => {
                       .filter((user) => user.id == hostId)
                       .map((user) => (
                         <option className="" value={hostId} key={hostId}>
-                          Bạn: {user.userId}
+                          Bạn: {user.displayName}
                         </option>
                       ))
                   : ""}
@@ -581,8 +882,7 @@ const Video = () => {
                       .filter((user) => user.id !== hostId)
                       .map((user) => (
                         <option key={user.id} value={user.id}>
-                          <p>{user.userId}</p>
-                          <p> Id: {user.id}</p>
+                          {user.displayName + " Id:" + user.id}
                         </option>
                       ))
                   : ""}
@@ -634,6 +934,7 @@ const Video = () => {
             >
               Thay đổi
             </button>
+            <button onClick={handleDeleteRoom}>Xóa phòng</button>
           </div>
           <div className="room-users">
             <ul></ul>
@@ -647,6 +948,7 @@ const Video = () => {
       >
         Host
       </button>
+      
     </div>
   );
 };

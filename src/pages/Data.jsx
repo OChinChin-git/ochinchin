@@ -49,13 +49,7 @@ export default function Home() {
       <h1 className="title">{hello}!</h1>
       {/* When the user hovers over the image we apply the wiggle style to it */}
       <animated.div onMouseEnter={trigger} style={style}>
-        <iframe
-          src="https://taianhlen.glitch.me/xyz.html?docName=Sex-ga-Suki-de-Suki-de-Daisuki-na-Classmate-no-Anoko-1"
-          className="illustration"
-          onClick={handleChangeHello}
-          alt="Illustration click to change language"
-          
-        />
+
       </animated.div>
       <div className="navigation">
         {/* When the user hovers over this text, we apply the wiggle function to the image style */}

@@ -25,7 +25,7 @@ body {
     url("https://www.desktophut.com/images/1723027733.webp");
   background-size: cover; /* Để hình ảnh luôn phủ kín vùng chứa */
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 50px);
   
 }
 .kimochi .add-content-page{

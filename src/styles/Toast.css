@@ -18,6 +18,7 @@
   transform: translateX(-50%) translateY(20px);
   transition: opacity 0.5s ease, transform 0.5s ease;
   border: none; /* Không có viền chung cho tất cả */
+  z-index:10;
 }
 
 /* Hiển thị toast khi thêm lớp show */

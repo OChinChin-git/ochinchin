@@ -1,24 +1,30 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef  } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
-import {getUserProfile,changeUserProfile,loginAnonymous} from './firebaseAuth.js'
-import { useLoader } from "./LoaderContext"; 
-import { useToast } from './ToastContext';
-import {useDialog} from './DialogContext';
-const Navbar = () => {
+import {
+  getUserProfile,
+  changeUserProfile,
+  loginAnonymous,
+} from "./firebaseAuth.js";
+import { useLoader } from "./LoaderContext";
+import { useToast } from "./ToastContext";
+import { useDialog } from "./DialogContext";
+import { Login } from "../pages/Login";
+const Navbar = forwardRef((props, ref) => {
   const { showLoader, hideLoader } = useLoader(); // Use loader context
   const { showToast } = useToast();
   const { showPrompt } = useDialog();
   const [activeItem, setActiveItem] = React.useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false); 
-  const [name,setName]=useState("");
-  const [email,setEmail]=useState("");
-  const[isLoggedIn,setIsLoggedIn] = useState(false);
-  
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userCoin, setUserCoin] = useState(0);
   const [uid, setUid] = useState(localStorage.getItem("loggedInUserId"));
-  const [avt,setAvt] = useState("");
+  const [avt, setAvt] = useState("");
+
   // Cập nhật activeItem khi đường dẫn thay đổi
   useEffect(() => {
     const path = location.pathname;
@@ -28,17 +34,42 @@ const Navbar = () => {
       setActiveItem("Edm");
     } else if (path === "/content") {
       setActiveItem("Content");
-    } else if (path === "/data") {
-      setActiveItem("Data");
+    } else if (path === "/link") {
+      setActiveItem("ShortenLink");
     } else if (path === "/kimochi") {
       setActiveItem("Kimochi");
+    } else if (path === "/quest") {
+      setActiveItem("Quest");
     } else {
       setActiveItem("");
     }
   }, [location]);
+  useEffect(() => {
+    // Kiểm tra thay đổi trong localStorage mỗi 1000ms (1 giây)
+    const intervalId = setInterval(() => {
+      const newUid = localStorage.getItem("loggedInUserId");
+      if (newUid !== uid) {
+        setUid(newUid); // Cập nhật lại state nếu có sự thay đổi
+      }
+    }, 4000);
 
+    // Dọn dẹp khi component unmount
+    return () => clearInterval(intervalId);
+  }, [uid]);
   // Hàm chuyển hướng khi menu item được click
   const handleMenuItemClick = (item) => {
+    if (item == "Kimochi") {
+      const isConfirm = confirm("Bạn chắc chứ 🤤");
+      if (!isConfirm) {
+        return;
+      }
+      window.location.href = "https://ihentai.li/";
+      return;
+    }
+    if (item == "ShortenLink") {
+      navigate("/link");
+      return;
+    }
     setActiveItem(item);
     const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
     navigate(path);
@@ -46,9 +77,9 @@ const Navbar = () => {
 
   // Đăng ký sự kiện toggle khi component được render
   useEffect(() => {
+    const items = document.querySelectorAll("*");
     const ball = document.querySelector(".toggle-ball");
     if (ball) {
-      const items = document.querySelectorAll("*");
       // Kiểm tra trạng thái "kimochi" từ localStorage khi trang tải lại
       const isKimochi = localStorage.getItem("kimochi") === "true";
       if (isKimochi) {
@@ -81,141 +112,240 @@ const Navbar = () => {
       }
     };
   }, []); // Chỉ chạy một lần khi component mount
-  const handleProfileOpen=()=>{
+  const handleProfileOpen = () => {
     setIsOpen(!isOpen);
-  }
-  const handleLoginButton = ()=>{
-    const isConfirm = confirm("Chuyển đến trang đăng nhập ?")
-    if(!isConfirm){
-      return
-    }
-    navigate('/login');
-  }
+  };
+  const [isPopUp, setIsPopUp] = useState(false);
+  const handleLoginButton = () => {
+    setIsPopUp(true);
+  };
 
-  const isLog=()=>{
-if(uid == null){
-    setIsLoggedIn(false);
-    return
-    }
-   setIsLoggedIn(true);
-}  
-const userProfile = async()=>{
-  try{
-    const data = await getUserProfile(uid);
-    if(data == 'yamate'){
-      return
-    }
-    setName(data.displayName);
-    setEmail(data.email || 'Ẩn danh');
-    setAvt(data.avatar);
-  }catch(error){
-    alert(error);
-  }
-}
-
-  useEffect(() =>{
-    
-  isLog();
-        if(!isLoggedIn){
-      return
-    }
-    userProfile();
-  },[uid,isLoggedIn])
-  
-  useEffect(()=>{
-    isLog();
-    if(!isLoggedIn){
-      return
-    }
-    userProfile();
-  },[]);
-    const handleLogoutButton = async()=>{
-    const isConfirm1 = confirm("Đăng xuất chứ ?")
-      if(!isConfirm1){
-        return
-      }
-      localStorage.removeItem("loggedInUserId");
+  const isLog = () => {
+    if (uid == null) {
       setIsLoggedIn(false);
-      setUid(null);
-      setAvt("")
-    const isConfirm = confirm("Chuyển đến trang đăng nhập ?")
-    if(!isConfirm){
-      return
+      return;
     }
-   navigate('/login');
-  }
-    const changeProfile = async()=>{
-      const nameChange = await showPrompt("Nhập tên mới 😎",name);
-      const avtChange = await showPrompt("Nhập url avatar mới 😎",avt);
-      try{
-        showLoader("Đang lưu ...")
-        await changeUserProfile(uid,nameChange,avtChange);
-        userProfile();
-        showToast("Thay đổi thành công","success")
-      }catch(error){
-        alert(error)
-      }hideLoader();
-    }
-    const handleLoginAnonymousButton = async()=>{
-      try{
-        showLoader('Đang đăng nhập ẩn danh')
-        await loginAnonymous();
-        setUid(localStorage.getItem("loggedInUserId"));
-        setIsLoggedIn(true);
-      }catch(error){
-        alert("handle login anonymous"+error)
-      }finally{
-        hideLoader();
+    setIsLoggedIn(true);
+  };
+  const userProfile = async () => {
+    try {
+      if (!uid) {
+        setName("");
+        setEmail("");
+        setAvt("");
+        setUserCoin(null);
+        return;
       }
+      const data = await getUserProfile(uid);
+      if (data == "yamate") {
+        return;
+      }
+      setName(data.displayName);
+      setEmail(data.email || "Ẩn danh");
+      setAvt(data.avatar);
+      data.coin ? setUserCoin(data.coin) : 0;
+    } catch (error) {
+      alert("user profile" + error);
     }
+  };
 
+  useEffect(() => {
+    isLog();
+    if (uid) {
+      setIsPopUp(false);
+    }
+    userProfile();
+  }, [uid, isLoggedIn]);
+
+  useEffect(() => {
+    isLog();
+    if (!isLoggedIn) {
+      return;
+    }
+    userProfile();
+  }, []);
+  const handleLogoutButton = async () => {
+    const isConfirm1 = confirm("Đăng xuất chứ ?");
+    if (!isConfirm1) {
+      return;
+    }
+    localStorage.removeItem("loggedInUserId");
+  };
+  const changeProfile = async (profile, mess, type) => {
+    const profileChange = await showPrompt(mess, profile);
+    try {
+      showLoader("Đang lưu ...");
+      await changeUserProfile(uid, profileChange, type);
+      userProfile();
+      showToast("Thay đổi thành công", "success");
+    } catch (error) {
+      alert("change profile" + error);
+    }
+    hideLoader();
+  };
+  const handleLoginAnonymousButton = async () => {
+    try {
+      showLoader("Đang đăng nhập ẩn danh");
+      await loginAnonymous();
+      setUid(localStorage.getItem("loggedInUserId"));
+    } catch (error) {
+      alert("handle login anonymous" + error);
+    } finally {
+      hideLoader();
+    }
+  };
+  useImperativeHandle(ref, () => ({
+    userProfile,
+  }));
   return (
     <div className="navbar">
-      
       <div className="navbar-container">
         <div className="logo-container">
           <h1 className="logo animated4">OChinChin</h1>
         </div>
         <div className="menu-container">
           <ul className="menu-list">
-            {["Home", "Edm", "Content", "Data", "Kimochi"].map((item) => (
-              <li
-                key={item}
-                className={`menu-list-item ${
-                  activeItem === item ? "active" : ""
-                }`}
-                onClick={() => handleMenuItemClick(item)}
-              >
-                {item}
-              </li>
-            ))}
+            {["Home", "Edm", "Content", "ShortenLink", "Kimochi",'Quest'].map(
+              (item) => (
+                <li
+                  key={item}
+                  className={`menu-list-item ${
+                    activeItem === item ? "active" : ""
+                  }`}
+                  onClick={() => handleMenuItemClick(item)}
+                >
+                  {item}
+                </li>
+              )
+            )}
           </ul>
         </div>
         <div className="profile-container">
-          <img className="profile-picture" alt="Profile" src={avt} />
+          <div
+            onClick={handleProfileOpen}
+            style={{ position: "relative", display: "inline-block" }}
+            className="profile-dropdown-picture"
+          >
+            <img className="profile-picture" alt=".." src={avt} />
+            <i
+              className={!isOpen ? "fas fa-chevron-up" : "fas fa-chevron-down"}
+              style={{
+                position: "absolute",
+                transform: "translateY(-50%)",
+                top: "50%",
+                marginLeft: "4px",
+                fontSize: "14px",
+              }}
+            ></i>
+          </div>
           <div className="profile-text-container">
-            <span className="profile-text">Profile</span>
-            <div onClick={handleProfileOpen} style={{cursor:"pointer"}}>
-            <i className={`fas ${isOpen ?" fa-caret-up":"fa-caret-down"} toggleProfile`}></i>
+            <div
+              className="dropdownMenu"
+              style={!isOpen ? { display: "none" } : { display: "block" }}
+            >
+              <div style={!isLoggedIn ? { display: "none" } : { display: "" }}>
+                <span
+                  style={{
+                    marginLeft: "40%",
+                    fontSize: "16px",
+                    fontStyle: "oblique",
+                    width: "100%",
+                    textDecoration: "underline",
+                  }}
+                >
+                  Profile
+                </span>
+                <div className="profile-value-container">
+                  <div
+                    style={{ position: "relative", padding: "0", margin: "0" }}
+                  >
+                    <img
+                      className="profile-picture-dropdown"
+                      alt="Profile"
+                      src={avt}
+                    />
+                    <i
+                      className="fas fa-edit"
+                      style={{
+                        position: "absolute",
+                        bottom: "0px",
+                        right: "0px",
+                        fontSize: "13px",
+                      }}
+                      onClick={() =>
+                        changeProfile(avt, "Nhập url avatar mới", "avatar")
+                      }
+                    ></i>
+                  </div>
+                  <div>
+                    <div
+                      value={name}
+                      style={{
+                        whiteSpace: "nowrap",
+                        padding: "0",
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {name}
+                      <i
+                        className="fas fa-edit"
+                        style={{ marginLeft: "4px", fontSize: "9px" }}
+                        onClick={() =>
+                          changeProfile(name, "Nhập tên mới", "displayName")
+                        }
+                      ></i>
+                    </div>
+
+                    <div
+                      value={email}
+                      style={{
+                        whiteSpace: "nowrap",
+                          padding:'0',
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {" "}
+                      {"Email: " + email}
+                    </div>
+
+                    <div
+                      value={userCoin}
+                      style={{
+                        whiteSpace: "nowrap",
+                        color: "gold",
+                          paddingTop:'12px',
+                        paddingBottom: "0",
+                      }}
+                    >
+                      <i
+                        className="fab fa-bitcoin"
+                        style={{ marginRight: "4px" }}
+                      ></i>
+                      {userCoin}
+                    </div>
+                  </div>
+                </div>
+                <div className="button-container">
+                  <button type="button" onClick={handleLogoutButton}>
+                    Logout
+                  </button>
+                </div>
               </div>
-              <div className="dropdownMenu" style={!isOpen ? { display: 'none' } : { display: 'block' }}>
-      <div style={!isLoggedIn ?{ display: 'none'} : {display: ''}}>
-      <div >Name: <span value={name}>{name}</span></div>
-      <div >Email: <span value={email}> {email}</span></div>
-      <div className="button-container">
-        <button type="button" onClick={changeProfile}>Change Profile</button>
-        <button type="button" onClick={handleLogoutButton}>Logout</button>
-      </div>
-      </div>
-      
-      <div style={isLoggedIn ?{ display: 'none'} : {display: ''}}>
-        <div><span >Chưa đăng nhập </span></div>
-      <div className="button-container">
-        <button type="button" onClick={handleLoginButton}>Login</button>
-        <button type="button" onClick={handleLoginAnonymousButton}>Login Ẩn danh</button>
-      </div>
-      </div>
-    </div>
+
+              <div style={isLoggedIn ? { display: "none" } : { display: "" }}>
+                <div>
+                  <span>Chưa đăng nhập </span>
+                </div>
+                <div className="button-container">
+                  <button type="button" onClick={handleLoginButton}>
+                    Login
+                  </button>
+                  <button type="button" onClick={handleLoginAnonymousButton}>
+                    Login Ẩn danh
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="toggle">
@@ -224,8 +354,17 @@ const userProfile = async()=>{
           <div className="toggle-ball"></div>
         </div>
       </div>
+      <div
+        className="loginPopUp"
+        style={isPopUp ? { display: "" } : { display: "none" }}
+      >
+        <button className="x-button-login" onClick={() => setIsPopUp(false)}>
+          x
+        </button>
+        <Login />
+      </div>
     </div>
   );
-};
+});
 
 export default Navbar;
