@@ -1,166 +1,379 @@
-import React,{useState,useEffect,useRef} from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 export default function game() {
-  const [gameScene,setGameScene] = useState('scene1');
-  const [videoIframe,setVideoIframe] = useState(null);
-  const [isPlayVideo,setIsPlayVideo] = useState(false);
-  const sceneImgs = {
-    scene1:{
-      src:'https://i.ytimg.com/vi/KqVynH6DLug/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBeBs_fAtcI9jPYqbrA8YSXp8ERWg',
-      
+  const [gameScene, setGameScene] = useState("scene1");
+  const [videoIframe, setVideoIframe] = useState(null);
+  const [isPlayVideo, setIsPlayVideo] = useState(false);
+  const scenesInfo = {
+    sceneEnd:{
+      img:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/5100deec-5b1e-4bc3-bdc0-531cff3e67bd.image.png?v=1735227880727',
+      ref:useRef()
     },
-    scene2:{
-      src:'https://i.ytimg.com/vi/Lpo3dvfNfQ8/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLAeEX9zvqWH-UR70dKrg_hv-gprMA',
-      
-      
+    scene1: {
+      img: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-20h04m55s180.png?v=1735218311167",
+      ref:useRef()
     },
-    scene3:{
-      src:'https://i.ytimg.com/vi/k6HnOigop4w/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDieu20sl9uq4P05-vFE_3mo1MLOQ',
+    scene2: {
+      img: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-20h20m48s697.png?v=1735219261545",
+      ref:useRef()
     },
-    scene4:{
-      src:'',
-      
+    scene3: {
+      img: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-23h07m33s137.png?v=1735229274386",
+      ref:useRef()
     },
-    scene5:{
-      src:'',
-      
+    scene4: {
+      img: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-23h19m28s602.png?v=1735229977483",
+      ref:useRef()
     },
-    
-  }
-  const sceneRefs={
-    scene1:useRef(),
-    scene2:useRef(),
-    scene3:useRef(),
-    scene4:useRef(),
-    scene5:useRef(),
-    
-  }
-  const sounds ={
-    sound1:{
-      src:'https://cdn.pixabay.com/audio/2024/12/23/audio_c3fe7a607a.mp3',
+    scene5: {
+      img: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-23h31m53s889.png?v=1735230731959",
+      ref:useRef()
     },
-    sound2:{
-      src:'',
+    scene6:{
+      img:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-23h49m05s059.png?v=1735231774155',
+      ref:useRef()
     },
-    sound3:{
-      src:'',
+    scene7:{
+      img:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/vlcsnap-2024-12-26-23h55m37s574.png?v=1735232160902',
+      ref:useRef()
     },
-    sound4:{
-      src:'',
+  };
+  const sounds = {
+    soundDie: {
+      src: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/fx-halloween-horror-surprise-effect-247545.mp3?v=1735232656741",
     },
-    
-  }
-  const videos ={
-    video1:{
-      src:'https://videos.pexels.com/video-files/1508533/1508533-hd_1920_1080_25fps.mp4',
+    sound2: {
+      src: "",
     },
-    video2:{
-      src:'https://scontent.xx.fbcdn.net/v/t42.3356-2/471290036_8948389628607904_6094464678391062854_n.mp4?_nc_cat=109&ccb=1-7&_nc_sid=4f86bc&_nc_ohc=cF3AUDtycvwQ7kNvgHDavnX&_nc_zt=28&_nc_ht=scontent.xx&_nc_gid=A9oxmxX2soiQKisSidFFzlh&oh=03_Q7cD1gHrL0VCnueAAIo5orkhkFSTuzUHq-5Zo1mZEpnepCCULA&oe=676CCD0C&dl=1',
+    sound3: {
+      src: "",
     },
-    video3:{
-      src:'',
+    sound4: {
+      src: "",
     },
-    video4:{
-      src:'',
+  };
+  const videos = {
+    video1: {
+      src: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/Video%20ch%C6%B0a%20%C4%91%E1%BA%B7t%20t%C3%AAn%20%E2%80%90%20%C4%90%C6%B0%E1%BB%A3c%20t%E1%BA%A1o%20b%E1%BA%B1ng%20Clipchamp.mp4?v=1735219102586",
     },
-    video5:{
-      src:'',
+    video2: {
+      src: "https://cdn.glitch.me/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/Video%20ch%C6%B0a%20%C4%91%E1%BA%B7t%20t%C3%AAn%20%E2%80%90%20%C4%90%C6%B0%E1%BB%A3c%20t%E1%BA%A1o%20b%E1%BA%B1ng%20Clipchamp%20(1).mp4?v=1735219351926",
     },
-    
-  }
-  const [soundAudio,setSoundAudio] = useState()
-  const playSound = (soundKey)=>{
-    const sound = sounds[soundKey];
-    if(!sound || !sound.src) return;
-    setSoundAudio(sound.src)
-  }
-  const playVideo = (videoKey)=>{
-    const video = videos[videoKey];
-    if(!video || !video.src) return;
-    setVideoIframe(video.src);
-    setIsPlayVideo(true);
-    
-  }
-  const audioRef = useRef()
-  const pauseVideoOnTime=(time)=>{
+    video3: {
+      src: "https://cdn.glitch.me/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/Video%20ch%C6%B0a%20%C4%91%E1%BA%B7t%20t%C3%AAn%20%E2%80%90%20%C4%90%C6%B0%E1%BB%A3c%20t%E1%BA%A1o%20b%E1%BA%B1ng%20Clipchamp%20(1).mp4?v=1735219351926",
+    },
+    video4: {
+      src: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/6169091448175.mp4?v=1735229906369",
+    },
+    video5: {
+      src: "https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/471290036_8948389628607904_6094464678391062854_n.mp4?v=1735137722011",
+    },
+    video6:{
+      src:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/6169092350337.mp4?v=1735230430197',
+    },
+    video7:{
+      src:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/6169093347456.mp4?v=1735231716187',
+    },
+    video8:{
+      src:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/6169092649763.mp4?v=1735232122016',
+    },
+  };
+  const [soundAudio, setSoundAudio] = useState();
+  const playSound = (soundKey,time) => {
     setTimeout(()=>{
+      const sound = sounds[soundKey];
+      if (!sound || !sound.src) return;
+      setSoundAudio(sound.src);
+    },time*1000)
+  };
+  const playVideo = (videoKey) => {
+    const video = videos[videoKey];
+    if (!video || !video.src) return;
+    setVideoIframe(video.src);
+  };
+  const audioRef = useRef();
+  const pauseVideoOnTime = (time) => {
+    setTimeout(() => {
       setVideoIframe(null);
       setIsPlayVideo(false);
-    },time*1000)
-  }
-  const pauseAudioOnTime = (time)=>{
-    if(!audioRef.current) return;
-    setTimeout(()=>{
-      audioRef.current.pause()
+    }, time * 1000);
+  };
+  const pauseAudioOnTime = (time) => {
+    if (!audioRef.current) return;
+    setTimeout(() => {
+      audioRef.current.pause();
       setSoundAudio(null);
-    },time*1000)
+    }, time * 1000);
+  };
+  const toNextScene = (scene) => {
+    setTimeout(() => {
+      setGameScene(scene);
+    }, 500);
+  };
+
+  const messBoxRef = useRef();
+  const [messBox,setMessBox] = useState();
+  
+  const waitForClick = () => {
+    return new Promise((resolve) => {
+      const handleClick = () => {
+        // Xóa sự kiện click sau khi xử lý một lần
+        messBoxRef.current.removeEventListener("click", handleClick);
+        resolve(); // Kết thúc Promise khi click xảy ra
+      };
+      // Thêm sự kiện click vào ref
+      messBoxRef.current.addEventListener("click", handleClick);
+    });
+  };
+
+  const showMessBox = async(mess)=>{
+    messBoxRef.current.style.display = '';
+    const messParts = mess.split('/')
+    let i;
+    for(i=0;i<messParts.length;i++){
+      setMessBox(messParts[i])
+      await waitForClick();
+    }
+    messBoxRef.current.style.display = 'none';
+    scenesInfo[gameScene].ref.current.style.display = '';
   }
+
   useEffect(()=>{
-    if(!gameScene || !sceneRefs[gameScene].current) return;
-    Object.values(sceneRefs).forEach((ref)=>{
-      if(!ref.current) return;
-      ref.current.style.display = 'none'
+    if(!gameScene || !scenesInfo[gameScene].ref.current) return;
+    Object.values(scenesInfo).forEach((ref)=>{
+      if(!ref.ref.current) return;
+      ref.ref.current.style.display = 'none'
     })
-    sceneRefs[gameScene].current.style.display = '';
+    const changeScene = async()=>{
+      if(gameScene == 'scene1'){
+        await showMessBox('Tối nay hơi lạnh, tôi muốn đi bộ 1 chút cho ấm hơn.../Bây giờ đã hơn 1h sáng, tôi có nên ra ngoài không ?');
+      }
+      if(gameScene == 'scene3'){
+        await showMessBox('Có tiếng gì đó.../Nghe như kiểu tiếng game phi phai.../Ai lại chơi phi phai lúc 1h sáng thế này nhỉ ?/Tôi có nên quay lại xem không ?')
+      }
+      if(gameScene == 'scene5'){
+        await showMessBox('Đã chạy được khoảng 30 phút.../Có vẻ thứ đó vẫn chạy theo.../Tôi cảm thấy rất mệt và không thể chạy được nữa.../Tôi nên đi bộ hay là chạy tiếp ?')
+      }
+      if(gameScene == 'scene4'){
+        await showMessBox('Ước gì được lựa chọn lại, tôi sẽ chọn ở nhà và chơi phi phai.../Bạn đã die !')
+        playVideo('video5');
+        setNextScene('sceneEnd')
+      }
+      if(gameScene == 'scene6'){
+        await showMessBox('Ước gì được lựa chọn lại, tôi sẽ chọn ở nhà và chơi phi phai.../Bạn đã die vì chạy quá chậm !')
+        playVideo('video5');
+        setNextScene('sceneEnd')
+      }
+      if(gameScene == 'scene7'){
+        await showMessBox('Ước gì được lựa chọn lại, tôi sẽ chọn ở nhà và chơi phi phai.../Bạn đã die vì đi bộ !')
+        playVideo('video5');
+        setNextScene('sceneEnd')
+      }
+      if(gameScene == 'sceneEnd'){
+        await showMessBox('Trò chơi đã kết thúc')
+      }
+      else{
+        scenesInfo[gameScene].ref.current.style.display = '';
+        messBoxRef.current.style.display = 'none';
+      }
+    }
+  changeScene();
   },[gameScene])
-  return(
-    <div className='page' style={{border:'2px solid #000000',height:'100vh',width:'calc(100vw - 60px)'}} >
-      <div style={{height:'100%',width:'100%'}}>
-        <img src={sceneImgs[gameScene].src}
-             style={{display:isPlayVideo ?'none':'' ,height:'100%',width:'100%',backgroundSize:'cover',backgroundPosition:'center',backgroundRepeat:'no-repeat',zIndex:'-1'}}
+  const [nextScene,setNextScene] = useState();
+  return (
+    <div
+      className="page"
+      style={{
+        border: "2px solid #000000",
+        height: "calc(100vh - 40px)",
+        width: "calc(100vw - 60px)",
+      }}
+    >
+      <div style={{ height: "100%", width: "100%" }}>
+        <img
+          src={scenesInfo[gameScene].img}
+          style={{
+            display: isPlayVideo ? "none" : "",
+            height: "100%",
+            width: "100%",
+            objectFit: "contain",
+
+            backgroundRepeat: "no-repeat",
+            zIndex: "-1",
+          }}
         ></img>
-        <video src={videoIframe}
-          style={{display:!isPlayVideo ?'none':'' ,height:'100%',width:'100%',zIndex:'2',
-                  objectFit:'cover'
-                 }}
-          crossOrigin='true'
+        <video
+          src={videoIframe}
+          style={{
+            display: !isPlayVideo ? "none" : "",
+            height: "100%",
+            width: "100%",
+            zIndex: "2",
+            objectFit: "contain",
+          }}
+          crossOrigin="true"
           playsInline
           autoPlay
-          onPlay={()=>{
-            pauseVideoOnTime(3);
+          onPlay={() => {
+            setIsPlayVideo(true);
           }}
-          onEnded={()=>{
+          onEnded={() => {
             setVideoIframe(null);
             setIsPlayVideo(false);
+            setGameScene(nextScene);
           }}
-          >
-        </video>
-        <audio src={soundAudio} preload='auto' autoPlay
-          onEnded={()=>{
+        ></video>
+        <audio
+          src={soundAudio}
+          preload="auto"
+          autoPlay
+          onEnded={() => {
             setSoundAudio(null);
           }}
-          onPlay={()=>{
+          onPlay={() => {
             pauseAudioOnTime(3);
           }}
           ref={audioRef}
-          ></audio>
-        <div style={{zIndex:'1'}}>
-          <div ref={sceneRefs.scene1}>
-            <button style={{display:isPlayVideo ?'none':'' ,position:'absolute',bottom:'50px',right:'100px'}}
-              onClick={()=>{
-                setGameScene('scene2')
-                playVideo('video1');
-              }}>Sang cảnh 2</button>
-            <button style={{display:isPlayVideo ?'none':'' ,position:'absolute',bottom:'50px',left:'100px'}}
-              onClick={()=>{
-                playSound('sound1')
-              }}>
-            Mèo kêu</button>
+        ></audio>
+        <div style={{ zIndex: "1"}}>
+          <p ref={messBoxRef} className='mess-box'>{messBox}</p>
+          
+          <div ref={scenesInfo.sceneEnd.ref}>
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                left: "50%",
+                transform:'translate(-50%,0)'
+              }}
+              onClick={async () => {
+                toNextScene("scene1");
+              }}
+            >
+              Click để bắt đầu lại
+            </button>
+          </div>
+          <div ref={scenesInfo.scene1.ref}  >
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                left: "30px",
+                
+              }}
+              onClick={async () => {
+                playVideo("video1");
+                setNextScene("scene2");
+              }}
+            >
+              Đi luôn
+            </button>
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                right: "30px",
+              }}
+              onClick={async () => {
+                playVideo("video5");
+                setNextScene("sceneEnd");
+              }}
+            >
+              Đéo, chơi phi phai
+            </button>
           </div>
 
-          <div ref={sceneRefs.scene2}>
-            <button style={{display:isPlayVideo ?'none':'' ,position:'absolute',bottom:'50px',right:'100px'}}
-              onClick={()=>{
-                setGameScene('scene3')
-              }}>Sang cảnh 3</button>
+          <div ref={scenesInfo.scene2.ref}  >
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                right: "45%",
+              }}
+              onClick={() => {
+                playVideo("video3");
+                setNextScene("scene3");
+              }}
+            >
+              Bật đèn pin
+            </button>
           </div>
 
-
-          <div ref={sceneRefs.scene3}>
-
+          <div ref={scenesInfo.scene3.ref}  >
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                left: "30px",
+              }}
+              onClick={() => {
+                playVideo('video4')
+                setNextScene("scene4");
+                playSound('soundDie',5)
+              }}
+            >
+              Quay lại xem sao
+            </button>
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                right: "30px",
+              }}
+              onClick={() => {
+                playVideo('video6')
+                setNextScene("scene5");
+              }}
+            >
+              Đéo ổn, chạy luôn đéo xem
+            </button>
+          </div>
+          <div ref={scenesInfo.scene4.ref}  >
+          </div>
+          <div ref={scenesInfo.scene5.ref}  >
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                left: "30px",
+              }}
+              onClick={() => {
+                playVideo('video8')
+                setNextScene("scene7");
+                playSound('soundDie',2)
+              }}
+            >
+              Đi bộ, đéo sợ
+            </button>
+            <button
+              style={{
+                display: isPlayVideo ? "none" : "",
+                position: "absolute",
+                top: "90%",
+                right: "30px",
+              }}
+              onClick={() => {
+                playVideo('video7')
+                setNextScene("scene6");
+                playSound('soundDie',6.5)
+              }}
+            >
+              Cố hết sức chạy tiếp
+            </button>
+          </div>
+          <div ref={scenesInfo.scene6.ref}>
+          </div>
+          <div ref={scenesInfo.scene7.ref}>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
