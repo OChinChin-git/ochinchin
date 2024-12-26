@@ -6,7 +6,18 @@ export default function game() {
   const [isPlayVideo, setIsPlayVideo] = useState(false);
   const scenesInfo = {
     sceneEnd:{
-      img:'https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/5100deec-5b1e-4bc3-bdc0-531cff3e67bd.image.png?v=1735227880727',
+      img:['https://cdn.glitch.global/01588a49-89cd-4ce8-a7dc-9cf5db61ffd3/5100deec-5b1e-4bc3-bdc0-531cff3e67bd.image.png?v=1735227880727',
+           'https://game8.vn/media/202405/images/k1.jpg',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-182-750x1333.webp',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-238-750x1381.webp',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-131-750x1133.webp',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-147-750x1045.webp',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-207-750x1364.webp',
+           'https://anhgaimup.com/wp-content/uploads/2024/02/anh-cosplay-sexy-tren-website-anh-gai-mup-049-750x1000.webp',
+           'https://sexymiu.com/wp-content/uploads/2021/07/Cosplay-h%E1%BA%A7u-g%C3%A1i-b%C3%A8o-nh%C3%BAn-si%C3%AAu-xinh-26.jpg',
+           'https://toquoc.mediacdn.vn/280518851207290880/2021/7/24/to2-16271144831061845151596-1627116904273-1627116904515486879758.jpg',
+           'https://gamek.mediacdn.vn/133514250583805952/2024/7/3/photo-1719992720380-17199927206592081096552.png',
+           ],
       ref:useRef()
     },
     scene1: {
@@ -180,6 +191,13 @@ export default function game() {
   changeScene();
   },[gameScene])
   const [nextScene,setNextScene] = useState();
+  const getImgSrc = ()=>{
+            if(gameScene == 'sceneEnd'){
+              return scenesInfo[gameScene].img[Math.floor(Math.random()*scenesInfo[gameScene].img.length)]
+            }else{
+              return scenesInfo[gameScene].img
+            }
+          }
   return (
     <div
       className="page"
@@ -191,7 +209,7 @@ export default function game() {
     >
       <div style={{ height: "100%", width: "100%" }}>
         <img
-          src={scenesInfo[gameScene].img}
+          src={getImgSrc()}
           style={{
             display: isPlayVideo ? "none" : "",
             height: "100%",
